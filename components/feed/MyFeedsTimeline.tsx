@@ -991,7 +991,10 @@ function VideoPlayer({
               autoplay
               prefer-playback={preferredHlsPlayback()}
               preload={isInViewport ? 'auto' : 'metadata'}
-              max-resolution="720p"
+              // Cap the ABR ladder so a feed full of players does not pull 4K.
+              // 1080p rather than 720p: the card renders up to 650px tall, and
+              // portrait video is bound by height, so 720p was visibly soft.
+              max-resolution="1080p"
               muted={isMuted}
               loop
               playsinline

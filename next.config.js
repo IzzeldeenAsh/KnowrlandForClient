@@ -23,7 +23,9 @@ const nextConfig = {
   async headers() {
     return [
       {
-        source: "/((?!_next/static/|images/|assets/).*)", // documents and dynamic responses
+        // social-image/ is excluded so generated share thumbnails stay cacheable
+        // for crawlers instead of inheriting the no-store document policy.
+        source: "/((?!_next/static/|images/|assets/|social-image/).*)", // documents and dynamic responses
         headers: [
           {
             key: "Cache-Control",

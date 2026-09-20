@@ -1,9 +1,9 @@
 'use client'
 
 import { Modal } from '@mantine/core'
-import { IconCheck, IconShare3 } from '@tabler/icons-react'
-import { useEffect, useState } from 'react'
-import FeedShare from './FeedShare'
+import { IconCheck } from '@tabler/icons-react'
+import { useEffect } from 'react'
+import ShareSocialActions from './ShareSocialActions'
 
 export type PublishedPostSummary = {
   uuid: string
@@ -66,11 +66,9 @@ export default function PublishSuccessModal({
 }: PublishSuccessModalProps) {
   const isRTL = locale === 'ar'
   const isWhitePaper = publication?.kind === 'white-paper'
-  const [shareOpened, setShareOpened] = useState(false)
 
   useEffect(() => {
     if (publication) {
-      setShareOpened(false)
       playPublishChime()
     }
   }, [publication])
@@ -86,81 +84,64 @@ export default function PublishSuccessModal({
         eyebrow: 'تم النشر',
         title: isWhitePaper ? 'تم نشر ورقتك البيضاء بنجاح!' : 'تم نشر منشورك بنجاح!',
         body: 'أصبحت مشاركتك متاحة الآن. شاركها مع شبكتك لتصل إلى الأشخاص المناسبين.',
-        share: isWhitePaper ? 'مشاركة الورقة البيضاء' : 'مشاركة المنشور',
         close: 'إغلاق رسالة نجاح النشر',
       }
     : {
         eyebrow: 'Published',
         title: isWhitePaper ? 'Your White Paper is live!' : 'Your post is live!',
         body: 'Your insight is now available. Share it with your network to help it reach the right people.',
-        share: isWhitePaper ? 'Share White Paper' : 'Share your post',
         close: 'Close publishing success message',
       }
 
   return (
-    <>
-      <Modal
-        opened={!shareOpened}
-        onClose={onClose}
-        centered
-        size={460}
-        radius={18}
-        padding={0}
-        title={null}
-        aria-label={copy.close}
-        overlayProps={{ backgroundOpacity: 0.58, blur: 4 }}
-        classNames={{
-          content: 'overflow-visible bg-transparent shadow-none',
-          body: 'p-0',
-          close: 'right-4 top-4 z-10 rounded-full bg-white/80 text-[#60708A] hover:bg-white',
-        }}
-        dir={isRTL ? 'rtl' : 'ltr'}
-      >
-        <div className="relative overflow-hidden rounded-[18px] border border-white/80 bg-white px-6 pb-6 pt-8 text-center shadow-[0_24px_80px_rgba(22,46,82,0.24)] sm:px-8">
-          <div className="relative mx-auto mb-5 flex h-[76px] w-[76px] items-center justify-center rounded-full bg-[#EAF4FF] ring-8 ring-[#F5F9FF]">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#2378E8] text-white motion-safe:animate-[publish-success-pop_.45s_cubic-bezier(.2,.9,.3,1.2)]">
-              <IconCheck aria-hidden className="h-8 w-8" stroke={2.4} />
-            </div>
-          </div>
-
-          <p className="relative mb-2 text-[11px] font-bold uppercase tracking-[0.2em] text-[#2378E8]">{copy.eyebrow}</p>
-          <h2 className="relative text-[24px] font-bold leading-tight text-[#101724]">{copy.title}</h2>
-          <p className="relative mx-auto mt-3 max-w-[350px] text-[14px] leading-6 text-[#66758D]">{copy.body}</p>
-
-          <div className="relative mt-7">
-            <button
-              type="button"
-              onClick={() => setShareOpened(true)}
-              className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#2378E8] px-5 text-[14px] font-semibold text-white transition-colors hover:bg-[#1768CE] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2"
-            >
-              <IconShare3 aria-hidden className="h-[18px] w-[18px]" stroke={1.8} />
-              {copy.share}
-            </button>
+    <Modal
+      opened
+      onClose={onClose}
+      centered
+      size={460}
+      radius={18}
+      padding={0}
+      title={null}
+      aria-label={copy.close}
+      overlayProps={{ backgroundOpacity: 0.58, blur: 4 }}
+      classNames={{
+        content: 'overflow-visible bg-transparent shadow-none',
+        body: 'p-0',
+        close: 'right-4 top-4 z-10 rounded-full bg-white/80 text-[#60708A] hover:bg-white',
+      }}
+      dir={isRTL ? 'rtl' : 'ltr'}
+    >
+      <div className="relative overflow-hidden rounded-[18px] border border-white/80 bg-white px-6 pb-6 pt-8 text-center shadow-[0_24px_80px_rgba(22,46,82,0.24)] sm:px-8">
+        <div className="relative mx-auto mb-5 flex h-[76px] w-[76px] items-center justify-center rounded-full bg-[#EAF4FF] ring-8 ring-[#F5F9FF]">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#2378E8] text-white motion-safe:animate-[publish-success-pop_.45s_cubic-bezier(.2,.9,.3,1.2)]">
+            <IconCheck aria-hidden className="h-8 w-8" stroke={2.4} />
           </div>
         </div>
 
-        <style jsx global>{`
-          @keyframes publish-success-pop {
-            0% { opacity: 0; transform: scale(.55) rotate(-10deg); }
-            100% { opacity: 1; transform: scale(1) rotate(0); }
-          }
-        `}</style>
-      </Modal>
+        <p className="relative mb-2 text-[11px] font-bold uppercase tracking-[0.2em] text-[#2378E8]">{copy.eyebrow}</p>
+        <h2 className="relative text-[24px] font-bold leading-tight text-[#101724]">{copy.title}</h2>
+        <p className="relative mx-auto mt-3 max-w-[350px] text-[14px] leading-6 text-[#66758D]">{copy.body}</p>
 
-      <FeedShare
-        shareUrl={shareUrl}
-        shareTitle={publication.title}
-        authorName={publication.authorName}
-        authorPhotoUrl={publication.authorPhotoUrl}
-        locale={locale}
-        shareKind={publication.kind}
-        hideTrigger
-        modalOpened={shareOpened}
-        onModalOpenedChange={(opened) => {
-          setShareOpened(opened)
-          if (!opened) onClose()
-        }}
-      />
-    </>
+        {/* Personal message + social share, in place of the former share button. */}
+        <div className="relative mt-7 [&>*:last-child]:mb-0">
+          <ShareSocialActions
+            key={publication.uuid}
+            shareUrl={shareUrl}
+            shareTitle={publication.title}
+            authorName={publication.authorName}
+            locale={locale}
+            shareKind={publication.kind}
+            active
+          />
+        </div>
+      </div>
+
+      <style jsx global>{`
+        @keyframes publish-success-pop {
+          0% { opacity: 0; transform: scale(.55) rotate(-10deg); }
+          100% { opacity: 1; transform: scale(1) rotate(0); }
+        }
+      `}</style>
+    </Modal>
   )
 }

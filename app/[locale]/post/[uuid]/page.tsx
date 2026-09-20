@@ -1,89 +1,25 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { cache } from 'react'
-import { getApiUrl, publicBaseUrl } from '@/app/config'
+import { publicBaseUrl } from '@/app/config'
 import FeedMobileSearch from '@/components/feed/FeedMobileSearch'
 import FeedSidebar from '@/components/feed/FeedSidebar'
-import MatchedRelatedDocumentsCard from '@/components/feed/MatchedRelatedDocumentsCard'
 import { FeedCard } from '@/components/feed/MyFeedsTimeline'
+import MatchedRelatedDocumentsCard from '@/components/feed/MatchedRelatedDocumentsCard'
 import RoleUpgradeCard from '@/components/feed/RoleUpgradeCard'
-import type { FeedItem } from '@/services/feed.service'
+import {
+  SOCIAL_THUMBNAIL_SIZE,
+  buildSocialDescription,
+  buildSocialThumbnailUrl,
+  buildSocialTitle,
+  loadFeedContent,
+} from '@/lib/feed-social'
 
 type PostPageProps = {
   params: Promise<{ locale: string; uuid: string }>
 }
 
-// Deduplicate the fetch between generateMetadata and the page render.
-const loadPost = cache(async (slug: string, locale: string): Promise<FeedItem | null> => {
-  try {
-    const response = await fetch(
-      getApiUrl(`/api/platform/community/feed/posts/${encodeURIComponent(slug)}`),
-      {
-        headers: {
-          Accept: 'application/json',
-          'Accept-language': locale,
-        },
-        next: { revalidate: 300 },
-      },
-    )
-
-    if (!response.ok) return null
-
-    const payload = await response.json()
-    return payload.data ?? null
-  } catch {
-    return null
-  }
-})
-
-const defaultSocialImage =
-  'https://res.cloudinary.com/dsiku9ipv/image/upload/v1761651021/drilldown_l7cdf2.jpg'
-
-function stripHtml(html: string): string {
-  return html
-    .replace(/<[^>]*>/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-}
-
-function buildDescription(post: FeedItem): string {
-  const source = stripHtml(post.body ?? post.excerpt ?? '')
-  if (source) return source.slice(0, 160)
-  return post.insighter
-    ? `A post shared by ${post.insighter.name} on Insighta.`
-    : 'A post shared on Insighta.'
-}
-
-function buildTitle(post: FeedItem, authorName: string, isArabic: boolean): string {
-  const explicitTitle = post.title?.trim()
-  if (explicitTitle) return explicitTitle
-
-  const bodyTitle = stripHtml(post.body ?? post.excerpt ?? '').slice(0, 90).trim()
-  if (bodyTitle) return bodyTitle
-
-  return isArabic ? `منشور بواسطة ${authorName}` : `A post by ${authorName}`
-}
-
-function getSocialImage(post: FeedItem): {
-  url: string
-  width?: number
-  height?: number
-} {
-  const image = post.media.find((media) => media.media_type === 'image' && media.url)
-  if (image?.url) {
-    return {
-      url: image.url,
-      ...(image.width ? { width: image.width } : {}),
-      ...(image.height ? { height: image.height } : {}),
-    }
-  }
-
-  const thumbnail = post.media.find((media) => media.thumbnail_url)?.thumbnail_url
-    ?? post.media.find((media) => media.media_type === 'thumbnail' && media.url)?.url
-
-  return thumbnail ? { url: thumbnail } : { url: defaultSocialImage, width: 1200, height: 630 }
-}
+const loadPost = (slug: string, locale: string) => loadFeedContent('post', slug, locale)
 
 export async function generateMetadata({ params }: PostPageProps): Promise<Metadata> {
   const { locale, uuid } = await params
@@ -98,11 +34,11 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
   }
 
   const authorName = post.insighter?.name ?? 'Insighta'
-  const title = buildTitle(post, authorName, isArabic)
-  const description = buildDescription(post)
+  const title = buildSocialTitle(post, authorName, isArabic)
+  const description = buildSocialDescription(post, isArabic)
   const identifier = post.slug ?? post.uuid
   const url = `${publicBaseUrl}/${locale}/post/${identifier}`
-  const socialImage = getSocialImage(post)
+  const socialImage = buildSocialThumbnailUrl('post', identifier)
 
   return {
     metadataBase: new URL(publicBaseUrl),
@@ -130,16 +66,26 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
       siteName: 'Insighta',
       title,
       description,
-      images: [{ ...socialImage, alt: title }],
+      images: [
+        {
+          url: socialImage,
+          width: SOCIAL_THUMBNAIL_SIZE,
+          height: SOCIAL_THUMBNAIL_SIZE,
+          type: 'image/jpeg',
+          alt: title,
+        },
+      ],
       authors: [authorName],
       ...(post.published_at ? { publishedTime: post.published_at } : {}),
     },
     twitter: {
-      card: 'summary_large_image',
+      // `summary` keeps the square thumbnail small next to the text instead of
+      // stretching a feed image across the whole card.
+      card: 'summary',
       site: '@INSIGHTA',
       title,
       description,
-      images: [socialImage.url],
+      images: [socialImage],
     },
   }
 }

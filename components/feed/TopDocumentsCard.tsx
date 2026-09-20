@@ -15,7 +15,7 @@ export default function TopDocumentsCard({ locale, className }: TopDocumentsCard
   const { data, isLoading, error } = usePopularKnowledge()
   const copy = isRTL
     ? {
-        title: 'أفضل المستندات',
+        title: 'أفضل الرؤى',
         unavailable: 'المستندات غير متاحة حالياً.',
         empty: 'لا توجد مستندات منشورة حالياً.',
         openInNewTab: 'فتح في علامة تبويب جديدة',
@@ -23,7 +23,7 @@ export default function TopDocumentsCard({ locale, className }: TopDocumentsCard
         viewAllDescription: 'البحث المتقدم عن المستندات',
       }
     : {
-        title: 'Top documents',
+        title: 'Top Insights',
         unavailable: 'Documents are unavailable right now.',
         empty: 'No documents have been published yet.',
         openInNewTab: 'Open in a new tab',

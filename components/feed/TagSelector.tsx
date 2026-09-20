@@ -1,8 +1,7 @@
 'use client'
 
 import { IconChevronDown, IconLoader2, IconX } from '@tabler/icons-react'
-import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { createPortal } from 'react-dom'
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { useToast } from '@/components/toast/ToastContext'
 import {
   createSuggestTag,
@@ -42,13 +41,6 @@ const copyByLocale = {
 
 const MAX_COMMON_TAG_SUGGESTIONS = 10
 
-type DropdownPosition = {
-  left: number
-  width: number
-  top?: number
-  bottom?: number
-}
-
 export default function TagSelector({
   locale,
   industryId,
@@ -60,7 +52,7 @@ export default function TagSelector({
   const toast = useToast()
   const listboxId = useId()
   const rootRef = useRef<HTMLDivElement>(null)
-  const dropdownRef = useRef<HTMLDivElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const [query, setQuery] = useState('')
   const [commonTags, setCommonTags] = useState<FeedTag[]>([])
@@ -68,7 +60,6 @@ export default function TagSelector({
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [isAdding, setIsAdding] = useState(false)
-  const [dropdownPosition, setDropdownPosition] = useState<DropdownPosition | null>(null)
 
   useEffect(() => {
     let active = true
@@ -119,7 +110,7 @@ export default function TagSelector({
   useEffect(() => {
     const closeOnOutsideClick = (event: PointerEvent) => {
       const target = event.target as Node
-      if (!rootRef.current?.contains(target) && !dropdownRef.current?.contains(target)) {
+      if (!rootRef.current?.contains(target)) {
         setIsOpen(false)
       }
     }
@@ -127,38 +118,16 @@ export default function TagSelector({
     return () => document.removeEventListener('pointerdown', closeOnOutsideClick)
   }, [])
 
-  // The composer sits inside a modal, whose ancestors may constrain overflow.
-  // Render the listbox in a portal and pin it to the viewport so its options
-  // remain visible regardless of the surrounding layout.
-  const updateDropdownPosition = useCallback(() => {
-    const rect = rootRef.current?.getBoundingClientRect()
-    if (!rect) return
-
-    const viewportGutter = 8
-    const availableBelow = window.innerHeight - rect.bottom
-    const availableAbove = rect.top
-    const shouldOpenAbove = availableBelow < 260 && availableAbove > availableBelow
-    const width = Math.min(rect.width, window.innerWidth - viewportGutter * 2)
-    const left = Math.max(viewportGutter, Math.min(rect.left, window.innerWidth - width - viewportGutter))
-
-    setDropdownPosition(
-      shouldOpenAbove
-        ? { left, width, bottom: window.innerHeight - rect.top + 6 }
-        : { left, width, top: rect.bottom + 6 },
-    )
-  }, [])
-
-  useLayoutEffect(() => {
+  // The panel stays in the document flow so it can never cover the dialog's
+  // action buttons; bring it into view instead when the field sits near the
+  // bottom of a scrollable dialog.
+  useEffect(() => {
     if (!isOpen || disabled) return
-
-    updateDropdownPosition()
-    window.addEventListener('resize', updateDropdownPosition)
-    window.addEventListener('scroll', updateDropdownPosition, true)
-    return () => {
-      window.removeEventListener('resize', updateDropdownPosition)
-      window.removeEventListener('scroll', updateDropdownPosition, true)
-    }
-  }, [disabled, isOpen, updateDropdownPosition])
+    const frame = window.requestAnimationFrame(() => {
+      panelRef.current?.scrollIntoView({ block: 'nearest' })
+    })
+    return () => window.cancelAnimationFrame(frame)
+  }, [disabled, isOpen])
 
   const selectedIds = useMemo(() => new Set(selectedTags.map((tag) => tag.id)), [selectedTags])
   const visibleTags = (query.trim() ? searchResults : commonTags)
@@ -279,13 +248,12 @@ export default function TagSelector({
         <IconChevronDown aria-hidden className={`h-4 w-4 shrink-0 text-[#7C899A] transition-transform ${isOpen ? 'rotate-180' : ''}`} stroke={1.8} />
       </div>
 
-      {isOpen && !disabled && dropdownPosition && createPortal(
+      {isOpen && !disabled && (
         <div
-          ref={dropdownRef}
+          ref={panelRef}
           id={listboxId}
           role="listbox"
-          className="fixed z-[310] overflow-hidden rounded-lg border border-[#DCE3EB] bg-white shadow-[0_12px_28px_rgba(24,39,58,0.14)]"
-          style={dropdownPosition}
+          className="mt-1.5 w-full min-w-0 max-w-full overflow-hidden rounded-lg border border-[#DCE3EB] bg-white"
         >
           <div className="border-b border-[#EDF0F3] px-3 py-2 text-[11px] font-medium text-[#7C899A]">
             {query.trim() ? copy.results : copy.choose}
@@ -313,8 +281,7 @@ export default function TagSelector({
               </div>
             )}
           </div>
-        </div>,
-        document.body,
+        </div>
       )}
     </div>
   )

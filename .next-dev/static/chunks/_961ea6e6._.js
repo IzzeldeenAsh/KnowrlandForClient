@@ -27,6 +27,8 @@ __turbopack_context__.s([
     ()=>getCommunityFeedPost,
     "getCommunityFeedPreview",
     ()=>getCommunityFeedPreview,
+    "getCompanyProfileFeed",
+    ()=>getCompanyProfileFeed,
     "getFeedDraft",
     ()=>getFeedDraft,
     "getFeedItem",
@@ -315,6 +317,31 @@ async function getInsighterProfileFeed(uuid, locale, cursor, signal) {
         }
     };
 }
+async function getCompanyProfileFeed(uuid, locale, cursor, signal) {
+    var _body_meta, _body_meta1, _body_meta2;
+    const params = new URLSearchParams({
+        limit: '10'
+    });
+    if (cursor) params.set('cursor', cursor);
+    const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getApiUrl"])("/api/platform/company/profile/".concat(encodeURIComponent(uuid), "/feed?").concat(params.toString())), {
+        headers: authHeaders(locale),
+        cache: 'no-store',
+        signal
+    });
+    if (!response.ok) {
+        await parseErrorMessage(response, 'Unable to load this company’s posts.');
+    }
+    const body = await response.json();
+    var _body_data, _body_meta_next_cursor, _body_meta_per_page;
+    return {
+        data: (_body_data = body.data) !== null && _body_data !== void 0 ? _body_data : [],
+        meta: {
+            has_more: Boolean((_body_meta = body.meta) === null || _body_meta === void 0 ? void 0 : _body_meta.next_cursor),
+            next_cursor: (_body_meta_next_cursor = (_body_meta1 = body.meta) === null || _body_meta1 === void 0 ? void 0 : _body_meta1.next_cursor) !== null && _body_meta_next_cursor !== void 0 ? _body_meta_next_cursor : null,
+            limit: (_body_meta_per_page = (_body_meta2 = body.meta) === null || _body_meta2 === void 0 ? void 0 : _body_meta2.per_page) !== null && _body_meta_per_page !== void 0 ? _body_meta_per_page : 10
+        }
+    };
+}
 async function getSavedCommunityFeed(locale, cursor, signal) {
     var _body_meta, _body_meta1;
     const params = new URLSearchParams({
@@ -492,7 +519,7 @@ async function saveImageTextPost(payload, status, locale, uuid) {
     }
     const formData = new FormData();
     formData.append('body', payload.body);
-    formData.append('industry_id', String(payload.industryId));
+    if (payload.industryId !== null) formData.append('industry_id', String(payload.industryId));
     formData.append('status', status);
     if (status === 'published' && payload.authorType) {
         formData.append('author_type', payload.authorType);
@@ -678,39 +705,47 @@ async function createSuggestTag(industryId, name, locale) {
     };
 }
 async function fetchPublishedLibraryKnowledge(page, locale) {
+    let isCompany = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : false, keyword = arguments.length > 3 && arguments[3] !== void 0 ? arguments[3] : '';
+    // Both list endpoints are already scoped to published items, paginated and
+    // ordered newest-first, and accept an optional `keyword` title filter.
     const params = new URLSearchParams({
-        page: String(page),
-        status: 'published'
+        page: String(page)
     });
-    const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getApiUrl"])("/api/insighter/library/knowledge?".concat(params)), {
+    const trimmedKeyword = keyword.trim();
+    if (trimmedKeyword) params.set('keyword', trimmedKeyword);
+    const path = isCompany ? "/api/company/library/knowledge/list?".concat(params) : "/api/insighter/library/knowledge/list?".concat(params);
+    const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getApiUrl"])(path), {
         headers: authHeaders(locale)
     });
     if (!response.ok) {
         await parseErrorMessage(response, 'Unable to load your library.');
     }
     const body = await response.json();
-    var _body_data, _body_meta;
+    var _body_data;
+    const data = ((_body_data = body.data) !== null && _body_data !== void 0 ? _body_data : []).map((item)=>({
+            id: item.id,
+            type: item.type,
+            title: item.title,
+            slug: item.slug,
+            status: item.status,
+            published_at: item.published_at,
+            description: item.description
+        }));
+    var _body_meta;
     return {
-        data: ((_body_data = body.data) !== null && _body_data !== void 0 ? _body_data : []).map((item)=>({
-                id: item.id,
-                type: item.type,
-                title: item.title,
-                slug: item.slug,
-                status: item.status,
-                published_at: item.published_at
-            })),
+        data,
         meta: (_body_meta = body.meta) !== null && _body_meta !== void 0 ? _body_meta : {
             current_page: page,
             last_page: page,
-            per_page: 10,
-            total: 0
+            per_page: data.length,
+            total: data.length
         }
     };
 }
 async function fetchLibraryKnowledgeById(id, locale) {
-    let maxPages = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : 5;
+    let maxPages = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : 5, isCompany = arguments.length > 3 && arguments[3] !== void 0 ? arguments[3] : false;
     for(let page = 1; page <= maxPages; page += 1){
-        const result = await fetchPublishedLibraryKnowledge(page, locale);
+        const result = await fetchPublishedLibraryKnowledge(page, locale, isCompany);
         const match = result.data.find((item)=>item.id === id);
         if (match) return match;
         if (page >= result.meta.last_page) break;
@@ -735,7 +770,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconBookmark$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconBookmark$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconBookmark.mjs [app-client] (ecmascript) <export default as IconBookmark>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconLoader2$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconLoader2$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconLoader2.mjs [app-client] (ecmascript) <export default as IconLoader2>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/config.ts [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/navigation.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$toast$2f$ToastContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/toast/ToastContext.tsx [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$header$2f$hooks$2f$useUserProfile$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/ui/header/hooks/useUserProfile.ts [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$feed$2e$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/services/feed.service.ts [app-client] (ecmascript)");
@@ -777,6 +812,7 @@ function FeedSaveButton(param) {
     _s();
     const copy = copyByLocale[locale === 'ar' ? 'ar' : 'en'];
     const toast = (0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$toast$2f$ToastContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useToast"])();
+    const router = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"])();
     const { user, isAuthResolved } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$header$2f$hooks$2f$useUserProfile$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useUserProfile"])();
     const [isSaved, setIsSaved] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(initialIsSaved === true);
     const [isUpdating, setIsUpdating] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
@@ -835,7 +871,7 @@ function FeedSaveButton(param) {
         if (isUpdating) return;
         if (!user) {
             const returnUrl = encodeURIComponent(window.location.href);
-            window.location.assign("".concat(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["dashboardUrl"], "/auth/login?returnUrl=").concat(returnUrl));
+            router.push("/".concat(locale, "/signin?returnUrl=").concat(returnUrl));
             return;
         }
         const nextIsSaved = !isSaved;
@@ -879,7 +915,7 @@ function FeedSaveButton(param) {
                     stroke: 2
                 }, void 0, false, {
                     fileName: "[project]/components/feed/FeedSaveButton.tsx",
-                    lineNumber: 156,
+                    lineNumber: 157,
                     columnNumber: 11
                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconBookmark$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconBookmark$3e$__["IconBookmark"], {
                     "aria-hidden": true,
@@ -888,31 +924,32 @@ function FeedSaveButton(param) {
                     fill: isSaved ? 'currentColor' : 'none'
                 }, void 0, false, {
                     fileName: "[project]/components/feed/FeedSaveButton.tsx",
-                    lineNumber: 158,
+                    lineNumber: 159,
                     columnNumber: 11
                 }, this),
                 layout === 'action' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                     children: isSaved ? copy.savedAction : copy.saveAction
                 }, void 0, false, {
                     fileName: "[project]/components/feed/FeedSaveButton.tsx",
-                    lineNumber: 166,
+                    lineNumber: 167,
                     columnNumber: 11
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/components/feed/FeedSaveButton.tsx",
-            lineNumber: 147,
+            lineNumber: 148,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/components/feed/FeedSaveButton.tsx",
-        lineNumber: 146,
+        lineNumber: 147,
         columnNumber: 5
     }, this);
 }
-_s(FeedSaveButton, "b2iTE7LVj+uQW6fJDppZUA7vQ1Q=", false, function() {
+_s(FeedSaveButton, "qBw5quPx/iN4tfI2bkNXcdc71Hk=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$toast$2f$ToastContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useToast"],
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"],
         __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$header$2f$hooks$2f$useUserProfile$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useUserProfile"]
     ];
 });
@@ -941,24 +978,20 @@ var _s = __turbopack_context__.k.signature();
 ;
 ;
 const FeedShare = (param)=>{
-    let { shareUrl, shareTitle, authorName, authorPhotoUrl, locale, shareKind = 'post', triggerClassName, hideTriggerLabel = false } = param;
+    let { shareUrl, shareTitle, authorName, authorPhotoUrl, locale, shareKind = 'post', triggerClassName, triggerIconClassName, hideTriggerLabel = false, triggerLabel, hideTrigger = false, modalOpened, onModalOpenedChange } = param;
     _s();
     const isRTL = locale === 'ar';
     const isWhitePaper = shareKind === 'white-paper';
-    const [shareModalOpened, setShareModalOpened] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [internalModalOpened, setInternalModalOpened] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const shareModalOpened = modalOpened !== null && modalOpened !== void 0 ? modalOpened : internalModalOpened;
+    const setShareModalOpened = (opened)=>{
+        if (modalOpened === undefined) setInternalModalOpened(opened);
+        onModalOpenedChange === null || onModalOpenedChange === void 0 ? void 0 : onModalOpenedChange(opened);
+    };
     const [customShareMessage, setCustomShareMessage] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])('');
     const [linkCopied, setLinkCopied] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [facebookNotice, setFacebookNotice] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const shareTextareaRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
-    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
-        "FeedShare.useEffect": ()=>{
-            if (shareModalOpened) {
-                var _shareTextareaRef_current;
-                (_shareTextareaRef_current = shareTextareaRef.current) === null || _shareTextareaRef_current === void 0 ? void 0 : _shareTextareaRef_current.focus();
-            }
-        }
-    }["FeedShare.useEffect"], [
-        shareModalOpened
-    ]);
     const t = {
         share: isRTL ? 'مشاركة' : 'Share',
         sharePost: isWhitePaper ? isRTL ? 'مشاركة الورقة البيضاء' : 'Share White Paper' : isRTL ? 'مشاركة المنشور' : 'Share Post',
@@ -969,17 +1002,55 @@ const FeedShare = (param)=>{
         linkCopied: isRTL ? 'تم نسخ الرابط!' : 'Link Copied!',
         checkOutPost: isWhitePaper ? isRTL ? 'اطّلع على هذه الورقة البيضاء على انسايتا: ' : 'Check out this white paper on Insighta: ' : isRTL ? 'اطّلع على هذا المنشور على انسايتا: ' : 'Check out this post on Insighta: ',
         sharedBy: isWhitePaper ? isRTL ? 'ورقة بيضاء بواسطة' : 'White Paper by' : isRTL ? 'منشور بواسطة' : 'Post by',
-        close: isRTL ? 'إغلاق' : 'Close'
+        close: isRTL ? 'إغلاق' : 'Close',
+        facebookTextCopied: isRTL ? 'لا يسمح فيسبوك بتعبئة النص مسبقًا. نسخنا رسالتك — الصقها في مربع النشر على فيسبوك.' : 'Facebook does not allow pre-filled text. We copied your message — paste it into the Facebook composer.',
+        facebookTextManual: isRTL ? 'لا يسمح فيسبوك بتعبئة النص مسبقًا. انسخ رسالتك من الأعلى والصقها في مربع النشر على فيسبوك.' : 'Facebook does not allow pre-filled text. Copy your message above and paste it into the Facebook composer.'
     };
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "FeedShare.useEffect": ()=>{
+            if (shareModalOpened) {
+                var _shareTextareaRef_current;
+                setCustomShareMessage({
+                    "FeedShare.useEffect": (current)=>current || "".concat(t.checkOutPost).concat(shareTitle || authorName)
+                }["FeedShare.useEffect"]);
+                setFacebookNotice(null);
+                (_shareTextareaRef_current = shareTextareaRef.current) === null || _shareTextareaRef_current === void 0 ? void 0 : _shareTextareaRef_current.focus();
+            }
+        // The localized default is intentionally set only when the modal opens.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        }
+    }["FeedShare.useEffect"], [
+        shareModalOpened
+    ]);
     const authorInitials = authorName.split(' ').filter(Boolean).slice(0, 2).map((part)=>part[0]).join('').toUpperCase();
     const handleShare = ()=>{
         setCustomShareMessage("".concat(t.checkOutPost).concat(shareTitle || authorName));
+        setFacebookNotice(null);
         setShareModalOpened(true);
     };
-    const shareToSocial = (platform)=>{
+    const isMobileDevice = ()=>{
+        if (typeof navigator === 'undefined') return false;
+        // iPadOS reports a desktop UA, so fall back to the touch-point hint.
+        return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+    };
+    const copyToClipboard = async (text)=>{
+        try {
+            await navigator.clipboard.writeText(text);
+            return true;
+        } catch (e) {
+            return false;
+        }
+    };
+    const openShareWindow = (url)=>{
+        // The sized popup is a desktop affordance; on mobile it opens a cramped
+        // window that several in-app browsers refuse outright.
+        const features = isMobileDevice() ? 'noopener,noreferrer' : 'width=600,height=500,noopener,noreferrer';
+        const opened = window.open(url, '_blank', features);
+        if (!opened) window.location.href = url;
+    };
+    const shareToSocial = async (platform)=>{
         const url = encodeURIComponent(shareUrl);
         const message = encodeURIComponent(customShareMessage);
-        const title = encodeURIComponent(shareTitle || authorName);
         let socialUrl = '';
         switch(platform){
             case 'facebook':
@@ -989,16 +1060,47 @@ const FeedShare = (param)=>{
                 socialUrl = "https://twitter.com/intent/tweet?text=".concat(message, "&url=").concat(url);
                 break;
             case 'linkedin':
-                socialUrl = "https://www.linkedin.com/sharing/share-offsite/?url=".concat(url, "&title=").concat(title, "&summary=").concat(message);
+                // LinkedIn's share-offsite endpoint ignores `title` and `summary`, so
+                // the message entered in our modal never reaches its composer. The
+                // feed composer accepts the post text and shared URL explicitly.
+                socialUrl = "https://www.linkedin.com/feed/?shareActive=true&shareUrl=".concat(url, "&text=").concat(message);
                 break;
             case 'whatsapp':
                 socialUrl = "https://api.whatsapp.com/send?text=".concat(message, "%20").concat(url);
                 break;
         }
-        if (socialUrl) {
-            window.open(socialUrl, '_blank', 'width=600,height=400');
-            setShareModalOpened(false);
+        if (!socialUrl) return;
+        if (platform === 'facebook') {
+            // Two Facebook limitations are handled here:
+            //   1. The mobile Facebook app captures facebook.com links as app links
+            //      but has no handler for sharer.php, so the app opens on its home
+            //      screen and the share is silently dropped. The native share sheet
+            //      hands the URL to the app's own composer instead.
+            //   2. Facebook removed pre-filled share text (the `quote` parameter) in
+            //      2017, so the personal message can only be offered for pasting.
+            const copied = await copyToClipboard(customShareMessage);
+            if (isMobileDevice() && typeof navigator.share === 'function') {
+                try {
+                    await navigator.share({
+                        title: shareTitle || authorName,
+                        text: customShareMessage,
+                        url: shareUrl
+                    });
+                    setShareModalOpened(false);
+                    return;
+                } catch (error) {
+                    var _this;
+                    // A cancelled sheet is not a failure; anything else falls through to
+                    // the web sharer below.
+                    if (((_this = error) === null || _this === void 0 ? void 0 : _this.name) === 'AbortError') return;
+                }
+            }
+            setFacebookNotice(copied ? 'copied' : 'manual');
+            openShareWindow(socialUrl);
+            return;
         }
+        openShareWindow(socialUrl);
+        setShareModalOpened(false);
     };
     const handleCopyLink = async ()=>{
         try {
@@ -1011,7 +1113,7 @@ const FeedShare = (param)=>{
     };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
         children: [
-            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+            !hideTrigger && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                 type: "button",
                 onClick: handleShare,
                 "aria-label": t.share,
@@ -1019,28 +1121,28 @@ const FeedShare = (param)=>{
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconShare3$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconShare3$3e$__["IconShare3"], {
                         "aria-hidden": true,
-                        className: "h-4 w-4 shrink-0 text-[#E0398A] sm:h-[18px] sm:w-[18px]",
+                        className: triggerIconClassName !== null && triggerIconClassName !== void 0 ? triggerIconClassName : 'h-4 w-4 shrink-0 text-[#E0398A] sm:h-[18px] sm:w-[18px]',
                         stroke: 1.8
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedShare.tsx",
-                        lineNumber: 128,
-                        columnNumber: 9
+                        lineNumber: 217,
+                        columnNumber: 11
                     }, ("TURBOPACK compile-time value", void 0)),
                     !hideTriggerLabel && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                        children: t.share
+                        children: triggerLabel !== null && triggerLabel !== void 0 ? triggerLabel : t.share
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedShare.tsx",
-                        lineNumber: 129,
-                        columnNumber: 31
+                        lineNumber: 222,
+                        columnNumber: 33
                     }, ("TURBOPACK compile-time value", void 0))
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/FeedShare.tsx",
-                lineNumber: 122,
-                columnNumber: 7
+                lineNumber: 211,
+                columnNumber: 9
             }, ("TURBOPACK compile-time value", void 0)),
             shareModalOpened && typeof document !== 'undefined' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2d$dom$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["createPortal"])(/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4",
+                className: "fixed inset-0 z-[1000] flex items-center justify-center bg-black/50 p-4",
                 onClick: ()=>setShareModalOpened(false),
                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "w-full max-w-md rounded-lg bg-white p-6 dark:bg-slate-800",
@@ -1055,7 +1157,7 @@ const FeedShare = (param)=>{
                                     children: t.sharePost
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/FeedShare.tsx",
-                                    lineNumber: 144,
+                                    lineNumber: 238,
                                     columnNumber: 15
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1066,13 +1168,13 @@ const FeedShare = (param)=>{
                                     children: "×"
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/FeedShare.tsx",
-                                    lineNumber: 145,
+                                    lineNumber: 239,
                                     columnNumber: 15
                                 }, ("TURBOPACK compile-time value", void 0))
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/feed/FeedShare.tsx",
-                            lineNumber: 143,
+                            lineNumber: 237,
                             columnNumber: 13
                         }, ("TURBOPACK compile-time value", void 0)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1088,19 +1190,19 @@ const FeedShare = (param)=>{
                                             className: "h-full w-full object-cover object-top"
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/FeedShare.tsx",
-                                            lineNumber: 160,
+                                            lineNumber: 254,
                                             columnNumber: 21
                                         }, ("TURBOPACK compile-time value", void 0)) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                             className: "flex h-full w-full items-center justify-center bg-blue-500 text-sm font-semibold text-white",
                                             children: authorInitials || 'I'
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/FeedShare.tsx",
-                                            lineNumber: 166,
+                                            lineNumber: 260,
                                             columnNumber: 21
                                         }, ("TURBOPACK compile-time value", void 0))
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedShare.tsx",
-                                        lineNumber: 158,
+                                        lineNumber: 252,
                                         columnNumber: 17
                                     }, ("TURBOPACK compile-time value", void 0)),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1111,7 +1213,7 @@ const FeedShare = (param)=>{
                                                 children: shareTitle || authorName
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/FeedShare.tsx",
-                                                lineNumber: 172,
+                                                lineNumber: 266,
                                                 columnNumber: 19
                                             }, ("TURBOPACK compile-time value", void 0)),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1123,24 +1225,24 @@ const FeedShare = (param)=>{
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/feed/FeedShare.tsx",
-                                                lineNumber: 175,
+                                                lineNumber: 269,
                                                 columnNumber: 19
                                             }, ("TURBOPACK compile-time value", void 0))
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/feed/FeedShare.tsx",
-                                        lineNumber: 171,
+                                        lineNumber: 265,
                                         columnNumber: 17
                                     }, ("TURBOPACK compile-time value", void 0))
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/FeedShare.tsx",
-                                lineNumber: 157,
+                                lineNumber: 251,
                                 columnNumber: 15
                             }, ("TURBOPACK compile-time value", void 0))
                         }, void 0, false, {
                             fileName: "[project]/components/feed/FeedShare.tsx",
-                            lineNumber: 156,
+                            lineNumber: 250,
                             columnNumber: 13
                         }, ("TURBOPACK compile-time value", void 0)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1151,7 +1253,7 @@ const FeedShare = (param)=>{
                                     children: t.customShareMessage
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/FeedShare.tsx",
-                                    lineNumber: 184,
+                                    lineNumber: 278,
                                     columnNumber: 15
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("textarea", {
@@ -1163,13 +1265,13 @@ const FeedShare = (param)=>{
                                     placeholder: t.shareMessageHint
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/FeedShare.tsx",
-                                    lineNumber: 187,
+                                    lineNumber: 281,
                                     columnNumber: 15
                                 }, ("TURBOPACK compile-time value", void 0))
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/feed/FeedShare.tsx",
-                            lineNumber: 183,
+                            lineNumber: 277,
                             columnNumber: 13
                         }, ("TURBOPACK compile-time value", void 0)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1183,12 +1285,12 @@ const FeedShare = (param)=>{
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/FeedShare.tsx",
-                                lineNumber: 198,
+                                lineNumber: 292,
                                 columnNumber: 15
                             }, ("TURBOPACK compile-time value", void 0))
                         }, void 0, false, {
                             fileName: "[project]/components/feed/FeedShare.tsx",
-                            lineNumber: 197,
+                            lineNumber: 291,
                             columnNumber: 13
                         }, ("TURBOPACK compile-time value", void 0)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1197,7 +1299,9 @@ const FeedShare = (param)=>{
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                     type: "button",
                                     className: "flex h-12 w-12 items-center justify-center rounded-full bg-[#2196F3] text-white transition-colors hover:bg-blue-700",
-                                    onClick: ()=>shareToSocial('facebook'),
+                                    onClick: ()=>{
+                                        void shareToSocial('facebook');
+                                    },
                                     title: "Share on Facebook",
                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
                                         width: "19",
@@ -1210,23 +1314,25 @@ const FeedShare = (param)=>{
                                             fill: "white"
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/FeedShare.tsx",
-                                            lineNumber: 212,
+                                            lineNumber: 306,
                                             columnNumber: 19
                                         }, ("TURBOPACK compile-time value", void 0))
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedShare.tsx",
-                                        lineNumber: 211,
+                                        lineNumber: 305,
                                         columnNumber: 17
                                     }, ("TURBOPACK compile-time value", void 0))
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/FeedShare.tsx",
-                                    lineNumber: 205,
+                                    lineNumber: 299,
                                     columnNumber: 15
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                     type: "button",
                                     className: "flex h-12 w-12 items-center justify-center rounded-full bg-black text-white transition-colors hover:bg-gray-800",
-                                    onClick: ()=>shareToSocial('twitter'),
+                                    onClick: ()=>{
+                                        void shareToSocial('twitter');
+                                    },
                                     title: "Share on X",
                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
                                         width: "19",
@@ -1239,23 +1345,25 @@ const FeedShare = (param)=>{
                                             fill: "white"
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/FeedShare.tsx",
-                                            lineNumber: 223,
+                                            lineNumber: 317,
                                             columnNumber: 19
                                         }, ("TURBOPACK compile-time value", void 0))
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedShare.tsx",
-                                        lineNumber: 222,
+                                        lineNumber: 316,
                                         columnNumber: 17
                                     }, ("TURBOPACK compile-time value", void 0))
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/FeedShare.tsx",
-                                    lineNumber: 216,
+                                    lineNumber: 310,
                                     columnNumber: 15
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                     type: "button",
                                     className: "flex h-12 w-12 items-center justify-center rounded-full bg-[#0077b5] text-white transition-colors hover:bg-blue-800",
-                                    onClick: ()=>shareToSocial('linkedin'),
+                                    onClick: ()=>{
+                                        void shareToSocial('linkedin');
+                                    },
                                     title: "Share on LinkedIn",
                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
                                         width: "19",
@@ -1271,12 +1379,12 @@ const FeedShare = (param)=>{
                                                     fill: "white"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/feed/FeedShare.tsx",
-                                                    lineNumber: 235,
+                                                    lineNumber: 329,
                                                     columnNumber: 21
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/FeedShare.tsx",
-                                                lineNumber: 234,
+                                                lineNumber: 328,
                                                 columnNumber: 19
                                             }, ("TURBOPACK compile-time value", void 0)),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("defs", {
@@ -1288,34 +1396,36 @@ const FeedShare = (param)=>{
                                                         fill: "white"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/FeedShare.tsx",
-                                                        lineNumber: 239,
+                                                        lineNumber: 333,
                                                         columnNumber: 23
                                                     }, ("TURBOPACK compile-time value", void 0))
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/feed/FeedShare.tsx",
-                                                    lineNumber: 238,
+                                                    lineNumber: 332,
                                                     columnNumber: 21
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/FeedShare.tsx",
-                                                lineNumber: 237,
+                                                lineNumber: 331,
                                                 columnNumber: 19
                                             }, ("TURBOPACK compile-time value", void 0))
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/feed/FeedShare.tsx",
-                                        lineNumber: 233,
+                                        lineNumber: 327,
                                         columnNumber: 17
                                     }, ("TURBOPACK compile-time value", void 0))
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/FeedShare.tsx",
-                                    lineNumber: 227,
+                                    lineNumber: 321,
                                     columnNumber: 15
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                     type: "button",
                                     className: "flex h-12 w-12 items-center justify-center rounded-full bg-green-500 text-white transition-colors hover:bg-green-600",
-                                    onClick: ()=>shareToSocial('whatsapp'),
+                                    onClick: ()=>{
+                                        void shareToSocial('whatsapp');
+                                    },
                                     title: "Share on WhatsApp",
                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
                                         width: "19",
@@ -1328,24 +1438,32 @@ const FeedShare = (param)=>{
                                             fill: "white"
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/FeedShare.tsx",
-                                            lineNumber: 252,
+                                            lineNumber: 346,
                                             columnNumber: 19
                                         }, ("TURBOPACK compile-time value", void 0))
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedShare.tsx",
-                                        lineNumber: 251,
+                                        lineNumber: 345,
                                         columnNumber: 17
                                     }, ("TURBOPACK compile-time value", void 0))
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/FeedShare.tsx",
-                                    lineNumber: 245,
+                                    lineNumber: 339,
                                     columnNumber: 15
                                 }, ("TURBOPACK compile-time value", void 0))
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/feed/FeedShare.tsx",
-                            lineNumber: 204,
+                            lineNumber: 298,
                             columnNumber: 13
+                        }, ("TURBOPACK compile-time value", void 0)),
+                        facebookNotice && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                            className: "-mt-3 mb-4 rounded-lg bg-blue-50 px-3 py-2 text-xs text-blue-800 dark:bg-blue-900/30 dark:text-blue-200",
+                            children: facebookNotice === 'copied' ? t.facebookTextCopied : t.facebookTextManual
+                        }, void 0, false, {
+                            fileName: "[project]/components/feed/FeedShare.tsx",
+                            lineNumber: 352,
+                            columnNumber: 15
                         }, ("TURBOPACK compile-time value", void 0)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                             type: "button",
@@ -1354,24 +1472,24 @@ const FeedShare = (param)=>{
                             children: linkCopied ? t.linkCopied : t.copyLink
                         }, void 0, false, {
                             fileName: "[project]/components/feed/FeedShare.tsx",
-                            lineNumber: 258,
+                            lineNumber: 358,
                             columnNumber: 13
                         }, ("TURBOPACK compile-time value", void 0))
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/feed/FeedShare.tsx",
-                    lineNumber: 137,
+                    lineNumber: 231,
                     columnNumber: 11
                 }, ("TURBOPACK compile-time value", void 0))
             }, void 0, false, {
                 fileName: "[project]/components/feed/FeedShare.tsx",
-                lineNumber: 133,
+                lineNumber: 227,
                 columnNumber: 9
             }, ("TURBOPACK compile-time value", void 0)), document.body)
         ]
     }, void 0, true);
 };
-_s(FeedShare, "2Tue5SYcaLReRS9occKXdLH2bBk=");
+_s(FeedShare, "xNx4kGpSvgwZKQx04cKkp6pkj2A=");
 _c = FeedShare;
 const __TURBOPACK__default__export__ = FeedShare;
 var _c;
@@ -2679,11 +2797,7 @@ const allowedTags = new Set([
     'a'
 ]);
 function plainText(html) {
-    if (typeof document === 'undefined') return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-    const container = document.createElement('div');
-    container.innerHTML = html;
-    var _container_textContent;
-    return ((_container_textContent = container.textContent) !== null && _container_textContent !== void 0 ? _container_textContent : '').replace(/\s+/g, ' ').trim();
+    return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 }
 function getInsightPrice(price, freeLabel) {
     const normalizedPrice = String(price !== null && price !== void 0 ? price : '').trim();
@@ -2748,25 +2862,25 @@ function ArticleSkeleton(param) {
                             className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$article$2f$ArticleReader$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].skeletonTitle
                         }, void 0, false, {
                             fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                            lineNumber: 156,
+                            lineNumber: 153,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$article$2f$ArticleReader$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].skeletonTitleShort
                         }, void 0, false, {
                             fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                            lineNumber: 157,
+                            lineNumber: 154,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                    lineNumber: 155,
+                    lineNumber: 152,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                lineNumber: 154,
+                lineNumber: 151,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2776,7 +2890,7 @@ function ArticleSkeleton(param) {
                         className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$article$2f$ArticleReader$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].skeletonSide
                     }, void 0, false, {
                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                        lineNumber: 161,
+                        lineNumber: 158,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2784,40 +2898,40 @@ function ArticleSkeleton(param) {
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {}, void 0, false, {
                                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
+                                lineNumber: 160,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {}, void 0, false, {
+                                fileName: "[project]/components/feed/article/ArticleReader.tsx",
+                                lineNumber: 161,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {}, void 0, false, {
+                                fileName: "[project]/components/feed/article/ArticleReader.tsx",
+                                lineNumber: 162,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {}, void 0, false, {
+                                fileName: "[project]/components/feed/article/ArticleReader.tsx",
                                 lineNumber: 163,
-                                columnNumber: 11
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {}, void 0, false, {
-                                fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                lineNumber: 164,
-                                columnNumber: 11
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {}, void 0, false, {
-                                fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                lineNumber: 165,
-                                columnNumber: 11
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {}, void 0, false, {
-                                fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                lineNumber: 166,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                        lineNumber: 162,
+                        lineNumber: 159,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                lineNumber: 160,
+                lineNumber: 157,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-        lineNumber: 153,
+        lineNumber: 150,
         columnNumber: 5
     }, this);
 }
@@ -2893,7 +3007,7 @@ function ArticleReader(param) {
         label: copy.loading
     }, void 0, false, {
         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-        lineNumber: 219,
+        lineNumber: 216,
         columnNumber: 25
     }, this);
     if (error || !item) {
@@ -2908,7 +3022,7 @@ function ArticleReader(param) {
                         stroke: 1.4
                     }, void 0, false, {
                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                        lineNumber: 225,
+                        lineNumber: 222,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
@@ -2916,7 +3030,7 @@ function ArticleReader(param) {
                         children: error !== null && error !== void 0 ? error : copy.loadFailed
                     }, void 0, false, {
                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                        lineNumber: 226,
+                        lineNumber: 223,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2928,7 +3042,7 @@ function ArticleReader(param) {
                                 children: copy.back
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                lineNumber: 228,
+                                lineNumber: 225,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2938,24 +3052,24 @@ function ArticleReader(param) {
                                 children: copy.tryAgain
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                lineNumber: 231,
+                                lineNumber: 228,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                        lineNumber: 227,
+                        lineNumber: 224,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                lineNumber: 224,
+                lineNumber: 221,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/components/feed/article/ArticleReader.tsx",
-            lineNumber: 223,
+            lineNumber: 220,
             columnNumber: 7
         }, this);
     }
@@ -2985,7 +3099,7 @@ function ArticleReader(param) {
                         className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$article$2f$ArticleReader$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].heroShade
                     }, void 0, false, {
                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                        lineNumber: 267,
+                        lineNumber: 264,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3006,20 +3120,20 @@ function ArticleReader(param) {
                                                         "aria-hidden": true
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                        lineNumber: 277,
+                                                        lineNumber: 274,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                         children: truncateLabel(item.industry.name)
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                        lineNumber: 278,
+                                                        lineNumber: 275,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                lineNumber: 272,
+                                                lineNumber: 269,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
@@ -3027,13 +3141,13 @@ function ArticleReader(param) {
                                                 children: item.title
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                lineNumber: 281,
+                                                lineNumber: 278,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                        lineNumber: 270,
+                                        lineNumber: 267,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3049,7 +3163,7 @@ function ArticleReader(param) {
                                                 className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$article$2f$ArticleReader$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].heroActionButton
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                lineNumber: 285,
+                                                lineNumber: 282,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$FeedShare$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -3063,19 +3177,19 @@ function ArticleReader(param) {
                                                 hideTriggerLabel: true
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                lineNumber: 295,
+                                                lineNumber: 292,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                        lineNumber: 283,
+                                        lineNumber: 280,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                lineNumber: 269,
+                                lineNumber: 266,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3093,22 +3207,21 @@ function ArticleReader(param) {
                                                     className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$article$2f$ArticleReader$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].authorAvatar,
                                                     children: publisherPhoto ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
                                                         src: publisherPhoto,
-                                                        alt: publisherName,
-                                                        className: isPublishedAsCompany ? '!object-contain !p-1' : undefined
+                                                        alt: publisherName
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                        lineNumber: 318,
+                                                        lineNumber: 315,
                                                         columnNumber: 39
                                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                         children: publisherInitials
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                        lineNumber: 318,
-                                                        columnNumber: 160
+                                                        lineNumber: 315,
+                                                        columnNumber: 90
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                    lineNumber: 317,
+                                                    lineNumber: 314,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3119,31 +3232,31 @@ function ArticleReader(param) {
                                                             children: copy.publisher
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                            lineNumber: 321,
+                                                            lineNumber: 318,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
                                                             children: publisherName
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                            lineNumber: 322,
+                                                            lineNumber: 319,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                    lineNumber: 320,
+                                                    lineNumber: 317,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                            lineNumber: 311,
+                                            lineNumber: 308,
                                             columnNumber: 17
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                        lineNumber: 310,
+                                        lineNumber: 307,
                                         columnNumber: 15
                                     }, this),
                                     publishedDate && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("time", {
@@ -3155,20 +3268,20 @@ function ArticleReader(param) {
                                                 children: copy.published
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                lineNumber: 330,
+                                                lineNumber: 327,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
                                                 children: publishedDate
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                lineNumber: 331,
+                                                lineNumber: 328,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                        lineNumber: 329,
+                                        lineNumber: 326,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3181,7 +3294,7 @@ function ArticleReader(param) {
                                                         "aria-hidden": true
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                        lineNumber: 337,
+                                                        lineNumber: 334,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3189,13 +3302,13 @@ function ArticleReader(param) {
                                                         children: copy.readTime
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                        lineNumber: 338,
+                                                        lineNumber: 335,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                lineNumber: 336,
+                                                lineNumber: 333,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
@@ -3206,31 +3319,31 @@ function ArticleReader(param) {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                lineNumber: 340,
+                                                lineNumber: 337,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                        lineNumber: 335,
+                                        lineNumber: 332,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                lineNumber: 308,
+                                lineNumber: 305,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                        lineNumber: 268,
+                        lineNumber: 265,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                lineNumber: 263,
+                lineNumber: 260,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
@@ -3244,14 +3357,14 @@ function ArticleReader(param) {
                                 "aria-hidden": true
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                lineNumber: 348,
+                                lineNumber: 345,
                                 columnNumber: 11
                             }, this),
                             copy.back
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                        lineNumber: 347,
+                        lineNumber: 344,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("article", {
@@ -3268,7 +3381,7 @@ function ArticleReader(param) {
                                         }
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                        lineNumber: 354,
+                                        lineNumber: 351,
                                         columnNumber: 13
                                     }, this),
                                     item.related_insights.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3295,7 +3408,7 @@ function ArticleReader(param) {
                                                                             size: 16
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                                            lineNumber: 376,
+                                                                            lineNumber: 373,
                                                                             columnNumber: 29
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3303,13 +3416,13 @@ function ArticleReader(param) {
                                                                             children: insight.type
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                                            lineNumber: 377,
+                                                                            lineNumber: 374,
                                                                             columnNumber: 29
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                                    lineNumber: 375,
+                                                                    lineNumber: 372,
                                                                     columnNumber: 27
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -3318,18 +3431,18 @@ function ArticleReader(param) {
                                                                     children: insight.title
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                                    lineNumber: 381,
+                                                                    lineNumber: 378,
                                                                     columnNumber: 27
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                            lineNumber: 374,
+                                                            lineNumber: 371,
                                                             columnNumber: 25
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                        lineNumber: 367,
+                                                        lineNumber: 364,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3343,7 +3456,7 @@ function ArticleReader(param) {
                                                                     children: plainText(insight.description)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                                    lineNumber: 390,
+                                                                    lineNumber: 387,
                                                                     columnNumber: 29
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3360,16 +3473,16 @@ function ArticleReader(param) {
                                                                                 children: insightPrice.label
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                                                lineNumber: 397,
+                                                                                lineNumber: 394,
                                                                                 columnNumber: 33
                                                                             }, this)
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                                            lineNumber: 396,
+                                                                            lineNumber: 393,
                                                                             columnNumber: 31
                                                                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {}, void 0, false, {
                                                                             fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                                            lineNumber: 399,
+                                                                            lineNumber: 396,
                                                                             columnNumber: 33
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -3392,7 +3505,7 @@ function ArticleReader(param) {
                                                                                         stroke: 2
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                                                        lineNumber: 415,
+                                                                                        lineNumber: 412,
                                                                                         columnNumber: 33
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3400,49 +3513,49 @@ function ArticleReader(param) {
                                                                                         children: copy.openingInsight
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                                                        lineNumber: 416,
+                                                                                        lineNumber: 413,
                                                                                         columnNumber: 33
                                                                                     }, this)
                                                                                 ]
                                                                             }, void 0, true) : copy.viewInsight
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                                            lineNumber: 400,
+                                                                            lineNumber: 397,
                                                                             columnNumber: 27
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                                    lineNumber: 394,
+                                                                    lineNumber: 391,
                                                                     columnNumber: 27
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                            lineNumber: 388,
+                                                            lineNumber: 385,
                                                             columnNumber: 25
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                        lineNumber: 387,
+                                                        lineNumber: 384,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, insightKey, true, {
                                                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                lineNumber: 363,
+                                                lineNumber: 360,
                                                 columnNumber: 21
                                             }, this);
                                         })
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                        lineNumber: 357,
+                                        lineNumber: 354,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                lineNumber: 353,
+                                lineNumber: 350,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("aside", {
@@ -3453,30 +3566,30 @@ function ArticleReader(param) {
                                     insights: item.matched_related_insights
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                    lineNumber: 433,
+                                    lineNumber: 430,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                lineNumber: 432,
+                                lineNumber: 429,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                        lineNumber: 352,
+                        lineNumber: 349,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                lineNumber: 346,
+                lineNumber: 343,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-        lineNumber: 262,
+        lineNumber: 259,
         columnNumber: 5
     }, this);
 }
