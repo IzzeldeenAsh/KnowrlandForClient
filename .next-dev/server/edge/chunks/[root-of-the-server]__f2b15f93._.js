@@ -97,6 +97,19 @@ function middleware(request) {
         target.hostname = target.hostname.slice(4);
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$esm$2f$server$2f$web$2f$exports$2f$index$2e$js__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__["NextResponse"].redirect(target, 308);
     }
+    // Resolve the dashboard index here rather than via `redirect()` in the page.
+    // A server redirect is delivered to the client router as a NEXT_REDIRECT row
+    // inside the Flight payload, which has to be unwound mid-navigation. If that
+    // navigation interrupts an earlier pending one, the router's action promise is
+    // discarded and never resolves, leaving Next's AppRouter suspended on a stale
+    // thenable -- it then renders a short hook list and React throws #310.
+    // A middleware redirect resolves before the RSC render, so no such row exists.
+    const dashboardIndex = pathname.match(/^\/(en|ar)\/dashboard\/?$/);
+    if (dashboardIndex) {
+        const target = request.nextUrl.clone();
+        target.pathname = `/${dashboardIndex[1]}/dashboard/users/clients`;
+        return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$esm$2f$server$2f$web$2f$exports$2f$index$2e$js__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__["NextResponse"].redirect(target, 307);
+    }
     const hasLocale = /^\/(en|ar)(?:\/|$)/.test(pathname);
     if (!hasLocale && request.cookies.has('preferred_language')) {
         const target = request.nextUrl.clone();

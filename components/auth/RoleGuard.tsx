@@ -39,7 +39,7 @@ export default function RoleGuard({ children }: { children: React.ReactNode }) {
         console.log('[RoleGuard] Current path:', pathname);
         
         // Redirect to Angular admin dashboard
-        window.location.replace(`/${pathname.startsWith('/ar') ? 'ar' : 'en'}/dashboard`);
+        window.location.replace(`/${pathname.startsWith('/ar') ? 'ar' : 'en'}/dashboard/users/clients`);
       }
     }
   }, [user, roles, isLoading, pathname]);

@@ -9189,7 +9189,7 @@ function RoleGuard(param) {
                     console.log('[RoleGuard] User roles:', roles);
                     console.log('[RoleGuard] Current path:', pathname);
                     // Redirect to Angular admin dashboard
-                    window.location.replace("/".concat(pathname.startsWith('/ar') ? 'ar' : 'en', "/dashboard"));
+                    window.location.replace("/".concat(pathname.startsWith('/ar') ? 'ar' : 'en', "/dashboard/users/clients"));
                 }
             }
         }

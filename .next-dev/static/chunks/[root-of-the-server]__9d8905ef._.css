@@ -6538,6 +6538,11 @@ input[type="search"]::-webkit-search-results-decoration {
   gap: 1px;
 }
 
+.gap-x-2 {
+  -moz-column-gap: .5rem;
+  column-gap: .5rem;
+}
+
 .gap-x-3 {
   -moz-column-gap: .75rem;
   column-gap: .75rem;
@@ -6567,11 +6572,6 @@ input[type="search"]::-webkit-search-results-decoration {
 
 .gap-y-5 {
   row-gap: 1.25rem;
-}
-
-.gap-x-2 {
-  -moz-column-gap: .5rem;
-  column-gap: .5rem;
 }
 
 .-space-x-3 > :not([hidden]) ~ :not([hidden]) {

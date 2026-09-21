@@ -1,8 +1,5 @@
 {
   "/[locale]/(default)/page": "app/[locale]/(default)/page.js",
-  "/[locale]/article/write/page": "app/[locale]/article/write/page.js",
   "/[locale]/dashboard/page": "app/[locale]/dashboard/page.js",
-  "/[locale]/dashboard/users/clients/page": "app/[locale]/dashboard/users/clients/page.js",
-  "/[locale]/home/page": "app/[locale]/home/page.js",
-  "/manifest.webmanifest/route": "app/manifest.webmanifest/route.js"
+  "/[locale]/dashboard/users/clients/page": "app/[locale]/dashboard/users/clients/page.js"
 }

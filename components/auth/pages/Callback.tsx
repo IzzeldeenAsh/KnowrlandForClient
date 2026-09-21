@@ -40,7 +40,7 @@ export default function Callback({ locale }: { locale: string }) {
         // Best effort, off the navigation critical path.
         void authRequest('account/timezone/set', locale, { timezone: Intl.DateTimeFormat().resolvedOptions().timeZone }).catch(() => {});
         const roles = Array.isArray(user.roles) ? user.roles : [];
-        if (roles.includes('admin') || roles.includes('staff')) { destination.current = `/${locale}/dashboard`; navigate(); return; }
+        if (roles.includes('admin') || roles.includes('staff')) { destination.current = `/${locale}/dashboard/users/clients`; navigate(); return; }
         const professional = hasInsighterPromptRole(roles);
         destination.current = getSafeReturnUrl(rawReturn) || (professional ? `${getAngularAppOrigin()}/app/insighter-dashboard/my-dashboard` : `/${locale}`);
         const [prompts, insighter, accepted] = await Promise.allSettled([
