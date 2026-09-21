@@ -227,14 +227,23 @@ export default function ArticleEditor({ locale }: ArticleEditorProps) {
     editor.commands.setContent(body, { emitUpdate: false })
   }, [body, editor])
 
+  // The saved draft is fetched exactly once per mount. Re-running this would
+  // overwrite whatever the author has typed since — losing an in-progress White
+  // Paper and, because the server copy has no cover yet, leaving publish stuck
+  // on "Add a cover image before continuing."
+  const hasLoadedDraftRef = useRef(false)
+
   useEffect(() => {
     if (!isAuthResolved) return
     if (!canPublish) {
       setIsLoading(false)
       return
     }
+    if (hasLoadedDraftRef.current) return
+    hasLoadedDraftRef.current = true
 
     const controller = new AbortController()
+    let settled = false
     const editUuid = new URLSearchParams(window.location.search).get('edit')
     const loadItem = editUuid
       ? getFeedItem(editUuid, locale)
@@ -268,9 +277,17 @@ export default function ArticleEditor({ locale }: ArticleEditorProps) {
           toast.error(error instanceof Error ? error.message : copy.loadFailed)
         }
       })
-      .finally(() => setIsLoading(false))
+      .finally(() => {
+        settled = true
+        setIsLoading(false)
+      })
 
-    return () => controller.abort()
+    return () => {
+      controller.abort()
+      // An aborted load has to be retryable, otherwise the guard above would
+      // leave the editor permanently empty (e.g. React StrictMode remounts).
+      if (!settled) hasLoadedDraftRef.current = false
+    }
   }, [canPublish, copy.loadFailed, isAuthResolved, locale, toast])
 
   useEffect(() => () => {

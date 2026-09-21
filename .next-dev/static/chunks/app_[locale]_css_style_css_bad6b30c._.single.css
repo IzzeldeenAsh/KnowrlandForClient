@@ -6568,6 +6568,11 @@ input[type="search"]::-webkit-search-results-decoration {
   row-gap: 1.25rem;
 }
 
+.gap-x-2 {
+  -moz-column-gap: .5rem;
+  column-gap: .5rem;
+}
+
 .-space-x-3 > :not([hidden]) ~ :not([hidden]) {
   --tw-space-x-reverse: 0;
   margin-right: calc(-.75rem * var(--tw-space-x-reverse));
@@ -14416,11 +14421,6 @@ img.feed-media-contain {
 .hover\:bg-\[\#17689e\]:hover {
   --tw-bg-opacity: 1;
   background-color: rgba(23, 104, 158, var(--tw-bg-opacity, 1));
-}
-
-.hover\:bg-\[\#1768CE\]:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgba(23, 104, 206, var(--tw-bg-opacity, 1));
 }
 
 .hover\:bg-\[\#1769C2\]:hover {

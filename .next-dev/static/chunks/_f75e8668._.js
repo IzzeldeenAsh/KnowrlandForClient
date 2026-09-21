@@ -1521,10 +1521,18 @@ var _s = __turbopack_context__.k.signature();
     const openShareWindow = (url)=>{
         // Always a new tab: passing no window features keeps the browser's default
         // tab behaviour, and the current page must stay put so the share surface
-        // survives. A blocked popup falls back to a synthetic link click rather
-        // than navigating this tab away.
+        // survives.
         const opened = window.open(url, '_blank', 'noopener,noreferrer');
         if (opened) return;
+        // On mobile a synthetic <a> click is what iOS/Android treat as a user tap on
+        // a universal/app link, which hands facebook.com URLs to the Facebook app —
+        // and the app has no handler for sharer.php, so it lands on its home screen
+        // and drops the share. A scripted navigation stays in the browser, where the
+        // mobile web composer works.
+        if (isMobileDevice()) {
+            window.location.assign(url);
+            return;
+        }
         const link = document.createElement('a');
         link.href = url;
         link.target = '_blank';
@@ -1556,29 +1564,14 @@ var _s = __turbopack_context__.k.signature();
         }
         if (!socialUrl) return;
         if (platform === 'facebook') {
-            // Two Facebook limitations are handled here:
-            //   1. The mobile Facebook app captures facebook.com links as app links
-            //      but has no handler for sharer.php, so the app opens on its home
-            //      screen and the share is silently dropped. The native share sheet
-            //      hands the URL to the app's own composer instead.
-            //   2. Facebook removed pre-filled share text (the `quote` parameter) in
-            //      2017, so the personal message can only be offered for pasting.
+            // The Facebook button goes to Facebook on every platform. It used to hand
+            // mobile off to `navigator.share`, which showed the OS share sheet
+            // (AirDrop, Messages, Mail…) on top of our own share modal instead of the
+            // Facebook composer the button promises.
+            //
+            // Facebook removed pre-filled share text (the `quote` parameter) back in
+            // 2017, so the personal message is copied to the clipboard for pasting.
             const copied = await copyToClipboard(customShareMessage);
-            if (isMobileDevice() && typeof navigator.share === 'function') {
-                try {
-                    await navigator.share({
-                        title: shareTitle || authorName,
-                        text: customShareMessage,
-                        url: shareUrl
-                    });
-                    return;
-                } catch (error) {
-                    var _this;
-                    // A cancelled sheet is not a failure; anything else falls through to
-                    // the web sharer below.
-                    if (((_this = error) === null || _this === void 0 ? void 0 : _this.name) === 'AbortError') return;
-                }
-            }
             setFacebookNotice(copied ? 'copied' : 'manual');
             openShareWindow(socialUrl);
             return;
@@ -1597,7 +1590,7 @@ var _s = __turbopack_context__.k.signature();
                         children: t.customShareMessage
                     }, void 0, false, {
                         fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                        lineNumber: 168,
+                        lineNumber: 161,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("textarea", {
@@ -1609,13 +1602,13 @@ var _s = __turbopack_context__.k.signature();
                         placeholder: t.shareMessageHint
                     }, void 0, false, {
                         fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                        lineNumber: 171,
+                        lineNumber: 164,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0))
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                lineNumber: 167,
+                lineNumber: 160,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0)),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1629,12 +1622,12 @@ var _s = __turbopack_context__.k.signature();
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                    lineNumber: 182,
+                    lineNumber: 175,
                     columnNumber: 9
                 }, ("TURBOPACK compile-time value", void 0))
             }, void 0, false, {
                 fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                lineNumber: 181,
+                lineNumber: 174,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0)),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1658,17 +1651,17 @@ var _s = __turbopack_context__.k.signature();
                                 fill: "white"
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                                lineNumber: 196,
+                                lineNumber: 189,
                                 columnNumber: 13
                             }, ("TURBOPACK compile-time value", void 0))
                         }, void 0, false, {
                             fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                            lineNumber: 195,
+                            lineNumber: 188,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0))
                     }, void 0, false, {
                         fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                        lineNumber: 189,
+                        lineNumber: 182,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1689,17 +1682,17 @@ var _s = __turbopack_context__.k.signature();
                                 fill: "white"
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                                lineNumber: 207,
+                                lineNumber: 200,
                                 columnNumber: 13
                             }, ("TURBOPACK compile-time value", void 0))
                         }, void 0, false, {
                             fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                            lineNumber: 206,
+                            lineNumber: 199,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0))
                     }, void 0, false, {
                         fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                        lineNumber: 200,
+                        lineNumber: 193,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1723,12 +1716,12 @@ var _s = __turbopack_context__.k.signature();
                                         fill: "white"
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                                        lineNumber: 219,
+                                        lineNumber: 212,
                                         columnNumber: 15
                                     }, ("TURBOPACK compile-time value", void 0))
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                                    lineNumber: 218,
+                                    lineNumber: 211,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("defs", {
@@ -1740,28 +1733,28 @@ var _s = __turbopack_context__.k.signature();
                                             fill: "white"
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                                            lineNumber: 223,
+                                            lineNumber: 216,
                                             columnNumber: 17
                                         }, ("TURBOPACK compile-time value", void 0))
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                                        lineNumber: 222,
+                                        lineNumber: 215,
                                         columnNumber: 15
                                     }, ("TURBOPACK compile-time value", void 0))
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                                    lineNumber: 221,
+                                    lineNumber: 214,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0))
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                            lineNumber: 217,
+                            lineNumber: 210,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0))
                     }, void 0, false, {
                         fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                        lineNumber: 211,
+                        lineNumber: 204,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1782,23 +1775,23 @@ var _s = __turbopack_context__.k.signature();
                                 fill: "white"
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                                lineNumber: 236,
+                                lineNumber: 229,
                                 columnNumber: 13
                             }, ("TURBOPACK compile-time value", void 0))
                         }, void 0, false, {
                             fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                            lineNumber: 235,
+                            lineNumber: 228,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0))
                     }, void 0, false, {
                         fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                        lineNumber: 229,
+                        lineNumber: 222,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0))
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                lineNumber: 188,
+                lineNumber: 181,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0)),
             facebookNotice && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1806,7 +1799,7 @@ var _s = __turbopack_context__.k.signature();
                 children: facebookNotice === 'copied' ? t.facebookTextCopied : t.facebookTextManual
             }, void 0, false, {
                 fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                lineNumber: 242,
+                lineNumber: 235,
                 columnNumber: 9
             }, ("TURBOPACK compile-time value", void 0))
         ]

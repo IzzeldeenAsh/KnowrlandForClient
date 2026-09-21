@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useState, useContext, useCallback } from 'react';
+import React, { createContext, useState, useContext, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import Toast from './Toast';
 
@@ -167,14 +167,20 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     show(messageCandidate || 'An unexpected error occurred.', '', 10000);
   }, [error, warning]);
 
-  const contextValue = {
-    success,
-    error,
-    warning,
-    info,
-    handleServerSuccess,
-    handleServerErrors
-  };
+  // Memoized so the context value keeps a stable identity. Without this, every
+  // toast that appears or auto-dismisses hands consumers a brand new object and
+  // re-fires any effect that lists `toast` in its dependencies.
+  const contextValue = useMemo(
+    () => ({
+      success,
+      error,
+      warning,
+      info,
+      handleServerSuccess,
+      handleServerErrors
+    }),
+    [success, error, warning, info, handleServerSuccess, handleServerErrors]
+  );
 
   return (
     <ToastContext.Provider value={contextValue}>

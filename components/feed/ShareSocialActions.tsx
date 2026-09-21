@@ -86,10 +86,19 @@ const ShareSocialActions = ({
   const openShareWindow = (url: string) => {
     // Always a new tab: passing no window features keeps the browser's default
     // tab behaviour, and the current page must stay put so the share surface
-    // survives. A blocked popup falls back to a synthetic link click rather
-    // than navigating this tab away.
+    // survives.
     const opened = window.open(url, '_blank', 'noopener,noreferrer')
     if (opened) return
+
+    // On mobile a synthetic <a> click is what iOS/Android treat as a user tap on
+    // a universal/app link, which hands facebook.com URLs to the Facebook app —
+    // and the app has no handler for sharer.php, so it lands on its home screen
+    // and drops the share. A scripted navigation stays in the browser, where the
+    // mobile web composer works.
+    if (isMobileDevice()) {
+      window.location.assign(url)
+      return
+    }
 
     const link = document.createElement('a')
     link.href = url
@@ -127,30 +136,14 @@ const ShareSocialActions = ({
     if (!socialUrl) return
 
     if (platform === 'facebook') {
-      // Two Facebook limitations are handled here:
-      //   1. The mobile Facebook app captures facebook.com links as app links
-      //      but has no handler for sharer.php, so the app opens on its home
-      //      screen and the share is silently dropped. The native share sheet
-      //      hands the URL to the app's own composer instead.
-      //   2. Facebook removed pre-filled share text (the `quote` parameter) in
-      //      2017, so the personal message can only be offered for pasting.
+      // The Facebook button goes to Facebook on every platform. It used to hand
+      // mobile off to `navigator.share`, which showed the OS share sheet
+      // (AirDrop, Messages, Mail…) on top of our own share modal instead of the
+      // Facebook composer the button promises.
+      //
+      // Facebook removed pre-filled share text (the `quote` parameter) back in
+      // 2017, so the personal message is copied to the clipboard for pasting.
       const copied = await copyToClipboard(customShareMessage)
-
-      if (isMobileDevice() && typeof navigator.share === 'function') {
-        try {
-          await navigator.share({
-            title: shareTitle || authorName,
-            text: customShareMessage,
-            url: shareUrl,
-          })
-          return
-        } catch (error) {
-          // A cancelled sheet is not a failure; anything else falls through to
-          // the web sharer below.
-          if ((error as DOMException | undefined)?.name === 'AbortError') return
-        }
-      }
-
       setFacebookNotice(copied ? 'copied' : 'manual')
       openShareWindow(socialUrl)
       return

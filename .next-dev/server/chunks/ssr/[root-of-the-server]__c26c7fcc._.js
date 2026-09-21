@@ -8181,14 +8181,24 @@ const ToastProvider = ({ children })=>{
         error,
         warning
     ]);
-    const contextValue = {
+    // Memoized so the context value keeps a stable identity. Without this, every
+    // toast that appears or auto-dismisses hands consumers a brand new object and
+    // re-fires any effect that lists `toast` in its dependencies.
+    const contextValue = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useMemo"])(()=>({
+            success,
+            error,
+            warning,
+            info,
+            handleServerSuccess,
+            handleServerErrors
+        }), [
         success,
         error,
         warning,
         info,
         handleServerSuccess,
         handleServerErrors
-    };
+    ]);
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(ToastContext.Provider, {
         value: contextValue,
         children: [
@@ -8202,14 +8212,14 @@ const ToastProvider = ({ children })=>{
                         onClose: ()=>removeToast(toast.id)
                     }, toast.id, false, {
                         fileName: "[project]/components/toast/ToastContext.tsx",
-                        lineNumber: 186,
+                        lineNumber: 192,
                         columnNumber: 17
                     }, ("TURBOPACK compile-time value", void 0)))
             }, void 0, false), portalContainer) : null
         ]
     }, void 0, true, {
         fileName: "[project]/components/toast/ToastContext.tsx",
-        lineNumber: 180,
+        lineNumber: 186,
         columnNumber: 5
     }, ("TURBOPACK compile-time value", void 0));
 };

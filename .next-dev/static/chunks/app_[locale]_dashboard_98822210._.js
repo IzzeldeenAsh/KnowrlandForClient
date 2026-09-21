@@ -979,6 +979,7 @@ function DashboardShell(param) {
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Text$2f$Text$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Text"], {
+                                    component: "span",
                                     size: "sm",
                                     className: "flex items-center gap-2",
                                     fw: 600,
@@ -995,10 +996,11 @@ function DashboardShell(param) {
                                             }
                                         }, void 0, false, {
                                             fileName: "[project]/app/[locale]/dashboard/_components/DashboardShell.tsx",
-                                            lineNumber: 64,
+                                            lineNumber: 68,
                                             columnNumber: 13
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Text$2f$Text$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Text"], {
+                                            component: "span",
                                             size: "sm",
                                             className: "text-base",
                                             fw: 500,
@@ -1006,13 +1008,13 @@ function DashboardShell(param) {
                                             children: "Insighta cPanel"
                                         }, void 0, false, {
                                             fileName: "[project]/app/[locale]/dashboard/_components/DashboardShell.tsx",
-                                            lineNumber: 69,
+                                            lineNumber: 73,
                                             columnNumber: 13
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/[locale]/dashboard/_components/DashboardShell.tsx",
-                                    lineNumber: 63,
+                                    lineNumber: 67,
                                     columnNumber: 13
                                 }, this)
                             ]
@@ -1025,7 +1027,7 @@ function DashboardShell(param) {
                             parent: "app"
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/dashboard/_components/DashboardShell.tsx",
-                            lineNumber: 73,
+                            lineNumber: 77,
                             columnNumber: 11
                         }, this)
                     ]
@@ -1048,12 +1050,12 @@ function DashboardShell(param) {
                     onToggleCollapse: toggleDesktop
                 }, void 0, false, {
                     fileName: "[project]/app/[locale]/dashboard/_components/DashboardShell.tsx",
-                    lineNumber: 78,
+                    lineNumber: 82,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/[locale]/dashboard/_components/DashboardShell.tsx",
-                lineNumber: 77,
+                lineNumber: 81,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$AppShell$2f$AppShell$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["AppShell"].Main, {
@@ -1062,12 +1064,12 @@ function DashboardShell(param) {
                     children: children
                 }, void 0, false, {
                     fileName: "[project]/app/[locale]/dashboard/_components/DashboardShell.tsx",
-                    lineNumber: 87,
+                    lineNumber: 91,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/[locale]/dashboard/_components/DashboardShell.tsx",
-                lineNumber: 86,
+                lineNumber: 90,
                 columnNumber: 7
             }, this)
         ]

@@ -60,13 +60,17 @@ export default function DashboardShell({ children }: DashboardShellProps) {
               aria-label="Toggle sidebar"
             />
           
-            <Text size="sm" className='flex items-center gap-2' fw={600} c="#334155">
+            {/* `Text` renders a <p> by default; nesting one inside another makes
+                the browser auto-close the outer <p>, which breaks hydration and
+                crashes the whole dashboard in a production build. Keep the
+                wrapper a <span>. */}
+            <Text component="span" size="sm" className='flex items-center gap-2' fw={600} c="#334155">
             <img
               src="/images/smallLogo.png"
               alt="Insighta Business Logo"
               style={{ height: 40, width: 'auto', objectFit: 'contain', marginRight: 8 }}
             />
-            <Text size="sm" className='text-base' fw={500} c="#334155">Insighta cPanel</Text>
+            <Text component="span" size="sm" className='text-base' fw={500} c="#334155">Insighta cPanel</Text>
             </Text>
           </Group>
 

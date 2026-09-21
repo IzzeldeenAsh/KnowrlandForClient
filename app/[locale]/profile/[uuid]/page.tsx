@@ -1469,24 +1469,24 @@ function ProfilePageContent() {
                   {/* Profile Info */}
                   <div className="w-full flex-1">
                     <div className="flex flex-col md:flex-row h-full justify-between items-center">
-                      <div>
+                      <div className="w-full min-w-0 md:w-auto">
                         {/* Name and Badges */}
-                        <div className="flex flex-wrap items-center gap-2 mb-1 capitalize">
+                        <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-2 gap-y-1 mb-1 capitalize text-center md:text-start">
                           {/* {isRTL && <IconRosetteDiscountCheckFilled className="w-5 h-5 text-blue-500" />} */}
                           {enterpriseType === "insighter" && (
-                            <div>
-                              <h1 className="text-2xl font-bold">
+                            <div className="min-w-0 max-w-full">
+                              <h1 className="text-xl sm:text-2xl font-bold break-words">
                                 {profileData.first_name.toLowerCase() || ""}{" "}
                                 {profileData.last_name.toLowerCase() || ""}
                               </h1>
                             </div>
                           )}
                           {enterpriseType !== "insighter" && (
-                            <h1 className="text-2xl font-bold">
+                            <h1 className="text-xl sm:text-2xl font-bold break-words min-w-0 max-w-full">
                               {profileData.company?.legal_name || ""}
                             </h1>
                           )}
-                          <IconRosetteDiscountCheckFilled className="w-5 h-5 text-blue-500" />
+                          <IconRosetteDiscountCheckFilled className="w-5 h-5 shrink-0 text-blue-500" />
 
                           {isCompany && enterpriseType === "insighter" && (
                             <span
