@@ -723,6 +723,11 @@ export default function Header() {
                       onKeyDown={(e) => {
                         if (e.key === 'Escape') {
                           setSearchQuery('');
+                        } else if (e.key === 'Enter') {
+                          e.preventDefault();
+                          if (searchQuery.trim()) {
+                            handleSearch(searchQuery);
+                          }
                         }
                       }}
                       size="sm"
@@ -734,7 +739,7 @@ export default function Header() {
                           leftSection: hasSearchQuery ? (
                             <button
                               type="submit"
-                              className="p-1 text-slate-300 hover:text-white transition-all duration-200 cursor-pointer"
+                              className="p-1 text-[#67B5F6] hover:text-[#3B8AEF] transition-all duration-200 cursor-pointer"
                               aria-label="Search"
                             >
                               <IconSearch size={16} />
@@ -745,7 +750,7 @@ export default function Header() {
                           rightSection: hasSearchQuery ? (
                             <button
                               type="submit"
-                              className="p-1 text-slate-300 hover:text-white transition-all duration-200 cursor-pointer"
+                              className="p-1 text-[#67B5F6] hover:text-[#3B8AEF] transition-all duration-200 cursor-pointer"
                               aria-label="Search"
                             >
                               <IconSearch size={16} />

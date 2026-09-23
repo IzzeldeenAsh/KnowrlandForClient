@@ -15017,6 +15017,11 @@ img.feed-media-contain {
   color: rgba(38, 59, 73, var(--tw-text-opacity, 1));
 }
 
+.hover\:text-\[\#3B8AEF\]:hover {
+  --tw-text-opacity: 1;
+  color: rgba(59, 138, 239, var(--tw-text-opacity, 1));
+}
+
 .hover\:text-\[\#475569\]:hover {
   --tw-text-opacity: 1;
   color: rgba(71, 85, 105, var(--tw-text-opacity, 1));
