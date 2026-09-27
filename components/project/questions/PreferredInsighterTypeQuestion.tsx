@@ -84,6 +84,11 @@ export default function PreferredInsighterTypeQuestion({
         projectWizardStorage.preferredInsighterTypeKey(locale),
         value
       )
+      if (value === 'Either') {
+        // Worldwide is stored as an empty origin.
+        window.sessionStorage.setItem(projectWizardStorage.insighterOriginTypeKey(locale), '')
+        window.sessionStorage.setItem(projectWizardStorage.insighterOriginIdKey(locale), '')
+      }
     } catch {
       // ignore
     }

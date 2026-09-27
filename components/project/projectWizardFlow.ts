@@ -1,6 +1,7 @@
 import { projectWizardStorage, type WizardLocale } from './wizardStorage'
 import { readProjectAddonsState } from './projectAddonsState'
 import { isSpecifiedInsighterProject } from './specifiedInsighterProject'
+import { readProjectComponents } from './serviceComponentsPayload'
 
 export const projectWizardStepIds = {
   projectType: 'project-type',
@@ -28,13 +29,21 @@ export const projectWizardStepIds = {
 
 export type ProjectWizardStepId = string
 
+// Project-level components asked once, before the first service is picked.
+// The backend only returns them for insight-type services; all current services are.
+export const preServiceProjectComponentSlugs = ['target-market', 'data-sources-expected']
+
+// Service add-ons are hidden for now: the step still runs to save the service, then forwards.
+export const serviceAddonsHidden = true
+
+// Steps that only do work and forward, so Back skips over them.
+export const passThroughStepIds = new Set<string>([
+  'project-context',
+  ...(serviceAddonsHidden ? ['service-addons'] : []),
+])
+
 export const deliverableStageStepSlugs = [
-  'deliverable-first-draft-date',
-  'deliverable-first-draft-type',
-  'deliverable-first-draft-way',
-  'deliverable-final-version-date',
-  'deliverable-final-version-type',
-  'deliverable-final-version-way',
+  'deliverables',
 ] as const
 
 const deliverableComponentSlugs = new Set<string>([
@@ -197,29 +206,41 @@ export function getProjectWizardStepOrder(locale: WizardLocale): string[] {
           ? [projectWizardStepIds.companyTeamSize]
           : []
 
+  // "Any" insighter type means a worldwide origin, so the origin step is skipped.
   const insighterPreferenceSteps = specifiedInsighterProject
     ? []
     : [
         projectWizardStepIds.preferredInsighterType,
-        projectWizardStepIds.insighterOrigin,
+        ...(preferredInsighterType === 'Either' ? [] : [projectWizardStepIds.insighterOrigin]),
         ...postOriginSteps,
       ]
 
+  const stored = (name: string) => typeof window === 'undefined' ? null : sessionStorage.getItem(`project:wizard:${locale}:${name}`)
+  const projectSlugs: string[] = JSON.parse(stored('projectComponentSlugs') || '[]')
+  const isAskedElsewhere = (slug: string) =>
+    preServiceProjectComponentSlugs.includes(slug) || projectSlugs.includes(slug)
+  const isOther = typeof window !== 'undefined' && sessionStorage.getItem(projectWizardStorage.serviceIsOtherKey(locale)) === '1'
   return [
     projectWizardStepIds.projectType,
     projectWizardStepIds.deliverablesLanguage,
     projectWizardStepIds.insighterIndustry,
-    ...(includeSubIndustryStep
-      ? [projectWizardStepIds.insighterSubIndustry]
-      : []),
-    projectWizardStepIds.service,
-    projectWizardStepIds.projectScope,
-    projectWizardStepIds.projectSubscopes,
-    ...serviceComponentSlugs,
+    ...(includeSubIndustryStep ? [projectWizardStepIds.insighterSubIndustry] : []),
     projectWizardStepIds.projectStatus,
     projectWizardStepIds.whoAreYou,
     ...insighterPreferenceSteps,
+    'planned-start-date',
     projectWizardStepIds.projectDeadline,
+    ...preServiceProjectComponentSlugs,
+    projectWizardStepIds.service,
+    ...(isOther ? ['service-intake'] : []),
+    projectWizardStepIds.projectScope,
+    projectWizardStepIds.projectSubscopes,
+    ...serviceComponentSlugs.filter(slug => !isAskedElsewhere(slug)),
+    'project-context',
+    ...projectSlugs.filter(slug => !preServiceProjectComponentSlugs.includes(slug)),
+    'service-addons',
+    // Only specified-insighter projects can hold more than one service.
+    ...(specifiedInsighterProject ? ['services-summary'] : []),
     projectWizardStepIds.projectDescription,
     projectWizardStepIds.addonsIntro,
     ...(skipKickoffMeeting ? [] : [projectWizardStepIds.kickoffMeeting]),
@@ -227,4 +248,16 @@ export function getProjectWizardStepOrder(locale: WizardLocale): string[] {
     ...(specifiedInsighterProject ? [] : [projectWizardStepIds.projectMatches]),
     projectWizardStepIds.deadlineOffer,
   ]
+}
+
+export function getNextProjectWizardStepId(
+  locale: WizardLocale,
+  currentStep: string
+): string | null {
+  const stepOrder = getProjectWizardStepOrder(locale)
+  const index = stepOrder.indexOf(currentStep)
+  if (index < 0) return null
+
+  const answers = readProjectComponents(locale)
+  return stepOrder.slice(index + 1).find((step) => !(step in answers)) || null
 }

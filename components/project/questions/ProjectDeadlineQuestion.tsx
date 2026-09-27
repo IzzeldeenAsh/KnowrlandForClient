@@ -4,20 +4,12 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { getProjectApiErrorMessage } from '@/components/project/projectApiError'
-import { readServiceComponentPayloadValue } from '@/components/project/serviceComponentsPayload'
-import { syncProjectProperties } from '@/components/project/projectPropertiesSync'
 import { useProjectStepErrorToast } from '@/components/project/useProjectStepErrorToast'
 import InlineDateCalendar from './InlineDateCalendar'
 import ProjectSelectedTypeHeader from '../ProjectSelectedTypeHeader'
 import { useProjectWizardNavigation } from '../useProjectWizardNavigation'
 import { projectWizardStorage, type WizardLocale } from '../wizardStorage'
 import UrgentDateNotice from './UrgentDateNotice'
-
-type DeliverableStagePayload = {
-  final_version?: {
-    date?: string
-  }
-}
 
 function toLocalIsoDate(date: Date): string {
   const year = date.getFullYear()
@@ -56,7 +48,7 @@ export default function ProjectDeadlineQuestion({
   const [entered, setEntered] = useState(false)
   const [projectType, setProjectType] = useState<string | null>(null)
   const [dateValue, setDateValue] = useState('')
-  const [finalDraftDate, setFinalDraftDate] = useState('')
+  const [plannedStart, setPlannedStart] = useState('')
   const [showUrgentWarning, setShowUrgentWarning] = useState(false)
   const [urgentAcknowledged, setUrgentAcknowledged] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -68,7 +60,7 @@ export default function ProjectDeadlineQuestion({
   const today = todayString()
   const tomorrow = addDaysString(1)
   const isUrgentProject = normalizeProjectType(projectType) === 'urgent_request'
-  const minimumDeadline = isUrgentProject ? tomorrow : finalDraftDate || today
+  const minimumDeadline = plannedStart > tomorrow ? plannedStart : tomorrow
   const isBeforeMinimumDate = dateValue !== '' && dateValue < minimumDeadline
   const isAfterUrgentMaxDate =
     isUrgentProject && dateValue !== '' && dateValue > tomorrow
@@ -88,12 +80,7 @@ export default function ProjectDeadlineQuestion({
       const stored = window.sessionStorage.getItem(storageKey)
       if (stored) setDateValue(stored)
 
-      const deliverableStage =
-        readServiceComponentPayloadValue<DeliverableStagePayload>(
-          locale,
-          'deliverable-stage'
-        )
-      setFinalDraftDate(String(deliverableStage?.final_version?.date || ''))
+      setPlannedStart(window.sessionStorage.getItem(projectWizardStorage.plannedStartDateKey(locale)) || '')
     } catch {
       // ignore
     }
@@ -104,7 +91,7 @@ export default function ProjectDeadlineQuestion({
     setError(null)
 
     try {
-      await syncProjectProperties(locale)
+      // Shared properties are saved after the service requirements are complete.
       if (nav.nextHref) {
         nav.goNext()
         return
@@ -122,9 +109,9 @@ export default function ProjectDeadlineQuestion({
     }
   }
 
-  const submitDeadline = async () => {
+  const submitDeadline = async (value = dateValue) => {
     try {
-      window.sessionStorage.setItem(storageKey, dateValue)
+      window.sessionStorage.setItem(storageKey, value)
     } catch {
       // ignore
     }
@@ -159,10 +146,10 @@ export default function ProjectDeadlineQuestion({
         ? isRTL
           ? 'هذا اليوم فقط متاح لأن الطلبات العاجلة يجب أن تكون خلال 24 ساعة.'
           : 'Only this date is available because urgent requests are 24-hour requests.'
-        : finalDraftDate
+        : plannedStart
         ? isRTL
-          ? 'يجب أن يكون موعد تسليم المشروع في نفس يوم النسخة النهائية أو بعدها.'
-          : 'Project deadline must be the same day as the final draft or after it.'
+          ? 'يجب أن يكون موعد التسليم في تاريخ بدء المشروع أو بعده.'
+          : 'The deadline must be on or after the planned start date.'
         : isRTL
           ? 'لا يمكن أن يكون التاريخ في الماضي.'
           : 'Date cannot be in the past.'
@@ -238,16 +225,19 @@ export default function ProjectDeadlineQuestion({
                 setDateValue(date)
                 setError(null)
                 setUrgentAcknowledged(false)
+                // The calendar only offers dates within min/max; a next-day pick still asks for urgent confirmation.
+                if (!isUrgentProject && date === tomorrow) setShowUrgentWarning(true)
+                else void submitDeadline(date)
               }}
               locale={locale}
               label={isRTL ? 'الموعد النهائي للتسليم' : 'Delivery deadline'}
             />
             {isUrgentProject ? <UrgentDateNotice locale={locale} /> : null}
-            {finalDraftDate ? (
+            {plannedStart ? (
               <p className="mt-3 text-xs font-semibold text-slate-500">
                 {isRTL
-                  ? `يجب أن يكون في ${finalDraftDate} أو بعده.`
-                  : `Must be on or after ${finalDraftDate}.`}
+                  ? `يجب أن يكون في ${plannedStart} أو بعده.`
+                  : `Must be on or after ${plannedStart}.`}
               </p>
             ) : null}
             {visibleError ? (

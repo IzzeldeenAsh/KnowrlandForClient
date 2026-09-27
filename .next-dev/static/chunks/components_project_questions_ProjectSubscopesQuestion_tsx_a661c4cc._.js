@@ -7,6 +7,7 @@ __turbopack_context__.s([
     ()=>ProjectSubscopesQuestion
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectServicesState$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/project/projectServicesState.ts [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/client/app-dir/link.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconCheck$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconCheck$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconCheck.mjs [app-client] (ecmascript) <export default as IconCheck>");
@@ -22,10 +23,13 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$pro
 var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectWizardFlow$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/project/projectWizardFlow.ts [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$useProjectStepErrorToast$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/project/useProjectStepErrorToast.ts [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$useProjectWizardNavigation$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/project/useProjectWizardNavigation.ts [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$backendLimits$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/project/backendLimits.ts [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$wizardStorage$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/project/wizardStorage.ts [app-client] (ecmascript)");
 ;
 var _s = __turbopack_context__.k.signature();
 'use client';
+;
+;
 ;
 ;
 ;
@@ -235,7 +239,7 @@ function persistAiSuggestedScopes(locale, scopes) {
     }
 }
 async function fetchServiceComponents(params) {
-    const url = params.isOther && params.projectUuid ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getApiUrl"])("/api/account/project/definition/service-prompt/component/".concat(params.projectUuid)) : (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getApiUrl"])("/api/common/setting/service/component/".concat(params.serviceId));
+    const url = params.isOther && params.projectUuid ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getApiUrl"])("/api/account/project/definition/service-prompt/component/".concat(params.projectUuid, "/").concat((0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectServicesState$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["requireProjectServiceUuid"])(params.locale))) : (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getApiUrl"])("/api/common/setting/service/component/".concat(params.serviceId));
     const res = await fetch(url, {
         method: 'GET',
         headers: {
@@ -261,7 +265,7 @@ async function syncScopes(params) {
             });
         });
     });
-    const res = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getApiUrl"])("/api/account/project/definition/scope/sync/".concat(params.projectUuid)), {
+    const res = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getApiUrl"])("/api/account/project/definition/scope/sync/".concat(params.projectUuid, "/").concat((0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectServicesState$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["requireProjectServiceUuid"])(params.locale))), {
         method: 'POST',
         headers: {
             Authorization: "Bearer ".concat(params.token),
@@ -331,19 +335,19 @@ function AttachmentTile(param) {
                     className: "h-full w-full object-contain"
                 }, void 0, false, {
                     fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                    lineNumber: 395,
+                    lineNumber: 398,
                     columnNumber: 11
                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "grid h-full w-full place-items-center rounded border border-slate-200 text-[8px] font-bold text-slate-500",
                     children: extensionLabel
                 }, void 0, false, {
                     fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                    lineNumber: 397,
+                    lineNumber: 400,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                lineNumber: 393,
+                lineNumber: 396,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -355,12 +359,12 @@ function AttachmentTile(param) {
                     size: 11
                 }, void 0, false, {
                     fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                    lineNumber: 409,
+                    lineNumber: 412,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                lineNumber: 403,
+                lineNumber: 406,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -372,13 +376,13 @@ function AttachmentTile(param) {
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                lineNumber: 412,
+                lineNumber: 415,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-        lineNumber: 392,
+        lineNumber: 395,
         columnNumber: 5
     }, this);
 }
@@ -544,7 +548,7 @@ function ProjectSubscopesQuestion(param) {
                                 return;
                             }
                         }
-                        const url = isOther ? projectUuid ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getApiUrl"])("/api/account/project/definition/ai-intake/check-clarification/".concat(projectUuid)) : null : (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getApiUrl"])("/api/common/setting/service/scope/".concat(serviceId));
+                        const url = isOther ? projectUuid ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getApiUrl"])("/api/account/project/definition/ai-intake/check-clarification/".concat(projectUuid, "/").concat((0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectServicesState$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["requireProjectServiceUuid"])(locale))) : null : (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getApiUrl"])("/api/common/setting/service/scope/".concat(serviceId));
                         if (!url) throw new Error('missing_project_uuid');
                         const res = await fetch(url, {
                             method: 'GET',
@@ -572,7 +576,7 @@ function ProjectSubscopesQuestion(param) {
                             });
                             await (0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectApiError$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["assertProjectApiResponse"])(showRes, isRTL ? 'تعذر تحميل نطاقات الخدمة.' : 'Failed to load service scopes.');
                             const showJson = await showRes.json();
-                            list = extractSuggestedScopesFromProjectRequest(showJson);
+                            list = extractSuggestedScopesFromProjectRequest((0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectServicesState$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["activeServiceResponse"])(showJson, locale));
                         }
                         if (!cancelled) {
                             setScopes(list || []);
@@ -993,19 +997,19 @@ function ProjectSubscopesQuestion(param) {
                         size: 14
                     }, void 0, false, {
                         fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                        lineNumber: 1104,
+                        lineNumber: 1107,
                         columnNumber: 9
                     }, this),
                     isRTL ? 'إضافة نطاق فرعي' : 'Add Subscope'
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                lineNumber: 1099,
+                lineNumber: 1102,
                 columnNumber: 7
             }, this)
         }, void 0, false, {
             fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-            lineNumber: 1098,
+            lineNumber: 1101,
             columnNumber: 5
         }, this);
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1018,7 +1022,7 @@ function ProjectSubscopesQuestion(param) {
                 projectTypeId: projectType
             }, void 0, false, {
                 fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                lineNumber: 1112,
+                lineNumber: 1115,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1028,7 +1032,7 @@ function ProjectSubscopesQuestion(param) {
                         children: '\n            #project-subscopes-question-title {\n              font-family: "IBM Plex Serif", serif !important;\n            }\n          '
                     }, void 0, false, {
                         fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                        lineNumber: 1127,
+                        lineNumber: 1130,
                         columnNumber: 11
                     }, this) : null,
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1040,7 +1044,7 @@ function ProjectSubscopesQuestion(param) {
                                 children: title
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                lineNumber: 1134,
+                                lineNumber: 1137,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1048,13 +1052,13 @@ function ProjectSubscopesQuestion(param) {
                                 children: selectedCountLabel(manualTotalSubscopes + totalSelectedSubscopes)
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                lineNumber: 1140,
+                                lineNumber: 1143,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                        lineNumber: 1133,
+                        lineNumber: 1136,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1062,13 +1066,13 @@ function ProjectSubscopesQuestion(param) {
                         children: subtitle
                     }, void 0, false, {
                         fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                        lineNumber: 1144,
+                        lineNumber: 1147,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                lineNumber: 1118,
+                lineNumber: 1121,
                 columnNumber: 7
             }, this),
             error ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1076,7 +1080,7 @@ function ProjectSubscopesQuestion(param) {
                 children: error
             }, void 0, false, {
                 fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                lineNumber: 1150,
+                lineNumber: 1153,
                 columnNumber: 9
             }, this) : null,
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1086,7 +1090,7 @@ function ProjectSubscopesQuestion(param) {
                     children: isRTL ? 'جاري التحميل…' : 'Loading…'
                 }, void 0, false, {
                     fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                    lineNumber: 1155,
+                    lineNumber: 1158,
                     columnNumber: 11
                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "grid grid-cols-1 items-start gap-4 lg:grid-cols-2",
@@ -1110,7 +1114,7 @@ function ProjectSubscopesQuestion(param) {
                                                     children: parent.name
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                    lineNumber: 1174,
+                                                    lineNumber: 1177,
                                                     columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1123,7 +1127,7 @@ function ProjectSubscopesQuestion(param) {
                                                             children: areAllChildrenSelected(parent.id, children) ? isRTL ? 'إلغاء تحديد الكل' : 'Deselect all' : isRTL ? 'تحديد الكل' : 'Select all'
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                            lineNumber: 1179,
+                                                            lineNumber: 1182,
                                                             columnNumber: 27
                                                         }, this) : null,
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1131,19 +1135,19 @@ function ProjectSubscopesQuestion(param) {
                                                             children: selectedCountLabel(selectedCount)
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                            lineNumber: 1193,
+                                                            lineNumber: 1196,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                    lineNumber: 1177,
+                                                    lineNumber: 1180,
                                                     columnNumber: 23
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                            lineNumber: 1173,
+                                            lineNumber: 1176,
                                             columnNumber: 21
                                         }, this),
                                         children.length === 0 ? !otherOpen ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1151,7 +1155,7 @@ function ProjectSubscopesQuestion(param) {
                                             children: renderAddSubscopeField(scopeKey)
                                         }, void 0, false, {
                                             fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                            lineNumber: 1201,
+                                            lineNumber: 1204,
                                             columnNumber: 25
                                         }, this) : null : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                             className: "grid grid-cols-1 gap-x-8 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2",
@@ -1180,12 +1184,12 @@ function ProjectSubscopesQuestion(param) {
                                                                                     className: "text-white"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                                    lineNumber: 1231,
+                                                                                    lineNumber: 1234,
                                                                                     columnNumber: 39
                                                                                 }, this) : null
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                                lineNumber: 1223,
+                                                                                lineNumber: 1226,
                                                                                 columnNumber: 35
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1193,13 +1197,13 @@ function ProjectSubscopesQuestion(param) {
                                                                                 children: child.name
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                                lineNumber: 1234,
+                                                                                lineNumber: 1237,
                                                                                 columnNumber: 35
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                        lineNumber: 1217,
+                                                                        lineNumber: 1220,
                                                                         columnNumber: 33
                                                                     }, this),
                                                                     checked ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1213,18 +1217,18 @@ function ProjectSubscopesQuestion(param) {
                                                                             stroke: 1.8
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                            lineNumber: 1249,
+                                                                            lineNumber: 1252,
                                                                             columnNumber: 37
                                                                         }, this)
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                        lineNumber: 1242,
+                                                                        lineNumber: 1245,
                                                                         columnNumber: 35
                                                                     }, this) : null
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                lineNumber: 1216,
+                                                                lineNumber: 1219,
                                                                 columnNumber: 31
                                                             }, this),
                                                             checked && attachments.length > 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1235,18 +1239,18 @@ function ProjectSubscopesQuestion(param) {
                                                                         isRTL: isRTL
                                                                     }, "".concat(file.name, "-").concat(file.size, "-").concat(idx), false, {
                                                                         fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                        lineNumber: 1257,
+                                                                        lineNumber: 1260,
                                                                         columnNumber: 37
                                                                     }, this))
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                lineNumber: 1255,
+                                                                lineNumber: 1258,
                                                                 columnNumber: 33
                                                             }, this) : null
                                                         ]
                                                     }, child.id, true, {
                                                         fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                        lineNumber: 1212,
+                                                        lineNumber: 1215,
                                                         columnNumber: 29
                                                     }, this);
                                                 }),
@@ -1254,7 +1258,7 @@ function ProjectSubscopesQuestion(param) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                            lineNumber: 1206,
+                                            lineNumber: 1209,
                                             columnNumber: 23
                                         }, this),
                                         otherOpen ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1289,12 +1293,12 @@ function ProjectSubscopesQuestion(param) {
                                                                                             className: "text-white"
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                                            lineNumber: 1305,
+                                                                                            lineNumber: 1308,
                                                                                             columnNumber: 45
                                                                                         }, this) : null
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                                        lineNumber: 1296,
+                                                                                        lineNumber: 1299,
                                                                                         columnNumber: 41
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1302,13 +1306,13 @@ function ProjectSubscopesQuestion(param) {
                                                                                         children: sub.name
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                                        lineNumber: 1308,
+                                                                                        lineNumber: 1311,
                                                                                         columnNumber: 41
                                                                                     }, this)
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                                lineNumber: 1291,
+                                                                                lineNumber: 1294,
                                                                                 columnNumber: 39
                                                                             }, this),
                                                                             isConfirmed ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1322,12 +1326,12 @@ function ProjectSubscopesQuestion(param) {
                                                                                     stroke: 1.8
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                                    lineNumber: 1321,
+                                                                                    lineNumber: 1324,
                                                                                     columnNumber: 43
                                                                                 }, this)
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                                lineNumber: 1314,
+                                                                                lineNumber: 1317,
                                                                                 columnNumber: 41
                                                                             }, this) : null,
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1340,29 +1344,30 @@ function ProjectSubscopesQuestion(param) {
                                                                                     size: 14
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                                    lineNumber: 1332,
+                                                                                    lineNumber: 1335,
                                                                                     columnNumber: 41
                                                                                 }, this)
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                                lineNumber: 1325,
+                                                                                lineNumber: 1328,
                                                                                 columnNumber: 39
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                        lineNumber: 1290,
+                                                                        lineNumber: 1293,
                                                                         columnNumber: 37
                                                                     }, this)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                    lineNumber: 1289,
+                                                                    lineNumber: 1292,
                                                                     columnNumber: 35
                                                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                                     className: "flex items-start justify-between gap-3",
                                                                     children: [
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
                                                                             value: sub.name,
+                                                                            maxLength: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$backendLimits$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["BACKEND_STRING_MAX"],
                                                                             onChange: (e)=>updateManualSubscopeName(scopeKey, sub.id, e.target.value),
                                                                             onKeyDown: (e)=>{
                                                                                 if (e.key === 'Enter') confirmManualSubscope(scopeKey, sub.id);
@@ -1372,7 +1377,7 @@ function ProjectSubscopesQuestion(param) {
                                                                             className: "w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-[13px] font-semibold text-slate-900 placeholder:text-slate-400 focus:border-slate-300 focus:outline-none focus:ring-0 ".concat(isRTL ? 'text-right' : 'text-left')
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                            lineNumber: 1338,
+                                                                            lineNumber: 1341,
                                                                             columnNumber: 37
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1390,12 +1395,12 @@ function ProjectSubscopesQuestion(param) {
                                                                                         stroke: 2
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                                        lineNumber: 1361,
+                                                                                        lineNumber: 1365,
                                                                                         columnNumber: 41
                                                                                     }, this)
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                                    lineNumber: 1353,
+                                                                                    lineNumber: 1357,
                                                                                     columnNumber: 39
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1408,24 +1413,24 @@ function ProjectSubscopesQuestion(param) {
                                                                                         size: 14
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                                        lineNumber: 1371,
+                                                                                        lineNumber: 1375,
                                                                                         columnNumber: 41
                                                                                     }, this)
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                                    lineNumber: 1364,
+                                                                                    lineNumber: 1368,
                                                                                     columnNumber: 39
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                            lineNumber: 1352,
+                                                                            lineNumber: 1356,
                                                                             columnNumber: 37
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                    lineNumber: 1337,
+                                                                    lineNumber: 1340,
                                                                     columnNumber: 35
                                                                 }, this),
                                                                 attachments.length > 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1436,18 +1441,18 @@ function ProjectSubscopesQuestion(param) {
                                                                             isRTL: isRTL
                                                                         }, "".concat(file.name, "-").concat(file.size, "-").concat(idx), false, {
                                                                             fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                            lineNumber: 1380,
+                                                                            lineNumber: 1384,
                                                                             columnNumber: 39
                                                                         }, this))
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                    lineNumber: 1378,
+                                                                    lineNumber: 1382,
                                                                     columnNumber: 35
                                                                 }, this) : null
                                                             ]
                                                         }, sub.id, true, {
                                                             fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                            lineNumber: 1284,
+                                                            lineNumber: 1287,
                                                             columnNumber: 31
                                                         }, this);
                                                     }),
@@ -1455,23 +1460,23 @@ function ProjectSubscopesQuestion(param) {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                lineNumber: 1276,
+                                                lineNumber: 1279,
                                                 columnNumber: 25
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                            lineNumber: 1274,
+                                            lineNumber: 1277,
                                             columnNumber: 23
                                         }, this) : null
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                    lineNumber: 1172,
+                                    lineNumber: 1175,
                                     columnNumber: 19
                                 }, this)
                             }, parent.id, false, {
                                 fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                lineNumber: 1168,
+                                lineNumber: 1171,
                                 columnNumber: 17
                             }, this);
                         }),
@@ -1492,7 +1497,7 @@ function ProjectSubscopesQuestion(param) {
                                                     children: scope.name
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                    lineNumber: 1412,
+                                                    lineNumber: 1416,
                                                     columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1500,13 +1505,13 @@ function ProjectSubscopesQuestion(param) {
                                                     children: selectedCountLabel(selectedCount)
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                    lineNumber: 1415,
+                                                    lineNumber: 1419,
                                                     columnNumber: 23
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                            lineNumber: 1411,
+                                            lineNumber: 1415,
                                             columnNumber: 21
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1540,12 +1545,12 @@ function ProjectSubscopesQuestion(param) {
                                                                                         className: "text-white"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                                        lineNumber: 1449,
+                                                                                        lineNumber: 1453,
                                                                                         columnNumber: 43
                                                                                     }, this) : null
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                                    lineNumber: 1440,
+                                                                                    lineNumber: 1444,
                                                                                     columnNumber: 39
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1553,13 +1558,13 @@ function ProjectSubscopesQuestion(param) {
                                                                                     children: sub.name
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                                    lineNumber: 1452,
+                                                                                    lineNumber: 1456,
                                                                                     columnNumber: 39
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                            lineNumber: 1435,
+                                                                            lineNumber: 1439,
                                                                             columnNumber: 37
                                                                         }, this),
                                                                         isConfirmed ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1573,12 +1578,12 @@ function ProjectSubscopesQuestion(param) {
                                                                                 stroke: 1.8
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                                lineNumber: 1465,
+                                                                                lineNumber: 1469,
                                                                                 columnNumber: 41
                                                                             }, this)
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                            lineNumber: 1458,
+                                                                            lineNumber: 1462,
                                                                             columnNumber: 39
                                                                         }, this) : null,
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1591,29 +1596,30 @@ function ProjectSubscopesQuestion(param) {
                                                                                 size: 14
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                                lineNumber: 1476,
+                                                                                lineNumber: 1480,
                                                                                 columnNumber: 39
                                                                             }, this)
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                            lineNumber: 1469,
+                                                                            lineNumber: 1473,
                                                                             columnNumber: 37
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                    lineNumber: 1434,
+                                                                    lineNumber: 1438,
                                                                     columnNumber: 35
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                lineNumber: 1433,
+                                                                lineNumber: 1437,
                                                                 columnNumber: 33
                                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                                 className: "flex items-start justify-between gap-3",
                                                                 children: [
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
                                                                         value: sub.name,
+                                                                        maxLength: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$backendLimits$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["BACKEND_STRING_MAX"],
                                                                         onChange: (e)=>updateManualSubscopeName(scopeKey, sub.id, e.target.value),
                                                                         onKeyDown: (e)=>{
                                                                             if (e.key === 'Enter') confirmManualSubscope(scopeKey, sub.id);
@@ -1623,7 +1629,7 @@ function ProjectSubscopesQuestion(param) {
                                                                         className: "w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-[13px] font-semibold text-slate-900 placeholder:text-slate-400 focus:border-slate-300 focus:outline-none focus:ring-0 ".concat(isRTL ? 'text-right' : 'text-left')
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                        lineNumber: 1482,
+                                                                        lineNumber: 1486,
                                                                         columnNumber: 35
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1641,12 +1647,12 @@ function ProjectSubscopesQuestion(param) {
                                                                                     stroke: 2
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                                    lineNumber: 1505,
+                                                                                    lineNumber: 1510,
                                                                                     columnNumber: 39
                                                                                 }, this)
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                                lineNumber: 1497,
+                                                                                lineNumber: 1502,
                                                                                 columnNumber: 37
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1659,24 +1665,24 @@ function ProjectSubscopesQuestion(param) {
                                                                                     size: 14
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                                    lineNumber: 1515,
+                                                                                    lineNumber: 1520,
                                                                                     columnNumber: 39
                                                                                 }, this)
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                                lineNumber: 1508,
+                                                                                lineNumber: 1513,
                                                                                 columnNumber: 37
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                        lineNumber: 1496,
+                                                                        lineNumber: 1501,
                                                                         columnNumber: 35
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                lineNumber: 1481,
+                                                                lineNumber: 1485,
                                                                 columnNumber: 33
                                                             }, this),
                                                             attachments.length > 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1687,18 +1693,18 @@ function ProjectSubscopesQuestion(param) {
                                                                         isRTL: isRTL
                                                                     }, "".concat(file.name, "-").concat(file.size, "-").concat(idx), false, {
                                                                         fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                        lineNumber: 1524,
+                                                                        lineNumber: 1529,
                                                                         columnNumber: 37
                                                                     }, this))
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                                lineNumber: 1522,
+                                                                lineNumber: 1527,
                                                                 columnNumber: 33
                                                             }, this) : null
                                                         ]
                                                     }, sub.id, true, {
                                                         fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                                        lineNumber: 1428,
+                                                        lineNumber: 1432,
                                                         columnNumber: 29
                                                     }, this);
                                                 }),
@@ -1706,30 +1712,30 @@ function ProjectSubscopesQuestion(param) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                            lineNumber: 1420,
+                                            lineNumber: 1424,
                                             columnNumber: 21
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                    lineNumber: 1410,
+                                    lineNumber: 1414,
                                     columnNumber: 19
                                 }, this)
                             }, scope.id, false, {
                                 fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                lineNumber: 1406,
+                                lineNumber: 1410,
                                 columnNumber: 17
                             }, this);
                         })
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                    lineNumber: 1159,
+                    lineNumber: 1162,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                lineNumber: 1153,
+                lineNumber: 1156,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1740,7 +1746,7 @@ function ProjectSubscopesQuestion(param) {
                 onChange: (e)=>onFilesPicked(e.target.files)
             }, inputNonce, false, {
                 fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                lineNumber: 1546,
+                lineNumber: 1551,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1756,7 +1762,7 @@ function ProjectSubscopesQuestion(param) {
                                 children: isRTL ? 'رجوع' : 'Back'
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                lineNumber: 1558,
+                                lineNumber: 1563,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1767,29 +1773,29 @@ function ProjectSubscopesQuestion(param) {
                                 children: submitting ? isRTL ? 'جاري المتابعة…' : 'Continuing…' : nav.continueLabel
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                                lineNumber: 1565,
+                                lineNumber: 1570,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                        lineNumber: 1557,
+                        lineNumber: 1562,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                    lineNumber: 1556,
+                    lineNumber: 1561,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-                lineNumber: 1555,
+                lineNumber: 1560,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/project/questions/ProjectSubscopesQuestion.tsx",
-        lineNumber: 1111,
+        lineNumber: 1114,
         columnNumber: 5
     }, this);
 }

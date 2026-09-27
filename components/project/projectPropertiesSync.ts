@@ -1,3 +1,4 @@
+import { readProjectComponents } from './serviceComponentsPayload'
 import { getApiUrl } from '@/app/config'
 import { getAuthToken } from '@/lib/authToken'
 import { assertProjectApiResponse } from './projectApiError'
@@ -73,6 +74,8 @@ export type ProjectPropertiesPayload = {
   phase: string
   business_type: string
   deadline: string
+  planned_start_date?: string | null
+  components?: Record<string, unknown>
   insighter_preferred_type?: 'individual' | 'company' | 'either' | ''
   insighter_origin_id?: string
   insighter_origin_type?: string
@@ -99,6 +102,8 @@ export function buildProjectPropertiesPayload(
   const hasOrigin = Boolean(insighterOriginType && insighterOriginId)
 
   const basePayload = {
+    planned_start_date: readStorageValue(locale, projectWizardStorage.plannedStartDateKey(locale)).trim() || null,
+    components: readProjectComponents(locale),
     phase: mapPhase(readStorageValue(locale, projectWizardStorage.projectStatusKey(locale))),
     business_type: mapBusinessType(
       readStorageValue(locale, projectWizardStorage.whoAreYouKey(locale))

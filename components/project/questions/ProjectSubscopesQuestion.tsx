@@ -1,5 +1,7 @@
 'use client'
 
+import { requireProjectServiceUuid, activeServiceResponse } from '../projectServicesState'
+
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { IconCheck, IconPaperclip, IconPlusFilled, IconXboxXFilled } from '@tabler/icons-react'
@@ -15,6 +17,7 @@ import { writeProjectScopeSnapshot } from '@/components/project/projectAddonsSta
 import { expandServiceComponentSlugs } from '@/components/project/projectWizardFlow'
 import { useProjectStepErrorToast } from '@/components/project/useProjectStepErrorToast'
 import { useProjectWizardNavigation } from '@/components/project/useProjectWizardNavigation'
+import { BACKEND_STRING_MAX } from '@/components/project/backendLimits'
 import { projectWizardStorage, type WizardLocale } from '@/components/project/wizardStorage'
 
 type ScopeChild = { id: number; name: string }
@@ -259,7 +262,7 @@ async function fetchServiceComponents(params: {
   const url =
     params.isOther && params.projectUuid
       ? getApiUrl(
-          `/api/account/project/definition/service-prompt/component/${params.projectUuid}`
+          `/api/account/project/definition/service-prompt/component/${params.projectUuid}/${requireProjectServiceUuid(params.locale)}`
         )
       : getApiUrl(`/api/common/setting/service/component/${params.serviceId}`)
 
@@ -304,7 +307,7 @@ async function syncScopes(params: {
   })
 
   const res = await fetch(
-    getApiUrl(`/api/account/project/definition/scope/sync/${params.projectUuid}`),
+    getApiUrl(`/api/account/project/definition/scope/sync/${params.projectUuid}/${requireProjectServiceUuid(params.locale)}`),
     {
       method: 'POST',
       headers: {
@@ -605,7 +608,7 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
         const url = isOther
           ? projectUuid
             ? getApiUrl(
-                `/api/account/project/definition/ai-intake/check-clarification/${projectUuid}`
+                `/api/account/project/definition/ai-intake/check-clarification/${projectUuid}/${requireProjectServiceUuid(locale)}`
               )
             : null
           : getApiUrl(`/api/common/setting/service/scope/${serviceId}`)
@@ -651,7 +654,7 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
           )
 
           const showJson = (await showRes.json()) as unknown
-          list = extractSuggestedScopesFromProjectRequest(showJson)
+          list = extractSuggestedScopesFromProjectRequest(activeServiceResponse(showJson, locale))
         }
 
         if (!cancelled) {
@@ -1337,6 +1340,7 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
                                   <div className="flex items-start justify-between gap-3">
                                     <input
                                       value={sub.name}
+                                      maxLength={BACKEND_STRING_MAX}
                                       onChange={(e) =>
                                         updateManualSubscopeName(scopeKey, sub.id, e.target.value)
                                       }
@@ -1481,6 +1485,7 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
                                 <div className="flex items-start justify-between gap-3">
                                   <input
                                     value={sub.name}
+                                    maxLength={BACKEND_STRING_MAX}
                                     onChange={(e) =>
                                       updateManualSubscopeName(scopeKey, sub.id, e.target.value)
                                     }

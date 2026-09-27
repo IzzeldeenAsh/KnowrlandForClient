@@ -11,7 +11,7 @@ import { useProjectStepErrorToast } from '../useProjectStepErrorToast'
 import { projectWizardStorage, type WizardLocale } from '../wizardStorage'
 import { useProjectWizardNavigation } from '../useProjectWizardNavigation'
 import { updateServiceComponentPayload } from '@/components/project/serviceComponentsPayload'
-import { syncServiceComponents } from '@/components/project/serviceComponentsSync'
+import { syncProjectProperties } from '@/components/project/projectPropertiesSync'
 
 type Mode = 'worldwide' | 'country' | 'regions' | 'economic'
 
@@ -380,7 +380,7 @@ export default function TargetMarketQuestion({ locale }: { locale: WizardLocale 
 
     updateServiceComponentPayload(locale, 'target-market', payload)
 
-    const leavingComponents = nav.nextStepId === 'project-status' || nav.isReviewEditMode
+    const leavingComponents = nav.isReviewEditMode
     if (!leavingComponents) {
       nav.goNext()
       return
@@ -388,7 +388,7 @@ export default function TargetMarketQuestion({ locale }: { locale: WizardLocale 
 
     setSubmitting(true)
     try {
-      await syncServiceComponents(locale)
+      await syncProjectProperties(locale)
       nav.goNext()
     } catch (err) {
       setError(

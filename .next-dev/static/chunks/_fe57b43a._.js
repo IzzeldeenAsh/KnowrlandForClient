@@ -6451,6 +6451,8 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 "use strict";
 
 __turbopack_context__.s([
+    "activeServiceStorageKey",
+    ()=>activeServiceStorageKey,
     "clearProjectWizardStorage",
     ()=>clearProjectWizardStorage,
     "clearProjectWizardStorageLocalePair",
@@ -6485,7 +6487,23 @@ function listProjectWizardStorageKeys(locale) {
     }
     return keys;
 }
+function activeServiceStorageKey(locale, name) {
+    const uuid = ("TURBOPACK compile-time falsy", 0) ? "TURBOPACK unreachable" : window.sessionStorage.getItem("project:wizard:".concat(locale, ":activeService")) || 'pending';
+    return "project:wizard:".concat(locale, ":services:").concat(uuid, ":").concat(name);
+}
 const projectWizardStorage = {
+    plannedStartDateKey (locale) {
+        return "project:wizard:".concat(locale, ":plannedStartDate");
+    },
+    projectComponentsKey (locale) {
+        return "project:wizard:".concat(locale, ":projectComponents");
+    },
+    projectComponentSlugsKey (locale) {
+        return "project:wizard:".concat(locale, ":projectComponentSlugs");
+    },
+    serviceAddonsKey (locale) {
+        return activeServiceStorageKey(locale, 'addons');
+    },
     projectTypeKey (locale) {
         return "project:wizard:".concat(locale, ":projectType");
     },
@@ -6541,7 +6559,7 @@ const projectWizardStorage = {
         return "project:wizard:".concat(locale, ":companyMaxTeamSize");
     },
     projectScopeSnapshotKey (locale) {
-        return "project:wizard:".concat(locale, ":projectScopeSnapshot");
+        return activeServiceStorageKey(locale, 'projectScopeSnapshot');
     },
     projectAddonsKey (locale) {
         return "project:wizard:".concat(locale, ":projectAddons");
@@ -6565,43 +6583,43 @@ const projectWizardStorage = {
         return "project:wizard:".concat(locale, ":targetMarketEconomicBlocIds");
     },
     serviceIdsKey (locale) {
-        return "project:wizard:".concat(locale, ":serviceIds");
+        return activeServiceStorageKey(locale, 'serviceIds');
     },
     serviceLabelKey (locale) {
-        return "project:wizard:".concat(locale, ":serviceLabel");
+        return activeServiceStorageKey(locale, 'serviceLabel');
     },
     servicePromptKey (locale) {
-        return "project:wizard:".concat(locale, ":servicePrompt");
+        return activeServiceStorageKey(locale, 'servicePrompt');
     },
     serviceIsOtherKey (locale) {
-        return "project:wizard:".concat(locale, ":serviceIsOther");
+        return activeServiceStorageKey(locale, 'serviceIsOther');
     },
     serviceScopeParentIdsKey (locale) {
-        return "project:wizard:".concat(locale, ":serviceScopeParentIds");
+        return activeServiceStorageKey(locale, 'serviceScopeParentIds');
     },
     serviceScopeChildIdsByParentKey (locale) {
-        return "project:wizard:".concat(locale, ":serviceScopeChildIdsByParent");
+        return activeServiceStorageKey(locale, 'serviceScopeChildIdsByParent');
     },
     serviceScopeHasChildrenKey (locale) {
-        return "project:wizard:".concat(locale, ":serviceScopeHasChildren");
+        return activeServiceStorageKey(locale, 'serviceScopeHasChildren');
     },
     serviceManualScopesKey (locale) {
-        return "project:wizard:".concat(locale, ":serviceManualScopes");
+        return activeServiceStorageKey(locale, 'serviceManualScopes');
     },
     serviceManualSubscopesByScopeKey (locale) {
-        return "project:wizard:".concat(locale, ":serviceManualSubscopesByScope");
+        return activeServiceStorageKey(locale, 'serviceManualSubscopesByScope');
     },
     serviceAiSuggestedScopesKey (locale) {
-        return "project:wizard:".concat(locale, ":serviceAiSuggestedScopes");
+        return activeServiceStorageKey(locale, 'serviceAiSuggestedScopes');
     },
     serviceComponentsPayloadKey (locale) {
-        return "project:wizard:".concat(locale, ":serviceComponentsPayload");
+        return activeServiceStorageKey(locale, 'serviceComponentsPayload');
     },
     serviceComponentSlugsKey (locale) {
-        return "project:wizard:".concat(locale, ":serviceComponentSlugs");
+        return activeServiceStorageKey(locale, 'serviceComponentSlugs');
     },
     serviceComponentAnswerKey (locale, slug) {
-        return "project:wizard:".concat(locale, ":serviceComponent:").concat(slug);
+        return activeServiceStorageKey(locale, "serviceComponent:".concat(slug));
     },
     deadlineOfferKey (locale) {
         return "project:wizard:".concat(locale, ":deadlineOffer");

@@ -1176,7 +1176,7 @@ function Callback({ locale }) {
                 }).catch(()=>{});
                 const roles = Array.isArray(user.roles) ? user.roles : [];
                 if (roles.includes('admin') || roles.includes('staff')) {
-                    destination.current = `/${locale}/dashboard`;
+                    destination.current = `/${locale}/dashboard/users/clients`;
                     navigate();
                     return;
                 }

@@ -113,7 +113,8 @@ async function fetchInsighterPromptStatuses(options) {
         const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getApiUrl"])('/api/insighter/onboarding/prompts/status'), {
             method: 'POST',
             headers: onboardingHeaders(options),
-            cache: 'no-store'
+            cache: 'no-store',
+            signal: AbortSignal.timeout(10000)
         });
         if (!response.ok) return [];
         const payload = await response.json();
@@ -144,7 +145,8 @@ async function fetchOnboardingPromptStatuses(options) {
     const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getApiUrl"])('/api/account/profile/onboarding/prompts/status'), {
         method: 'POST',
         headers: onboardingHeaders(options),
-        cache: 'no-store'
+        cache: 'no-store',
+        signal: AbortSignal.timeout(10000)
     });
     if (!response.ok) {
         throw new Error(await getErrorMessage(response, 'Unable to check your onboarding status.'));
@@ -721,7 +723,7 @@ async function saveImageTextPost(payload, status, locale, uuid) {
     }
     const formData = new FormData();
     formData.append('body', payload.body);
-    formData.append('industry_id', String(payload.industryId));
+    if (payload.industryId !== null) formData.append('industry_id', String(payload.industryId));
     formData.append('status', status);
     if (status === 'published' && payload.authorType) {
         formData.append('author_type', payload.authorType);

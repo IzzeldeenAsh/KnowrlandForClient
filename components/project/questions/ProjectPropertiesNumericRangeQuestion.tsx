@@ -136,7 +136,8 @@ export default function ProjectPropertiesNumericRangeQuestion({
     setError(null)
 
     try {
-      await syncProjectProperties(locale)
+      // Initial answers stay in the draft until the project is created and reviewed.
+      if (nav.isReviewEditMode) await syncProjectProperties(locale)
       if (nav.nextHref) {
         nav.goNext()
         return

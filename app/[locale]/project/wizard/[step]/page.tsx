@@ -1,3 +1,8 @@
+import DeliverablesQuestion from '@/components/project/questions/service-components/DeliverablesQuestion'
+import ProjectContextStep from '@/components/project/questions/ProjectContextStep'
+import PlannedStartDateQuestion from '@/components/project/questions/PlannedStartDateQuestion'
+import ServicesSummaryStep from '@/components/project/questions/ServicesSummaryStep'
+import ServiceAddonsStep from '@/components/project/questions/ServiceAddonsStep'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import ProjectWizardShell from '@/components/project/ProjectWizardShell'
@@ -23,12 +28,6 @@ import TargetMarketQuestion from '@/components/project/questions/TargetMarketQue
 import ServiceQuestion from '@/components/project/questions/ServiceQuestion'
 import ProjectScopeQuestion from '@/components/project/questions/ProjectScopeQuestion'
 import ProjectSubscopesQuestion from '@/components/project/questions/ProjectSubscopesQuestion'
-import DeliverableFirstDraftDateQuestion from '@/components/project/questions/service-components/DeliverableFirstDraftDateQuestion'
-import DeliverableFirstDraftTypeQuestion from '@/components/project/questions/service-components/DeliverableFirstDraftTypeQuestion'
-import DeliverableFirstDraftWayQuestion from '@/components/project/questions/service-components/DeliverableFirstDraftWayQuestion'
-import DeliverableFinalVersionDateQuestion from '@/components/project/questions/service-components/DeliverableFinalVersionDateQuestion'
-import DeliverableFinalVersionTypeQuestion from '@/components/project/questions/service-components/DeliverableFinalVersionTypeQuestion'
-import DeliverableFinalVersionWayQuestion from '@/components/project/questions/service-components/DeliverableFinalVersionWayQuestion'
 import DataSourcesExpectedQuestion from '@/components/project/questions/service-components/DataSourcesExpectedQuestion'
 
 type PageProps = {
@@ -39,21 +38,38 @@ export default async function ProjectWizardStepPage({ params }: PageProps) {
   const { locale, step } = await params
 
   const legacyRedirects: Record<string, string> = {
+    'deliverable-first-draft-date': 'deliverables',
+    'deliverable-first-draft-type': 'deliverables',
+    'deliverable-first-draft-way': 'deliverables',
+    'deliverable-final-version-date': 'deliverables',
+    'deliverable-final-version-type': 'deliverables',
+    'deliverable-final-version-way': 'deliverables',
     '1': 'project-type',
     '2': 'deliverables-language',
     '3': 'service',
     '5': 'project-status',
     '6': 'target-market',
     '7': 'service',
-    'deliverable-stage': 'deliverable-first-draft-date',
-    'deliverable-type-first-draft': 'deliverable-first-draft-type',
-    'deliverable-type-final-version': 'deliverable-final-version-type',
+    'deliverable-stage': 'deliverables',
+    'deliverable-type-first-draft': 'deliverables',
+    'deliverable-type-final-version': 'deliverables',
   }
 
   const legacyTarget = legacyRedirects[step]
   if (legacyTarget) {
     redirect(`/${locale}/project/wizard/${legacyTarget}`)
   }
+
+  const newSteps: Record<string, React.ComponentType<{locale: string}>> = {
+    'deliverables': DeliverablesQuestion,
+    'project-context': ProjectContextStep,
+    'planned-start-date': PlannedStartDateQuestion,
+    'services-summary': ServicesSummaryStep,
+    'service-addons': ServiceAddonsStep,
+  }
+  const NewStep = newSteps[step]
+  if (NewStep) return <ProjectWizardShell align="top"><NewStep locale={locale} /></ProjectWizardShell>
+  if (step === 'service-intake') return <ProjectWizardShell align="top"><ProjectScopeQuestion locale={locale} intakeOnly /></ProjectWizardShell>
 
   if (step === 'project-type') {
     return (
@@ -120,66 +136,6 @@ export default async function ProjectWizardStepPage({ params }: PageProps) {
       <ProjectWizardShell align="top">
         <div className="w-full pt-2 sm:pt-4">
           <ProjectSubscopesQuestion locale={locale} />
-        </div>
-      </ProjectWizardShell>
-    )
-  }
-
-  if (step === 'deliverable-first-draft-date') {
-    return (
-      <ProjectWizardShell align="top">
-        <div className="w-full pt-2 sm:pt-4">
-          <DeliverableFirstDraftDateQuestion locale={locale} />
-        </div>
-      </ProjectWizardShell>
-    )
-  }
-
-  if (step === 'deliverable-first-draft-type') {
-    return (
-      <ProjectWizardShell align="top">
-        <div className="w-full pt-2 sm:pt-4">
-          <DeliverableFirstDraftTypeQuestion locale={locale} />
-        </div>
-      </ProjectWizardShell>
-    )
-  }
-
-  if (step === 'deliverable-first-draft-way') {
-    return (
-      <ProjectWizardShell align="top">
-        <div className="w-full pt-2 sm:pt-4">
-          <DeliverableFirstDraftWayQuestion locale={locale} />
-        </div>
-      </ProjectWizardShell>
-    )
-  }
-
-  if (step === 'deliverable-final-version-date') {
-    return (
-      <ProjectWizardShell align="top">
-        <div className="w-full pt-2 sm:pt-4">
-          <DeliverableFinalVersionDateQuestion locale={locale} />
-        </div>
-      </ProjectWizardShell>
-    )
-  }
-
-  if (step === 'deliverable-final-version-type') {
-    return (
-      <ProjectWizardShell align="top">
-        <div className="w-full pt-2 sm:pt-4">
-          <DeliverableFinalVersionTypeQuestion locale={locale} />
-        </div>
-      </ProjectWizardShell>
-    )
-  }
-
-  if (step === 'deliverable-final-version-way') {
-    return (
-      <ProjectWizardShell align="top">
-        <div className="w-full pt-2 sm:pt-4">
-          <DeliverableFinalVersionWayQuestion locale={locale} />
         </div>
       </ProjectWizardShell>
     )

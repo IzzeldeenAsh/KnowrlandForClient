@@ -1,3 +1,4 @@
+import { requireProjectServiceUuid } from './projectServicesState'
 import { getApiUrl } from '@/app/config'
 import { getAuthToken } from '@/lib/authToken'
 import { assertProjectApiResponse } from './projectApiError'
@@ -17,7 +18,7 @@ export async function syncServiceComponents(locale: WizardLocale) {
   const payload = readServiceComponentsPayload(locale)
 
   const res = await fetch(
-    getApiUrl(`/api/account/project/definition/component/sync/${projectUuid}`),
+    getApiUrl(`/api/account/project/definition/component/sync/${projectUuid}/${requireProjectServiceUuid(locale)}`),
     {
       method: 'POST',
       headers: {

@@ -1,4 +1,6 @@
 'use client'
+import { readProjectServices } from './projectServicesState'
+import { isSpecifiedInsighterProject } from './specifiedInsighterProject'
 
 import { useEffect, useMemo, useState } from 'react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
@@ -7,8 +9,10 @@ import {
   type WizardLocale,
 } from './wizardStorage'
 import {
+  getNextProjectWizardStepId,
   getProjectWizardStepOrder,
   normalizeProjectWizardStepId,
+  passThroughStepIds,
   projectWizardStepIds,
 } from './projectWizardFlow'
 
@@ -37,7 +41,13 @@ export function useProjectWizardNavigation(locale: WizardLocale) {
 
   const index = useMemo(() => stepOrder.indexOf(currentStep), [currentStep, stepOrder])
 
-  const prevStepId = index > 0 ? stepOrder[index - 1] : null
+  const prevStepId =
+    index > 0
+      ? stepOrder
+          .slice(0, index)
+          .reverse()
+          .find((step) => !passThroughStepIds.has(step)) || null
+      : null
   const nextStepId =
     index >= 0 && index < stepOrder.length - 1 ? stepOrder[index + 1] : null
 
@@ -58,7 +68,9 @@ export function useProjectWizardNavigation(locale: WizardLocale) {
 
   const editHrefFor = (stepId: string) => withReviewReturn(baseHrefFor(stepId))
 
-  const backHref = isReviewEditMode
+  const backHref = currentStep === 'service' && isSpecifiedInsighterProject(locale) && readProjectServices(locale).length > 0
+    ? baseHrefFor('services-summary')
+    : isReviewEditMode
     ? reviewHref
     : prevStepId
       ? hrefFor(prevStepId)
@@ -82,15 +94,10 @@ export function useProjectWizardNavigation(locale: WizardLocale) {
       return
     }
 
-    const freshStepOrder = getProjectWizardStepOrder(locale)
-    const freshIndex = freshStepOrder.indexOf(currentStep)
-    const freshNextStepId =
-      freshIndex >= 0 && freshIndex < freshStepOrder.length - 1
-        ? freshStepOrder[freshIndex + 1]
-        : null
+    const freshNextStepId = getNextProjectWizardStepId(locale, currentStep)
 
     if (!freshNextStepId) return
-    setStepOrder(freshStepOrder)
+    setStepOrder(getProjectWizardStepOrder(locale))
     router.push(hrefFor(freshNextStepId))
   }
 

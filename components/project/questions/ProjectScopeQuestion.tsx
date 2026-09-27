@@ -1,5 +1,7 @@
 'use client'
 
+import { requireProjectServiceUuid, activeServiceResponse, markServiceComplete } from '../projectServicesState'
+
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { IconArrowUp, IconCheck, IconPlusFilled, IconSparklesFilled, IconXboxXFilled } from '@tabler/icons-react'
@@ -9,12 +11,12 @@ import {
   getProjectApiErrorMessage,
 } from '@/components/project/projectApiError'
 import {
-  clearStoredProjectRequestUuid,
   readStoredProjectRequestUuid,
 } from '@/components/project/projectRequestUuid'
-import { clearStoredProposalMatchUuid } from '@/components/project/projectProposalMatchUuid'
 import { useProjectStepErrorToast } from '@/components/project/useProjectStepErrorToast'
 import { useProjectWizardNavigation } from '@/components/project/useProjectWizardNavigation'
+import { projectWizardStepIds } from '@/components/project/projectWizardFlow'
+import { BACKEND_STRING_MAX } from '@/components/project/backendLimits'
 import { getApiUrl } from '@/app/config'
 import { getAuthToken } from '@/lib/authToken'
 import { projectWizardStorage, type WizardLocale } from '@/components/project/wizardStorage'
@@ -330,7 +332,7 @@ function AiIntakeFallback({
 
   const message = isRTL
     ? 'يرجى الرجوع واختيار خدمة من الخدمات المعرّفة مسبقًا للمتابعة.'
-    : 'Please go back and choose one of the predefined services to continue.'
+    : 'Return to your services to review the request, or start a new request.'
 
   return (
     <div className="max-w-2xl rounded-2xl border border-rose-100 bg-white/85 p-4 shadow-sm">
@@ -343,7 +345,7 @@ function AiIntakeFallback({
         onClick={onBackToServices}
         className="mt-4 rounded-full bg-[#1C7CBB] px-5 py-2 text-sm font-semibold text-white hover:bg-[#176799]"
       >
-        {isRTL ? 'اختيار خدمة معرّفة مسبقًا' : 'Choose a predefined service'}
+        {isRTL ? 'إدارة الخدمات' : 'Manage services'}
       </button>
     </div>
   )
@@ -359,6 +361,15 @@ function safeParseSelectedServiceId(value: string | null): number | null {
     const n = Number(value)
     return Number.isFinite(n) ? n : null
   }
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
 }
 
 function readServiceIsOther(locale: WizardLocale): boolean {
@@ -469,15 +480,19 @@ function persistAiSuggestedScopes(locale: WizardLocale, scopes: ScopeParent[]) {
 
 // components are fetched after scope sync (next step)
 
-export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale }) {
+export default function ProjectScopeQuestion({ locale, intakeOnly = false }: { locale: WizardLocale; intakeOnly?: boolean }) {
   const nav = useProjectWizardNavigation(locale)
   const isRTL = locale === 'ar'
   const isEnglish =
     typeof locale === 'string' && locale.toLowerCase().startsWith('en')
 
+  useEffect(() => {
+    if (!intakeOnly && !nav.isReviewEditMode) { try { markServiceComplete(locale, false) } catch {} }
+  }, [locale, intakeOnly, nav.isReviewEditMode])
   const [entered, setEntered] = useState(false)
   const [projectType, setProjectType] = useState<string | null>(null)
   const [serviceId, setServiceId] = useState<number | null>(null)
+  const [serviceLabel, setServiceLabel] = useState<string | null>(null)
   const [projectUuid, setProjectUuid] = useState('')
 
   const [scopes, setScopes] = useState<ScopeParent[] | null>(null)
@@ -513,6 +528,10 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
         safeParseSelectedServiceId(
           window.sessionStorage.getItem(projectWizardStorage.serviceIdsKey(locale))
         )
+      )
+      setServiceLabel(
+        window.sessionStorage.getItem(projectWizardStorage.serviceLabelKey(locale))?.trim() ||
+          null
       )
       setProjectUuid(readStoredProjectRequestUuid(locale))
       setSelectedParentIds(
@@ -582,7 +601,7 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
 
             try {
               const url = getApiUrl(
-                `/api/account/project/definition/ai-intake/check-clarification/${projectUuid}`
+                `/api/account/project/definition/ai-intake/check-clarification/${projectUuid}/${requireProjectServiceUuid(locale)}`
               )
               const res = await fetch(url, {
                 method: 'GET',
@@ -646,13 +665,14 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
                   )
 
                   const showJson = (await showRes.json()) as unknown
-                  showList = extractSuggestedScopesFromProjectRequest(showJson)
+                  showList = extractSuggestedScopesFromProjectRequest(activeServiceResponse(showJson, locale))
                 }
 
                 if (!cancelled) {
                   setScopes(showList)
                   persistAiSuggestedScopes(locale, showList)
                   setAiMode('idle')
+                  if (intakeOnly) nav.goNext()
                 }
                 return
               }
@@ -813,9 +833,13 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
       ? isRTL
         ? 'أضف نطاقات المشروع'
         : 'Add project scopes'
-      : isRTL
-        ? 'اختر نطاق المشروع'
-        : 'Select project scope'
+      : serviceLabel
+        ? isRTL
+          ? `اختر نطاق <span class="bg-gradient-to-r from-blue-700 via-sky-600 to-cyan-500 bg-clip-text text-transparent">${escapeHtml(serviceLabel)}</span>`
+          : `Select <span class="bg-gradient-to-r from-blue-700 via-sky-600 to-cyan-500 bg-clip-text text-transparent">${escapeHtml(serviceLabel)}</span> scope`
+        : isRTL
+          ? 'اختر نطاق المشروع'
+          : 'Select project scope'
 
   const subtitle = isOtherFlow
     ? availableScopes.length > 0
@@ -953,36 +977,7 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
   }
 
   const returnToDefinedServices = () => {
-    try {
-      window.sessionStorage.removeItem(projectWizardStorage.serviceIdsKey(locale))
-      window.sessionStorage.removeItem(projectWizardStorage.serviceIsOtherKey(locale))
-      window.sessionStorage.removeItem(projectWizardStorage.serviceLabelKey(locale))
-      window.sessionStorage.removeItem(projectWizardStorage.servicePromptKey(locale))
-      window.sessionStorage.removeItem(projectWizardStorage.projectScopeSnapshotKey(locale))
-      window.sessionStorage.removeItem(projectWizardStorage.serviceManualScopesKey(locale))
-      window.sessionStorage.removeItem(projectWizardStorage.serviceAiSuggestedScopesKey(locale))
-      window.sessionStorage.removeItem(
-        projectWizardStorage.serviceManualSubscopesByScopeKey(locale)
-      )
-      window.sessionStorage.setItem(
-        projectWizardStorage.serviceScopeParentIdsKey(locale),
-        JSON.stringify([])
-      )
-      window.sessionStorage.setItem(
-        projectWizardStorage.serviceComponentSlugsKey(locale),
-        JSON.stringify([])
-      )
-      window.sessionStorage.setItem(
-        projectWizardStorage.serviceComponentsPayloadKey(locale),
-        JSON.stringify({ components: {} })
-      )
-    } catch {
-      // ignore
-    }
-
-    clearStoredProjectRequestUuid(locale)
-    clearStoredProposalMatchUuid(locale)
-    nav.goBack()
+    window.location.assign(`/${locale}/project/wizard/services-summary`)
   }
 
   const submitAiClarificationAnswers = async () => {
@@ -1009,7 +1004,7 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
 
     try {
       const res = await fetch(
-        getApiUrl(`/api/account/project/definition/ai-intake/answers/${projectUuid}`),
+        getApiUrl(`/api/account/project/definition/ai-intake/answers/${projectUuid}/${requireProjectServiceUuid(locale)}`),
         {
           method: 'POST',
           headers: {
@@ -1067,6 +1062,12 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
       // ignore
     }
 
+    // Scopes are only saved by the sub-scopes step, so a review edit continues there.
+    if (nav.isReviewEditMode) {
+      window.location.assign(nav.hrefFor(projectWizardStepIds.projectSubscopes))
+      return
+    }
+
     nav.goNext()
   }
 
@@ -1099,7 +1100,8 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
       >
         {isEnglish ? (
           <style>{`
-            #project-scope-question-title {
+            #project-scope-question-title,
+            #project-scope-question-title * {
               font-family: "IBM Plex Serif", serif !important;
             }
           `}</style>
@@ -1260,6 +1262,7 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
                 />
                 <input
                   value={pendingScopeName}
+                  maxLength={BACKEND_STRING_MAX}
                   onChange={(e) => setPendingScopeName(e.target.value)}
                   onBlur={commitPendingScope}
                   onKeyDown={(e) => {

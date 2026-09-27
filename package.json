@@ -19,7 +19,8 @@
     "build:prod": "NEXT_DIST_DIR=.next-local next build",
     "prebuild:stage": "NEXT_DIST_DIR=.next-local node scripts/check-next-dir-perms.js",
     "test:auth": "node --experimental-strip-types --test tests/auth-policy.test.mjs",
-    "test:auth:browser": "node tests/auth-browser.cjs"
+    "test:auth:browser": "node tests/auth-browser.cjs",
+    "test:project:browser": "node tests/project-wizard-browser.cjs"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

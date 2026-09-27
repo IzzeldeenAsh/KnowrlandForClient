@@ -1,15 +1,20 @@
 'use client'
+import { validateDeliverables, type Deliverable } from '../deliverables'
+import { DeliverablesReviewTable, type ReviewProjectService } from './ProjectServicesReview'
+import { readProjectComponents } from '../serviceComponentsPayload'
+import { readProjectServices, selectProjectService } from '../projectServicesState'
+
 
 import Image from 'next/image'
 import { Fragment, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
+  BriefcaseIcon,
   ClipboardDocumentListIcon,
   DocumentTextIcon,
   GlobeAltIcon,
   PencilSquareIcon,
-  SparklesIcon,
 } from '@heroicons/react/24/solid'
 import { getApiUrl } from '@/app/config'
 import { getAuthToken } from '@/lib/authToken'
@@ -27,10 +32,9 @@ import { readProjectAddonsState, readProjectScopeSnapshot } from '../projectAddo
 import { projectTypeLabel } from '../projectLabels'
 import { readProjectDescriptionState } from '../projectDescriptionState'
 import {
-  readServiceComponentsPayload,
   type ServiceComponentsPayload,
 } from '../serviceComponentsPayload'
-import { projectWizardStepIds, readServiceComponentSlugs } from '../projectWizardFlow'
+import { projectWizardStepIds } from '../projectWizardFlow'
 import { useProjectStepErrorToast } from '../useProjectStepErrorToast'
 import { useProjectWizardNavigation } from '../useProjectWizardNavigation'
 import { projectWizardStorage, type WizardLocale } from '../wizardStorage'
@@ -74,6 +78,7 @@ type ProjectRequestComponent = Record<string, unknown>
 type ProjectRequestData = {
   id: number
   uuid?: string
+  project_services?: ReviewProjectService[]
   title?: string | null
   type?: string | null
   service?: RequestService | null
@@ -98,10 +103,14 @@ type ReviewRow = {
   label: string
   value: string[]
   fileTypes?: string[]
-  variant?: 'default' | 'chips' | 'scope-table'
+  variant?: 'default' | 'chips' | 'scope-table' | 'deliverables-table'
   scopeGroups?: Array<{ name: string; subscopes: string[] }>
+  deliverables?: Deliverable[]
   editStepId?: string
+  // Runs before the edit link navigates, e.g. to make a service the active one.
+  onEdit?: () => void
   wide?: boolean
+  full?: boolean
 }
 
 type ReviewSection = {
@@ -110,6 +119,9 @@ type ReviewSection = {
 }
 
 type ReviewData = {
+  projectServices: ReviewProjectService[]
+  plannedStart: string
+
   title: string
   projectType: string
   deliverablesLanguage: string
@@ -137,7 +149,7 @@ const sectionIcons = [
     className: 'bg-sky-50 text-sky-500',
   },
   {
-    icon: SparklesIcon,
+    icon: BriefcaseIcon,
     className: 'bg-amber-50 text-amber-500',
   },
   {
@@ -497,56 +509,6 @@ function getComponentTitle(locale: WizardLocale, slug: string): string {
   return locale === 'ar' ? label.ar : label.en
 }
 
-function getDeliverableWayLabel(locale: WizardLocale, value: string): string {
-  const labels: Record<string, { en: string; ar: string }> = {
-    on_platform: { en: 'On platform', ar: 'على المنصة' },
-    session: { en: 'Session', ar: 'جلسة' },
-    physical_workshop: { en: 'Physical workshop', ar: 'ورشة حضورية' },
-  }
-
-  const match = labels[value]
-  if (!match) return stringifyValue(value)
-  return locale === 'ar' ? match.ar : match.en
-}
-
-function resolveDeliverableWay(value: unknown): { key: string; address: string } {
-  const raw = value && typeof value === 'object' ? (value as Record<string, unknown>) : {}
-  const way = raw.way && typeof raw.way === 'object' ? (raw.way as Record<string, unknown>) : {}
-
-  const selected = stringifyValue(way.selected)
-  if (selected) {
-    return {
-      key: selected,
-      address: stringifyValue(way.address),
-    }
-  }
-
-  const onPlatform =
-    way.on_platform && typeof way.on_platform === 'object'
-      ? Number((way.on_platform as Record<string, unknown>).selected)
-      : 0
-  const session =
-    way.session && typeof way.session === 'object'
-      ? Number((way.session as Record<string, unknown>).selected)
-      : 0
-  const workshop =
-    way.physical_workshop && typeof way.physical_workshop === 'object'
-      ? (way.physical_workshop as Record<string, unknown>)
-      : {}
-
-  if (Number(workshop.selected) > 0) {
-    return {
-      key: 'physical_workshop',
-      address: String(workshop.address || '').trim(),
-    }
-  }
-
-  if (session > 0) return { key: 'session', address: '' }
-  if (onPlatform > 0) return { key: 'on_platform', address: '' }
-
-  return { key: 'on_platform', address: '' }
-}
-
 function buildServiceComponentSections(params: {
   locale: WizardLocale
   slugs: string[]
@@ -558,75 +520,6 @@ function buildServiceComponentSections(params: {
     .filter((slug) => slug !== 'target-market')
     .map<ReviewSection | null>((slug) => {
       const payloadValue = payload.components?.[slug]
-
-      if (slug === 'deliverable-stage') {
-        const raw =
-          payloadValue && typeof payloadValue === 'object'
-            ? (payloadValue as Record<string, unknown>)
-            : {}
-        const firstDraft =
-          raw.first_draft && typeof raw.first_draft === 'object'
-            ? (raw.first_draft as Record<string, unknown>)
-            : {}
-        const finalVersion =
-          raw.final_version && typeof raw.final_version === 'object'
-            ? (raw.final_version as Record<string, unknown>)
-            : {}
-
-        const firstDraftWay = resolveDeliverableWay(firstDraft)
-        const finalVersionWay = resolveDeliverableWay(finalVersion)
-        const firstDraftReportTypes = getReportTypes(firstDraft.report_type)
-        const finalVersionReportTypes = getReportTypes(finalVersion.report_type)
-        const notSpecified = locale === 'ar' ? 'غير محدد' : 'Not specified'
-
-        return {
-          title: getComponentTitle(locale, slug),
-          rows: [
-            {
-              label: locale === 'ar' ? 'تاريخ المسودة الأولى' : 'First draft date',
-              value: [String(firstDraft.date || '').trim() || notSpecified],
-              editStepId: 'deliverable-first-draft-date',
-            },
-            {
-              label: locale === 'ar' ? 'طريقة تسليم المسودة الأولى' : 'First draft delivery mode',
-              value: [
-                getDeliverableWayLabel(locale, firstDraftWay.key),
-                ...(firstDraftWay.address
-                  ? [`${locale === 'ar' ? 'العنوان' : 'Address'}: ${firstDraftWay.address}`]
-                  : []),
-              ],
-              editStepId: 'deliverable-first-draft-way',
-            },
-            {
-              label: locale === 'ar' ? 'صيغ المسودة الأولى' : 'First draft formats',
-              value: firstDraftReportTypes.length === 0 ? [notSpecified] : [],
-              fileTypes: firstDraftReportTypes,
-              editStepId: 'deliverable-first-draft-type',
-            },
-            {
-              label: locale === 'ar' ? 'تاريخ النسخة النهائية' : 'Final version date',
-              value: [String(finalVersion.date || '').trim() || notSpecified],
-              editStepId: 'deliverable-final-version-date',
-            },
-            {
-              label: locale === 'ar' ? 'طريقة تسليم النسخة النهائية' : 'Final version delivery mode',
-              value: [
-                getDeliverableWayLabel(locale, finalVersionWay.key),
-                ...(finalVersionWay.address
-                  ? [`${locale === 'ar' ? 'العنوان' : 'Address'}: ${finalVersionWay.address}`]
-                  : []),
-              ],
-              editStepId: 'deliverable-final-version-way',
-            },
-            {
-              label: locale === 'ar' ? 'صيغ النسخة النهائية' : 'Final version formats',
-              value: finalVersionReportTypes.length === 0 ? [notSpecified] : [],
-              fileTypes: finalVersionReportTypes,
-              editStepId: 'deliverable-final-version-type',
-            },
-          ],
-        }
-      }
 
       if (slug === 'data-sources-expected') {
         return {
@@ -673,6 +566,7 @@ function buildServiceComponentSections(params: {
 }
 
 function SectionBlock({
+  locale,
   title,
   rows,
   emptyText,
@@ -681,6 +575,7 @@ function SectionBlock({
   editLabel,
   editHrefFor,
 }: {
+  locale: WizardLocale
   title: string
   rows: ReviewRow[]
   emptyText: string
@@ -712,7 +607,7 @@ function SectionBlock({
           <article
             key={row.label}
             className={`min-w-0 ${
-              rows.length === 1
+              rows.length === 1 || row.full
                 ? 'sm:col-span-2 xl:col-span-3'
                 : row.wide
                   ? 'sm:col-span-2 xl:col-span-2'
@@ -724,6 +619,7 @@ function SectionBlock({
               {row.editStepId ? (
                 <Link
                   href={editHrefFor(row.editStepId)}
+                  onClick={row.onEdit}
                   title={`${editLabel}: ${row.label}`}
                   aria-label={`${editLabel}: ${row.label}`}
                   className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition-colors hover:border-sky-200 hover:bg-sky-50 hover:text-sky-700"
@@ -738,7 +634,9 @@ function SectionBlock({
 
             {row.value.length > 0 || (row.fileTypes?.length ?? 0) > 0 ? (
               <div className="space-y-3">
-                {row.variant === 'scope-table' && row.scopeGroups ? (
+                {row.variant === 'deliverables-table' && row.deliverables ? (
+                  <DeliverablesReviewTable locale={locale} deliverables={row.deliverables} />
+                ) : row.variant === 'scope-table' && row.scopeGroups ? (
                   <div className="overflow-hidden rounded-xl border border-slate-200">
                     <table className="w-full border-collapse text-sm">
                       <tbody>
@@ -1048,7 +946,7 @@ export default function ProjectReviewStep({
       const descriptionState = readProjectDescriptionState(locale)
       const addonsState = readProjectAddonsState(locale)
       const scopeSnapshot = readProjectScopeSnapshot(locale)
-      const storedServiceComponentsPayload = readServiceComponentsPayload(locale)
+      const storedServiceComponentsPayload = { components: readProjectComponents(locale) }
       const apiServiceComponentsPayload = normalizeProjectComponents(requestData?.components)
       const serviceComponentsPayload: ServiceComponentsPayload = {
         components: {
@@ -1058,7 +956,7 @@ export default function ProjectReviewStep({
       }
       const serviceComponentSlugs = Array.from(
         new Set([
-          ...readServiceComponentSlugs(locale),
+
           ...Object.keys(serviceComponentsPayload.components || {}),
         ])
       )
@@ -1108,7 +1006,9 @@ export default function ProjectReviewStep({
           deliverablesLanguage || (isRTL ? 'غير محدد' : 'Not specified'),
         insighterIndustry:
           insighterIndustryLabel || (isRTL ? 'غير محدد' : 'Not specified'),
-        service: serviceName,
+        projectServices: requestData?.project_services || [],
+        plannedStart: readStorageValue(locale, projectWizardStorage.plannedStartDateKey(locale)),
+        service: (requestData?.project_services || []).map(s => s.title || s.service?.name).filter(Boolean).join(' · ') || serviceName,
         projectStatus: projectStatusValue || (isRTL ? 'غير محدد' : 'Not specified'),
         whoAreYou: businessTypeValue || (isRTL ? 'غير محدد' : 'Not specified'),
         preferredInsighterType:
@@ -1159,22 +1059,19 @@ export default function ProjectReviewStep({
       {
         label: isRTL ? 'نوع المشروع' : 'Project type',
         value: [review.projectType],
-        editStepId: projectWizardStepIds.projectType,
       },
       {
         label: isRTL ? 'لغة المخرجات' : 'Deliverables language',
         value: [review.deliverablesLanguage],
-        editStepId: projectWizardStepIds.deliverablesLanguage,
       },
       {
         label: isRTL ? 'الصناعة' : 'Industry',
         value: [review.insighterIndustry],
-        editStepId: projectWizardStepIds.insighterIndustry,
       },
       {
         label: isRTL ? 'الخدمة' : 'Service',
         value: [review.service],
-        editStepId: projectWizardStepIds.service,
+        ...(isSpecifiedInsighter ? { editStepId: 'services-summary' } : {}),
       },
       ...(isSpecifiedInsighter
         ? [
@@ -1198,6 +1095,7 @@ export default function ProjectReviewStep({
         value: [review.whoAreYou],
         editStepId: projectWizardStepIds.whoAreYou,
       },
+      {label: isRTL ? 'تاريخ البدء' : 'Planned start date', value: review.plannedStart ? [review.plannedStart] : [], editStepId: 'planned-start-date'},
       {
         label: isRTL ? 'موعد التسليم' : 'Delivery deadline',
         value: review.deadline ? [review.deadline] : [],
@@ -1206,36 +1104,67 @@ export default function ProjectReviewStep({
     ]
   }, [isRTL, isSpecifiedInsighter, locale, review, specifiedInsighterDisplayName])
 
-  const scopeRows = useMemo(() => {
+  const serviceSections = useMemo<ReviewSection[]>(() => {
     if (!review) return []
 
-    return [
-      {
-        label: isRTL ? 'النطاق' : 'Scope',
-        variant: 'scope-table' as const,
-        scopeGroups: review.scopeSnapshot.map((scope) => ({
-          name: scope.name,
-          subscopes: scope.subscopes,
-        })),
-        value: review.scopeSnapshot.flatMap((scope) =>
-          scope.subscopes.length > 0
-            ? scope.subscopes.map((subscope) => `${scope.name}: ${subscope}`)
-            : [scope.name]
-        ),
-        editStepId: projectWizardStepIds.projectSubscopes,
-        wide: true,
-      },
-      ...(review.servicePrompt
-        ? [
-            {
-              label: isRTL ? 'ملاحظة الخدمة' : 'Service note',
-              value: [review.servicePrompt],
-              editStepId: projectWizardStepIds.service,
-            },
-          ]
-        : []),
-    ]
-  }, [isRTL, review])
+    const addonLabels: Record<string, string> = {
+      'consulting-sessions': isRTL ? 'جلسات استشارية' : 'Consulting sessions',
+      'third-party-consultant': isRTL ? 'استشاري طرف ثالث' : 'Third-party consultant',
+      'survey-conduct': isRTL ? 'إجراء استبيان' : 'Conduct a survey',
+    }
+    const many = review.projectServices.length > 1
+
+    return review.projectServices.map((service, index) => {
+      const name = service.title || service.service?.name || ''
+      const components = Object.assign({}, ...(service.components || [])) as Record<string, unknown>
+      const stage = components['deliverable-stage'] as { deliverables?: Deliverable[] } | undefined
+      const deliverables = stage?.deliverables || []
+      const scopeGroups = (service.scopes || []).map((scope) => ({
+        name: scope.scope,
+        subscopes: (scope.children || []).map((sub) => sub.scope),
+      }))
+      const addons = (service.addons || []).flatMap((addon) => Object.keys(addon))
+      const select = () => selectProjectService(locale, service.uuid)
+
+      const rows: ReviewRow[] = [
+        ...(service.prompt_ai
+          ? [{ label: isRTL ? 'وصف الخدمة' : 'Service description', value: [service.prompt_ai], full: true }]
+          : []),
+        {
+          label: isRTL ? 'النطاقات والنطاقات الفرعية' : 'Scopes and sub-scopes',
+          value: scopeGroups.map((group) => group.name),
+          variant: 'scope-table',
+          scopeGroups,
+          editStepId: projectWizardStepIds.projectScope,
+          onEdit: select,
+          full: true,
+        },
+        ...(stage
+          ? [{
+              label: isRTL ? 'المخرجات' : 'Deliverables',
+              value: deliverables.map((item) => item.title),
+              variant: 'deliverables-table' as const,
+              deliverables,
+              editStepId: 'deliverables',
+              onEdit: select,
+              full: true,
+            }]
+          : []),
+        ...(addons.length
+          ? [{
+              label: isRTL ? 'إضافات الخدمة' : 'Service add-ons',
+              value: addons.map((slug) => addonLabels[slug] || humanizeSlug(slug)),
+              variant: 'chips' as const,
+            }]
+          : []),
+      ]
+
+      const prefix = isRTL
+        ? many ? `الخدمة ${index + 1}` : 'الخدمة'
+        : many ? `Service ${index + 1}` : 'Service'
+      return { title: `${prefix}: ${name}`, rows }
+    })
+  }, [isRTL, locale, review])
 
   const contextRows = useMemo(() => {
     if (!review) return []
@@ -1320,6 +1249,13 @@ export default function ProjectReviewStep({
     setError(null)
 
     try {
+      const services = readProjectServices(locale)
+      if (!review?.projectServices.length) throw new Error(isRTL ? 'تعذر تحميل الخدمات. أعد تحميل الملخص.' : 'Services could not be loaded. Reload the summary before continuing.')
+      if (!services.length || services.some(s => !s.complete)) throw new Error(isRTL ? 'أكمل تفاصيل جميع الخدمات أولاً.' : 'Complete all service details before continuing.')
+      for (const service of review.projectServices) {
+        const stage = Object.assign({}, ...(service.components || []))['deliverable-stage'] as {deliverables?: Deliverable[]} | undefined
+        if (stage && !validateDeliverables(stage.deliverables || [], review.plannedStart, review.deadline)) throw new Error(isRTL ? 'راجع تواريخ وصيغ مخرجات الخدمات لتتوافق مع مدة المشروع.' : 'Check every service’s deliverable dates and formats against the project schedule.')
+      }
       await syncProjectProperties(locale)
       router.push(nav.nextHref || `/${locale}/project`)
     } catch (err) {
@@ -1392,6 +1328,7 @@ export default function ProjectReviewStep({
 
             <div className="mt-8 space-y-6">
               <SectionBlock
+                locale={locale}
                 title={isRTL ? 'نظرة عامة' : 'Overview'}
                 rows={overviewRows}
                 emptyText={emptyText}
@@ -1401,17 +1338,22 @@ export default function ProjectReviewStep({
                 editHrefFor={nav.editHrefFor}
               />
 
-              <SectionBlock
-                title={isRTL ? 'النطاق والمخرجات' : 'Scope and deliverables'}
-                rows={scopeRows}
-                emptyText={emptyText}
-                toneIndex={1}
-                isRTL={isRTL}
-                editLabel={editLabel}
-                editHrefFor={nav.editHrefFor}
-              />
+              {serviceSections.map((section) => (
+                <SectionBlock
+                  locale={locale}
+                  key={section.title}
+                  title={section.title}
+                  rows={section.rows}
+                  emptyText={emptyText}
+                  toneIndex={1}
+                  isRTL={isRTL}
+                  editLabel={editLabel}
+                  editHrefFor={nav.editHrefFor}
+                />
+              ))}
 
               <SectionBlock
+                locale={locale}
                 title={
                   isSpecifiedInsighter
                     ? isRTL
@@ -1431,6 +1373,7 @@ export default function ProjectReviewStep({
 
               {review.serviceComponentSections.map((section, index) => (
                 <SectionBlock
+                  locale={locale}
                   key={section.title}
                   title={section.title}
                   rows={section.rows}
@@ -1443,6 +1386,7 @@ export default function ProjectReviewStep({
               ))}
 
               <SectionBlock
+                locale={locale}
                 title={isRTL ? 'تفاصيل إضافية' : 'Additional details'}
                 rows={contextRows}
                 emptyText={emptyText}

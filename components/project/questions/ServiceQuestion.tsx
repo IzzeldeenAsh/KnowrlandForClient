@@ -1,28 +1,19 @@
 'use client'
+import { activeProjectServiceUuid, beginProjectService, forgetProjectService, readProjectServices, registerProjectService, selectProjectService } from '../projectServicesState'
+import { clearStoredProjectRequestUuid, readStoredProjectRequestUuid } from '../projectRequestUuid'
+import { definitionRequest } from '../projectDefinitionApi'
+
 
 import { useEffect, useMemo, useState } from 'react'
-import type { ComponentType } from 'react'
 import Link from 'next/link'
+import { serviceMetaForSlug, type ServiceMeta } from '../serviceMeta'
 import {
   IconArrowUp,
   IconCheck,
   IconSparklesFilled,
-  IconChartBar,
-  IconChartArrowsVertical,
-  IconClipboardText,
-  IconDeviceDesktopAnalytics,
-  IconBuildingBank,
-  IconTargetArrow,
-  IconCoins,
-  IconShieldCheck,
-  IconReportAnalytics,
-  IconFileSearch,
-  IconBulb,
-  IconFileDollar,
 } from '@tabler/icons-react'
 import ProjectSelectedTypeHeader from '../ProjectSelectedTypeHeader'
 import {
-  clearStoredProjectRequestUuid,
   extractProjectRequestUuid,
   writeStoredProjectRequestUuid,
 } from '../projectRequestUuid'
@@ -48,126 +39,8 @@ type Service = {
   slug: string
 }
 
-type TablerIcon = ComponentType<{ size?: number; stroke?: number; className?: string }>
-
-type ServiceMeta = {
-  Icon: TablerIcon
-  iconClass: string
-  description: { en: string; ar: string }
-}
-
-// Hardcoded presentation metadata per service slug. Icons are placeholders to be
-// swapped for custom illustrations later.
-const SERVICE_META: Record<string, ServiceMeta> = {
-  'market-research': {
-    Icon: IconChartBar,
-    iconClass: 'bg-blue-50 text-blue-600',
-    description: {
-      en: 'Understand market size, demand, and competition.',
-      ar: 'افهم حجم السوق والطلب والمنافسة.',
-    },
-  },
-  'pre-feasibility-study': {
-    Icon: IconFileSearch,
-    iconClass: 'bg-lime-50 text-lime-600',
-    description: {
-      en: 'Quickly assess whether your idea is worth developing.',
-      ar: 'قيّم بسرعة ما إذا كانت فكرتك جديرة بالتطوير.',
-    },
-  },
-  'feasibility-study': {
-    Icon: IconChartArrowsVertical,
-    iconClass: 'bg-amber-50 text-amber-600',
-    description: {
-      en: 'Assess viability, profitability, and next steps.',
-      ar: 'قيّم الجدوى والربحية والخطوات التالية.',
-    },
-  },
-  'business-plan': {
-    Icon: IconClipboardText,
-    iconClass: 'bg-emerald-50 text-emerald-600',
-    description: {
-      en: 'Build a roadmap for strategy and operations.',
-      ar: 'ابنِ خارطة طريق للاستراتيجية والعمليات.',
-    },
-  },
-  'digital-transformation': {
-    Icon: IconDeviceDesktopAnalytics,
-    iconClass: 'bg-violet-50 text-violet-600',
-    description: {
-      en: 'Modernize processes and technology to scale.',
-      ar: 'حدّث العمليات والتقنيات للتوسع.',
-    },
-  },
-  'company-valuation': {
-    Icon: IconBuildingBank,
-    iconClass: 'bg-cyan-50 text-cyan-600',
-    description: {
-      en: "Determine your company's fair value.",
-      ar: 'حدّد القيمة العادلة لشركتك.',
-    },
-  },
-  'go-to-market-strategy': {
-    Icon: IconTargetArrow,
-    iconClass: 'bg-rose-50 text-rose-600',
-    description: {
-      en: 'Plan launch, positioning, and customer growth.',
-      ar: 'خطّط للإطلاق والتموضع ونمو العملاء.',
-    },
-  },
-  'fundraising-strategy': {
-    Icon: IconCoins,
-    iconClass: 'bg-teal-50 text-teal-600',
-    description: {
-      en: 'Prepare to raise capital and attract investors.',
-      ar: 'استعد لجمع التمويل وجذب المستثمرين.',
-    },
-  },
-  'policies-procedures-governance': {
-    Icon: IconShieldCheck,
-    iconClass: 'bg-indigo-50 text-indigo-600',
-    description: {
-      en: 'Set governance, policies, and compliance.',
-      ar: 'ضع الحوكمة والسياسات والامتثال.',
-    },
-  },
-  'brief-feasibility-study': {
-    Icon: IconFileSearch,
-    iconClass: 'bg-lime-50 text-lime-600',
-    description: {
-      en: 'Quick check on whether your idea holds up.',
-      ar: 'فحص سريع لمدى جدوى فكرتك.',
-    },
-  },
-  'opportunity-evaluation': {
-    Icon: IconBulb,
-    iconClass: 'bg-orange-50 text-orange-600',
-    description: {
-      en: 'Weigh the potential of a business opportunity.',
-      ar: 'قيّم إمكانات الفرصة التجارية.',
-    },
-  },
-  'funding-application': {
-    Icon: IconFileDollar,
-    iconClass: 'bg-fuchsia-50 text-fuchsia-600',
-    description: {
-      en: 'Prepare and package your funding application.',
-      ar: 'جهّز وأعدّ طلب التمويل الخاص بك.',
-    },
-  },
-}
-
-const FALLBACK_SERVICE_META: ServiceMeta = {
-  Icon: IconReportAnalytics,
-  iconClass: 'bg-slate-100 text-slate-600',
-  description: {
-    en: 'Advisory tailored to your business needs.',
-    ar: 'استشارة مصممة لاحتياجات عملك.',
-  },
-}
-
 function getServiceMeta(service: Service): ServiceMeta {
-  return SERVICE_META[(service.slug || '').trim().toLowerCase()] || FALLBACK_SERVICE_META
+  return serviceMetaForSlug(service.slug)
 }
 
 function isOtherService(service: Service | null): boolean {
@@ -342,21 +215,43 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
     const load = async () => {
       setError(null)
       setLoading(true)
+      setServices(null)
       try {
-        const res = await fetch(
-          getApiUrl('/api/common/setting/service'),
-          {
+        const specifiedInsighterUuid = readStoredSpecifiedInsighterUuid(locale)
+        const servicePath = specifiedInsighterUuid
+          ? `/api/common/setting/service/insighter/${encodeURIComponent(specifiedInsighterUuid)}`
+          : '/api/common/setting/service'
+        const fetchServiceList = async (path: string): Promise<Service[]> => {
+          const res = await fetch(getApiUrl(path), {
             method: 'GET',
             headers: {
               Accept: 'application/json',
               'Accept-Language': locale === 'ar' ? 'ar' : 'en',
             },
             cache: 'no-store',
+          })
+          await assertProjectApiResponse(res)
+          const json = (await res.json()) as { data?: Service[] }
+          if (!Array.isArray(json.data)) throw new Error('Invalid service list response.')
+          return json.data
+        }
+
+        const availableServices = await fetchServiceList(servicePath)
+        // The API permits "Other" even when it is not assigned to the Insighter.
+        if (specifiedInsighterUuid && !availableServices.some(isOtherService)) {
+          try {
+            const catalog = await fetchServiceList('/api/common/setting/service')
+            const other = catalog.find(isOtherService)
+            if (other) availableServices.push(other)
+          } catch {
+            // The Insighter's eligible services remain usable without the optional "Other" choice.
           }
-        )
-        await assertProjectApiResponse(res)
-        const json = (await res.json()) as { data?: Service[] }
-        if (!cancelled) setServices(json.data || [])
+        }
+        if (!cancelled) {
+          const active = activeProjectServiceUuid(locale)
+          const selected = readProjectServices(locale)
+          setServices(availableServices.filter(service => !selected.some(s => s.serviceId === service.id && s.uuid !== active)))
+        }
       } catch (err) {
         if (!cancelled) {
           setError(
@@ -398,7 +293,7 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
 
   const isOtherSelected = isOtherService(selectedService)
 
-  const canContinue = selectedId != null && services != null
+  const canContinue = selectedService != null
 
   const toApiLanguage = (value: string | null) => {
     const v = (value || '').toLowerCase()
@@ -449,8 +344,7 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
 
   const resetDownstreamWizardState = (preservePrompt: boolean) => {
     try {
-      clearStoredProjectRequestUuid(locale)
-      clearStoredProposalMatchUuid(locale)
+      // Service selection must not discard the existing project.
       window.sessionStorage.removeItem(projectWizardStorage.projectScopeSnapshotKey(locale))
       window.sessionStorage.removeItem(projectWizardStorage.selectedMatchIdsKey(locale))
 
@@ -488,13 +382,57 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
     }
   }
 
+  const activeService = () =>
+    readProjectServices(locale).find((s) => s.uuid === activeProjectServiceUuid(locale))
+
+  const readActivePrompt = () => {
+    try {
+      return (window.sessionStorage.getItem(projectWizardStorage.servicePromptKey(locale)) || '').trim()
+    } catch {
+      return ''
+    }
+  }
+
   const submitSelection = async (payload: {
     serviceId: number
     isOtherSelected: boolean
     servicePrompt: string
     serviceLabel: string | null
+    serviceSlug?: string
   }) => {
     setError(null)
+    const existing = activeService()
+    // Service being swapped out on the server once its replacement exists (specified projects only).
+    let replacedServiceUuid = ''
+    if (existing) {
+      const unchanged =
+        existing.serviceId === payload.serviceId &&
+        (!payload.isOtherSelected || readActivePrompt() === payload.servicePrompt.trim())
+      if (unchanged) {
+        nav.goNext()
+        return
+      }
+
+      if (readStoredSpecifiedInsighterUuid(locale)) {
+        // The backend rejects a second copy of the same service, so an "Other" prompt cannot be swapped in place.
+        if (existing.serviceId === payload.serviceId) {
+          setError(
+            isRTL
+              ? 'لا يمكن تعديل وصف الخدمة المخصصة بعد إنشائها. تابع بها أو اختر خدمة أخرى.'
+              : "A custom service's description can't be changed once it's created. Continue with it or pick a different service."
+          )
+          return
+        }
+        replacedServiceUuid = existing.uuid
+      } else {
+        // A general project holds one service and the backend cannot swap it,
+        // so changing the service starts a fresh draft project.
+        forgetProjectService(locale, existing.uuid)
+        clearStoredProjectRequestUuid(locale)
+        clearStoredProposalMatchUuid(locale)
+      }
+      beginProjectService(locale)
+    }
 
     persistSelection(
       payload.serviceId,
@@ -527,7 +465,10 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
         )
       )
       const specifiedInsighterUuid = readStoredSpecifiedInsighterUuid(locale)
-      const initiatePath = specifiedInsighterUuid
+      const existingProjectUuid = readStoredProjectRequestUuid(locale)
+      const initiatePath = existingProjectUuid
+        ? `/api/account/project/definition/service/${existingProjectUuid}`
+        : specifiedInsighterUuid
         ? `/api/account/project/definition/initiate-specific/${encodeURIComponent(
             specifiedInsighterUuid
           )}`
@@ -551,15 +492,24 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
       await assertProjectApiResponse(initRes, 'Failed to create the project.')
 
       const initJson = (await initRes.json()) as unknown
-      const projectUuid = extractProjectRequestUuid(initJson)
+      const projectUuid = existingProjectUuid || extractProjectRequestUuid(initJson)
       if (!projectUuid) throw new Error('init_bad_response')
 
       writeStoredProjectRequestUuid(locale, projectUuid)
-      if (specifiedInsighterUuid) {
+      const data = (initJson as {data: {uuid?: string; project_services?: Array<{uuid: string; service: {id: number}}>}}).data
+      const serviceUuid = existingProjectUuid ? data.uuid : data.project_services?.find(s => s.service.id === payload.serviceId)?.uuid
+      if (!serviceUuid) throw new Error('The server did not return a project service identifier.')
+      registerProjectService(locale, { uuid: serviceUuid, serviceId: payload.serviceId, label: payload.serviceLabel || (isRTL ? 'خدمة مخصصة' : 'Custom service'), slug: payload.serviceSlug, isOther: payload.isOtherSelected, complete: false })
+      if (replacedServiceUuid) {
+        await definitionRequest(locale, `service/${projectUuid}/${replacedServiceUuid}`, 'DELETE')
+        forgetProjectService(locale, replacedServiceUuid)
+        replacedServiceUuid = ''
+      }
+      if (specifiedInsighterUuid && !existingProjectUuid) {
         const proposalMatchUuid = extractProjectProposalMatchUuid(initJson)
         if (!proposalMatchUuid) throw new Error('init_bad_response')
         writeStoredProposalMatchUuid(locale, proposalMatchUuid)
-      } else {
+      } else if (!specifiedInsighterUuid) {
         clearStoredProposalMatchUuid(locale)
       }
       try {
@@ -601,6 +551,9 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
 
       nav.goNext()
     } catch (err) {
+      // The replacement was never created, so the previous service stays active.
+      if (replacedServiceUuid && !activeProjectServiceUuid(locale))
+        selectProjectService(locale, replacedServiceUuid)
       setError(
         getProjectApiErrorMessage(
           err,
@@ -616,7 +569,7 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
     if (!canContinue || selectedId == null || submitting) return
 
     if (isOtherSelected) {
-      nav.goNext()
+      await onSendAiPrompt()
       return
     }
 
@@ -625,12 +578,18 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
       isOtherSelected,
       servicePrompt,
       serviceLabel: selectedService?.name || null,
+      serviceSlug: selectedService?.slug,
     })
   }
 
   const onSelect = (service: Service) => {
     if (submitting) return
-    if (service.id === selectedId) return
+    const existing = activeService()
+    if (existing && service.id === existing.serviceId && !existing.isOther) {
+      nav.goNext()
+      return
+    }
+    if (service.id === selectedId && !existing) return
 
     setError(null)
     setSelectedId(service.id)
@@ -638,24 +597,23 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
     const nextIsOtherSelected = isOtherService(service)
     const nextPrompt = nextIsOtherSelected ? servicePrompt : ''
     if (!nextIsOtherSelected) setServicePrompt('')
-    persistSelection(
-      service.id,
-      nextIsOtherSelected,
-      nextPrompt,
-      nextIsOtherSelected ? null : service.name
-    )
+    // Keep an existing service's stored answers intact until the replacement is saved.
+    if (!existing)
+      persistSelection(
+        service.id,
+        nextIsOtherSelected,
+        nextPrompt,
+        nextIsOtherSelected ? null : service.name
+      )
 
-    if (nextIsOtherSelected) {
-      resetDownstreamWizardState(true)
-      nav.goNext()
-      return
-    }
+    if (nextIsOtherSelected) return
 
     void submitSelection({
       serviceId: service.id,
       isOtherSelected: false,
       servicePrompt: '',
       serviceLabel: service.name,
+      serviceSlug: service.slug,
     })
   }
 
@@ -684,13 +642,19 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
     const otherServiceId = otherService.id
     setSelectedId(otherServiceId)
     setError(null)
-    resetDownstreamWizardState(true)
+    const existing = activeService()
+    if (existing?.isOther && readActivePrompt() === prompt) {
+      nav.goNext()
+      return
+    }
+    if (!existing) resetDownstreamWizardState(true)
 
     await submitSelection({
       serviceId: otherServiceId,
       isOtherSelected: true,
       servicePrompt: prompt,
       serviceLabel: null,
+      serviceSlug: otherService.slug,
     })
   }
 
@@ -734,6 +698,17 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
           </div>
         ) : (
           <>
+            {!error && services?.length === 0 ? (
+              <div className="text-sm font-semibold text-slate-600">
+                {readStoredSpecifiedInsighterUuid(locale)
+                  ? isRTL
+                    ? 'لا توجد خدمات متاحة من هذا الخبير حاليًا.'
+                    : 'This Insighter has no available services right now.'
+                  : isRTL
+                    ? 'لا توجد خدمات متاحة حاليًا.'
+                    : 'No services are available right now.'}
+              </div>
+            ) : null}
             {predefinedServices.length > 0 ? (
               <div>
                 <div
@@ -791,7 +766,7 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
               </div>
             ) : null}
 
-            <div className="mt-6">
+            {otherService && !activeProjectServiceUuid(locale) && <div className="mt-6">
               <AiScopePromptComposer
                 isRTL={isRTL}
                 value={servicePrompt}
@@ -802,7 +777,7 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
                 }}
                 onSend={onSendAiPrompt}
               />
-            </div>
+            </div>}
           </>
         )}
       </div>

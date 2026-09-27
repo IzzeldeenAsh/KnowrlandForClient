@@ -2,41 +2,68 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { getProjectApiErrorMessage } from '@/components/project/projectApiError'
 import ProjectSelectedTypeHeader from '@/components/project/ProjectSelectedTypeHeader'
-import { useProjectStepErrorToast } from '@/components/project/useProjectStepErrorToast'
-import type { WizardLocale } from '@/components/project/wizardStorage'
-import { projectWizardStorage } from '@/components/project/wizardStorage'
-import { useProjectWizardNavigation } from '@/components/project/useProjectWizardNavigation'
+import { getProjectApiErrorMessage } from '@/components/project/projectApiError'
 import {
   readServiceComponentPayloadValue,
   updateServiceComponentPayload,
 } from '@/components/project/serviceComponentsPayload'
-import { syncServiceComponents } from '@/components/project/serviceComponentsSync'
+import { syncProjectProperties } from '@/components/project/projectPropertiesSync'
+import { useProjectStepErrorToast } from '@/components/project/useProjectStepErrorToast'
+import { useProjectWizardNavigation } from '@/components/project/useProjectWizardNavigation'
+import { projectWizardStorage, type WizardLocale } from '@/components/project/wizardStorage'
 
-type Payload = {
-  primary_data: { required: 0 | 1 }
-  secondary_data: { required: 0 | 1 }
+type DataSourceId = 'primary_data' | 'secondary_data' | 'both' | 'does_not_matter'
+
+const dataSourceIds: DataSourceId[] = [
+  'primary_data',
+  'secondary_data',
+  'both',
+  'does_not_matter',
+]
+
+type Option = {
+  id: DataSourceId
+  label: string
 }
 
-export default function DataSourcesExpectedQuestion({ locale }: { locale: WizardLocale }) {
+function getOptions(locale: WizardLocale): Option[] {
+  const isRTL = locale === 'ar'
+  if (isRTL) {
+    return [
+      { id: 'primary_data', label: 'بيانات أولية' },
+      { id: 'secondary_data', label: 'بيانات ثانوية' },
+      { id: 'both', label: 'كلاهما' },
+      { id: 'does_not_matter', label: 'لا يهم' },
+    ]
+  }
+  return [
+    { id: 'primary_data', label: 'Primary data' },
+    { id: 'secondary_data', label: 'Secondary data' },
+    { id: 'both', label: 'Both' },
+    { id: 'does_not_matter', label: "Doesn't matter" },
+  ]
+}
+
+export default function DataSourcesExpectedQuestion({
+  locale,
+}: {
+  locale: WizardLocale
+}) {
   const isRTL = locale === 'ar'
   const isEnglish =
     typeof locale === 'string' && locale.toLowerCase().startsWith('en')
 
   const nav = useProjectWizardNavigation(locale)
+  const options = useMemo(() => getOptions(locale), [locale])
 
   const [entered, setEntered] = useState(false)
   const [projectType, setProjectType] = useState<string | null>(null)
+  const [selected, setSelected] = useState<DataSourceId | null>(null)
+  const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [submitting, setSubmitting] = useState(false)
 
   useProjectStepErrorToast(error, locale)
-
-  const [primary, setPrimary] = useState(false)
-  const [secondary, setSecondary] = useState(false)
-  const [both, setBoth] = useState(false)
-  const [doesntMatter, setDoesntMatter] = useState(false)
 
   useEffect(() => {
     const timer = window.setTimeout(() => setEntered(true), 30)
@@ -48,197 +75,135 @@ export default function DataSourcesExpectedQuestion({ locale }: { locale: Wizard
       setProjectType(
         window.sessionStorage.getItem(projectWizardStorage.projectTypeKey(locale))
       )
-
-      const saved = readServiceComponentPayloadValue<Payload>(
-        locale,
-        'data-sources-expected'
-      )
-
-      if (saved) {
-        const p = saved.primary_data?.required === 1
-        const s = saved.secondary_data?.required === 1
-        if (p && s) {
-          setBoth(true)
-          setDoesntMatter(false)
-          setPrimary(false)
-          setSecondary(false)
-        } else if (!p && !s) {
-          setDoesntMatter(true)
-          setBoth(false)
-          setPrimary(false)
-          setSecondary(false)
-        } else {
-          setPrimary(p)
-          setSecondary(s)
-          setBoth(false)
-          setDoesntMatter(false)
-        }
-      }
     } catch {
       // ignore
     }
+
+    const saved = readServiceComponentPayloadValue<string>(
+      locale,
+      'data-sources-expected'
+    )
+    if (saved && dataSourceIds.includes(saved as DataSourceId)) {
+      setSelected(saved as DataSourceId)
+    }
   }, [locale])
 
-  const canContinue = useMemo(() => {
-    const any = doesntMatter || both || primary || secondary
-    return any && !submitting
-  }, [both, doesntMatter, primary, secondary, submitting])
+  const title = isRTL ? 'مصادر البيانات المتوقعة' : 'Expected data sources'
 
-  const continueWithPayload = async (payload: Payload) => {
-    if (submitting) return
+  const canContinue = selected !== null
+
+  const persist = async (value: DataSourceId) => {
+    setBusy(true)
     setError(null)
-
-    updateServiceComponentPayload(locale, 'data-sources-expected', payload)
-
-    const leavingComponents = nav.nextStepId === 'project-status' || nav.isReviewEditMode
-    if (!leavingComponents) {
-      nav.goNext()
-      return
-    }
-
-    setSubmitting(true)
     try {
-      await syncServiceComponents(locale)
+      updateServiceComponentPayload(locale, 'data-sources-expected', value)
+      if (nav.isReviewEditMode) await syncProjectProperties(locale)
       nav.goNext()
     } catch (err) {
       setError(
         getProjectApiErrorMessage(
           err,
-          isRTL
-            ? 'تعذر حفظ مكوّنات الخدمة.'
-            : 'Failed to save service components.'
+          isRTL ? 'تعذر حفظ الاختيار.' : 'Unable to save your selection.'
         )
       )
     } finally {
-      setSubmitting(false)
+      setBusy(false)
     }
   }
 
-  const selectOption = (option: 'primary' | 'secondary' | 'both' | 'doesntMatter') => {
-    const nextPrimary = option === 'primary'
-    const nextSecondary = option === 'secondary'
-    const nextBoth = option === 'both'
-    const nextDoesntMatter = option === 'doesntMatter'
-
-    setPrimary(nextPrimary)
-    setSecondary(nextSecondary)
-    setBoth(nextBoth)
-    setDoesntMatter(nextDoesntMatter)
-
-    void continueWithPayload({
-      primary_data: { required: nextDoesntMatter ? 0 : nextBoth || nextPrimary ? 1 : 0 },
-      secondary_data: { required: nextDoesntMatter ? 0 : nextBoth || nextSecondary ? 1 : 0 },
-    })
+  const onSelect = (id: DataSourceId) => {
+    setSelected(id)
+    void persist(id)
   }
 
-  const onContinue = async () => {
-    if (!canContinue) return
-
-    await continueWithPayload({
-      primary_data: { required: doesntMatter ? 0 : both || primary ? 1 : 0 },
-      secondary_data: { required: doesntMatter ? 0 : both || secondary ? 1 : 0 },
-    })
+  const onContinue = () => {
+    if (!selected) return
+    void persist(selected)
   }
-
-  const title = isRTL ? 'مصادر البيانات المتوقعة' : 'Expected data sources'
-  const subtitle = isRTL
-    ? 'اختر الخيار الأنسب للمتابعة.'
-    : 'Select the best option to continue.'
-
-  const OptionRow = ({
-    checked,
-    label,
-    onClick,
-  }: {
-    checked: boolean
-    label: string
-    onClick: () => void
-  }) => (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`w-full flex items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-start transition-colors ${checked
-          ? 'border-blue-300 bg-white/70'
-          : 'border-white/30 bg-white/40 hover:bg-white/55'
-        }`}
-    >
-      <span className="text-sm sm:text-base font-semibold text-slate-900">{label}</span>
-      <span
-        className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border ${checked ? 'border-blue-600' : 'border-slate-300'
-          } bg-white/80`}
-        aria-hidden="true"
-      >
-        <span className={`h-2.5 w-2.5 rounded-sm ${checked ? 'bg-blue-600' : 'bg-transparent'}`} />
-      </span>
-    </button>
-  )
 
   return (
-    <div className="w-full max-w-lg mx-auto" dir={isRTL ? 'rtl' : 'ltr'}>
-      <ProjectSelectedTypeHeader
-        locale={locale}
-        entered={entered}
-        projectTypeId={projectType}
-      />
+    <div
+      className="w-full max-w-4xl mx-auto min-h-full flex flex-col"
+      dir={isRTL ? 'rtl' : 'ltr'}
+    >
+      <div className="flex-1 pb-28">
+        <ProjectSelectedTypeHeader
+          locale={locale}
+          entered={entered}
+          projectTypeId={projectType}
+        />
 
-      <div
-        className={`mt-2 text-start transition-all duration-700 ${entered
-            ? 'opacity-100 translate-x-0'
-            : isRTL
-              ? 'opacity-0 translate-x-4'
-              : 'opacity-0 -translate-x-4'
-          }`}
-      >
-        {isEnglish ? (
-          <style>{`
-            #data-sources-expected-title {
-              font-family: "IBM Plex Serif", serif !important;
-            }
-          `}</style>
-        ) : null}
-        <h2
-          id="data-sources-expected-title"
-          className="text-2xl sm:text-3xl font-medium tracking-tight text-slate-900"
+        <div
+          className={`mt-2 text-start transition-all duration-700 ${entered
+              ? 'opacity-100 translate-x-0'
+              : isRTL
+                ? 'opacity-0 translate-x-4'
+                : 'opacity-0 -translate-x-4'
+            }`}
         >
-          {title}
-        </h2>
-        <p className="mt-2 text-sm sm:text-base font-semibold text-slate-600">
-          {subtitle}
-        </p>
+          {isEnglish ? (
+            <style>{`
+              #data-sources-expected-question-title {
+                font-family: "IBM Plex Serif", serif !important;
+              }
+            `}</style>
+          ) : null}
+          <h2
+            id="data-sources-expected-question-title"
+            className="text-2xl sm:text-3xl font-medium tracking-tight text-slate-900"
+          >
+            {title}
+          </h2>
+        </div>
+
+        <div
+          className={`mt-8 space-y-3 max-w-xl transition-all duration-700 ${entered
+              ? 'opacity-100 translate-x-0'
+              : isRTL
+                ? 'opacity-0 translate-x-4'
+                : 'opacity-0 -translate-x-4'
+            }`}
+          style={{ transitionDelay: '160ms' }}
+          role="radiogroup"
+          aria-label={title}
+        >
+          {options.map((opt) => {
+            const isSelected = selected === opt.id
+            return (
+              <button
+                key={opt.id}
+                type="button"
+                role="radio"
+                aria-checked={isSelected}
+                onClick={() => onSelect(opt.id)}
+                className={`flex w-full items-center gap-3 rounded-2xl border p-5 text-start transition-colors ${isSelected
+                    ? 'border-blue-400 bg-white/80 shadow-sm'
+                    : 'border-slate-200 bg-white/60 hover:border-slate-300 hover:bg-white/80'
+                  }`}
+              >
+                <span
+                  className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${isSelected ? 'border-blue-600 bg-blue-600' : 'border-slate-300 bg-white'
+                    }`}
+                  aria-hidden="true"
+                >
+                  {isSelected ? <span className="h-2 w-2 rounded-full bg-white" /> : null}
+                </span>
+                <span className="text-base font-medium text-slate-900">{opt.label}</span>
+              </button>
+            )
+          })}
+        </div>
       </div>
 
-      {error ? (
-        <div className="mt-4 text-sm font-semibold text-rose-700">{error}</div>
-      ) : null}
-
-      <div className="mt-6 space-y-2 pb-28">
-        <OptionRow
-          checked={primary}
-          label={isRTL ? 'بيانات أولية' : 'Primary Data'}
-          onClick={() => selectOption('primary')}
-        />
-        <OptionRow
-          checked={secondary}
-          label={isRTL ? 'بيانات ثانوية' : 'Secondary Data'}
-          onClick={() => selectOption('secondary')}
-        />
-        <OptionRow
-          checked={both}
-          label={isRTL ? 'كلاهما' : 'Both'}
-          onClick={() => selectOption('both')}
-        />
-        <OptionRow
-          checked={doesntMatter}
-          label={isRTL ? 'لا يهم' : "Doesn't matter"}
-          onClick={() => selectOption('doesntMatter')}
-        />
-      </div>
-
-      <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-slate-200/70 bg-white/80 backdrop-blur-md">
-        <div className="mx-auto w-full max-w-6xl px-4 lg:px-0 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
+      <div className="fixed left-0 right-0 z-20 bottom-0 border-t border-slate-200/70 bg-white/80 backdrop-blur-md">
+        <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
           <div className="flex items-center justify-between gap-3">
             <Link
               href={nav.backHref}
+              aria-disabled={busy}
+              onClick={(e) => {
+                if (busy) e.preventDefault()
+              }}
               className="btn-sm px-6 py-2 rounded-full text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
             >
               {isRTL ? 'رجوع' : 'Back'}
@@ -247,13 +212,17 @@ export default function DataSourcesExpectedQuestion({ locale }: { locale: Wizard
             <button
               type="button"
               onClick={onContinue}
-              disabled={!canContinue}
-              className={`btn-sm px-6 py-2 rounded-full ${canContinue
+              disabled={!canContinue || busy}
+              className={`btn-sm px-6 py-2 rounded-full ${canContinue && !busy
                   ? 'text-white bg-[#1C7CBB] hover:bg-opacity-90'
                   : 'text-slate-500 bg-slate-200 cursor-not-allowed'
                 }`}
             >
-              {submitting ? (isRTL ? 'جاري الحفظ…' : 'Saving…') : nav.continueLabel}
+              {busy
+                ? isRTL
+                  ? 'جاري الحفظ...'
+                  : 'Saving...'
+                : nav.continueLabel}
             </button>
           </div>
         </div>
