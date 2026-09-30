@@ -1,6 +1,13 @@
 {
   "/(auth)/[locale]/callback/page": "app/(auth)/[locale]/callback/page.js",
   "/(auth)/[locale]/signin/page": "app/(auth)/[locale]/signin/page.js",
+  "/[locale]/(default)/landing/page": "app/[locale]/(default)/landing/page.js",
   "/[locale]/(default)/page": "app/[locale]/(default)/page.js",
+  "/[locale]/home/page": "app/[locale]/home/page.js",
+  "/[locale]/payment/stripe/page": "app/[locale]/payment/stripe/page.js",
+  "/[locale]/profile/[uuid]/page": "app/[locale]/profile/[uuid]/page.js",
+  "/[locale]/project/wizard/[step]/page": "app/[locale]/project/wizard/[step]/page.js",
+  "/apple-icon/route": "app-edge-has-no-entrypoint",
+  "/icon/route": "app-edge-has-no-entrypoint",
   "/manifest.webmanifest/route": "app/manifest.webmanifest/route.js"
 }

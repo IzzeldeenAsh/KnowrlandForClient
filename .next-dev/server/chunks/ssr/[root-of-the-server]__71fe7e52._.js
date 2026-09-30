@@ -398,23 +398,23 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$Pro
 ;
 ;
 ;
-function ProjectWizardShell({ children, align = 'center' }) {
+function ProjectWizardShell({ children, align = 'center', bleed = false }) {
     const containerClassName = align === 'top' ? 'w-full h-full box-border overflow-y-auto overscroll-contain pb-[calc(env(safe-area-inset-bottom)+7rem)]' : 'w-full h-full box-border overflow-y-auto overscroll-contain flex justify-center';
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
         className: "fixed inset-0 overflow-hidden bg-white z-0",
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$ProjectViewportLock$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                 fileName: "[project]/components/project/ProjectWizardShell.tsx",
-                lineNumber: 22,
+                lineNumber: 25,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$AnimatedWizardBackground$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                 fileName: "[project]/components/project/ProjectWizardShell.tsx",
-                lineNumber: 23,
+                lineNumber: 26,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: `absolute left-0 right-0 bottom-0 z-10 flex box-border px-4 sm:px-6 lg:px-8 overflow-hidden ${align === 'top' ? 'items-start justify-start pt-8' : 'items-center justify-center py-10'}`,
+                className: `absolute left-0 right-0 bottom-0 z-10 flex box-border ${bleed ? 'px-0' : 'px-4'} sm:px-6 lg:px-8 overflow-hidden ${align === 'top' ? 'items-start justify-start pt-8' : 'items-center justify-center py-10'}`,
                 style: {
                     top: 'var(--app-header-height, 0px)'
                 },
@@ -424,23 +424,23 @@ function ProjectWizardShell({ children, align = 'center' }) {
                         children: children
                     }, void 0, false, {
                         fileName: "[project]/components/project/ProjectWizardShell.tsx",
-                        lineNumber: 32,
+                        lineNumber: 35,
                         columnNumber: 45
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/components/project/ProjectWizardShell.tsx",
-                    lineNumber: 32,
+                    lineNumber: 35,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/project/ProjectWizardShell.tsx",
-                lineNumber: 24,
+                lineNumber: 27,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/project/ProjectWizardShell.tsx",
-        lineNumber: 21,
+        lineNumber: 24,
         columnNumber: 5
     }, this);
 }
@@ -1878,6 +1878,7 @@ async function ProjectWizardStepPage({ params }) {
     if (step === 'project-review') {
         return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$ProjectWizardShell$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"], {
             align: "top",
+            bleed: true,
             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 className: "w-full pt-2 sm:pt-4",
                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$questions$2f$ProjectReviewStep$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"], {

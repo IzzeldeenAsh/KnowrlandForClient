@@ -250,7 +250,9 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
         if (!cancelled) {
           const active = activeProjectServiceUuid(locale)
           const selected = readProjectServices(locale)
-          setServices(availableServices.filter(service => !selected.some(s => s.serviceId === service.id && s.uuid !== active)))
+          // DEBUG: temporarily keep "Other" selectable even if already used, so the
+          // backend's unique(project_id, service_id) rejection surfaces in the UI.
+          setServices(availableServices.filter(service => isOtherService(service) || !selected.some(s => s.serviceId === service.id && s.uuid !== active)))
         }
       } catch (err) {
         if (!cancelled) {

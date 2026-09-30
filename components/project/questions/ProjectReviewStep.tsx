@@ -2,7 +2,7 @@
 import { validateDeliverables, type Deliverable } from '../deliverables'
 import { DeliverablesReviewTable, type ReviewProjectService } from './ProjectServicesReview'
 import { readProjectComponents } from '../serviceComponentsPayload'
-import { readProjectServices, selectProjectService } from '../projectServicesState'
+import { selectProjectService } from '../projectServicesState'
 
 
 import Image from 'next/image'
@@ -113,9 +113,18 @@ type ReviewRow = {
   full?: boolean
 }
 
+// Required data missing from a saved service, with the step that fills it in.
+type ReviewIssue = {
+  text: string
+  stepId: string
+  onEdit?: () => void
+}
+
 type ReviewSection = {
+  id?: string
   title: string
   rows: ReviewRow[]
+  issues?: ReviewIssue[]
 }
 
 type ReviewData = {
@@ -567,8 +576,10 @@ function buildServiceComponentSections(params: {
 
 function SectionBlock({
   locale,
+  id,
   title,
   rows,
+  issues,
   emptyText,
   toneIndex,
   isRTL,
@@ -576,8 +587,10 @@ function SectionBlock({
   editHrefFor,
 }: {
   locale: WizardLocale
+  id?: string
   title: string
   rows: ReviewRow[]
+  issues?: ReviewIssue[]
   emptyText: string
   toneIndex: number
   isRTL: boolean
@@ -588,7 +601,7 @@ function SectionBlock({
   const Icon = sectionIcon.icon
 
   return (
-    <section className="border-t border-slate-200 pt-6 first:border-t-0 first:pt-0">
+    <section id={id} className="scroll-mt-4 border-t border-slate-200 pt-6 first:border-t-0 first:pt-0">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <div
@@ -601,6 +614,31 @@ function SectionBlock({
           </div>
         </div>
       </div>
+
+      {issues?.length ? (
+        <div
+          role="alert"
+          className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
+        >
+          <p className="font-semibold">
+            {isRTL ? 'هذه الخدمة غير مكتملة' : 'This service is incomplete'}
+          </p>
+          <ul className="mt-1.5 space-y-1.5">
+            {issues.map((issue) => (
+              <li key={issue.text} className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+                <span>{issue.text}</span>
+                <Link
+                  href={editHrefFor(issue.stepId)}
+                  onClick={issue.onEdit}
+                  className="inline-flex min-h-[32px] items-center font-semibold text-amber-800 underline underline-offset-2 hover:text-amber-950"
+                >
+                  {isRTL ? 'إكمال' : 'Complete it'}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
 
       <div className="mt-5 grid gap-x-8 gap-y-5 sm:grid-cols-2 xl:grid-cols-3">
         {rows.map((row) => (
@@ -625,7 +663,7 @@ function SectionBlock({
                   className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition-colors hover:border-sky-200 hover:bg-sky-50 hover:text-sky-700"
                 >
                 <svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path fill-rule="evenodd" clip-rule="evenodd" d="M9.83073 2.62588C10.6606 1.79601 12.0061 1.79601 12.8359 2.62588L14.3741 4.16408C15.204 4.99394 15.204 6.33941 14.3741 7.16928L6.87587 14.6675C6.74303 14.8004 6.56286 14.875 6.375 14.875H2.83333C2.44213 14.875 2.125 14.5579 2.125 14.1667V10.625C2.125 10.4371 2.19963 10.257 2.33247 10.1241L9.83073 2.62588ZM11.8342 3.62761C11.5576 3.35099 11.1091 3.35099 10.8325 3.62761L10.2101 4.25001L12.75 6.78994L13.3724 6.16754C13.649 5.89092 13.649 5.44243 13.3724 5.16581L11.8342 3.62761ZM11.7483 7.79168L9.20833 5.25174L3.54167 10.9184V13.4583H6.0816L11.7483 7.79168Z" fill="#00A028"/>
+<path fillRule="evenodd" clipRule="evenodd" d="M9.83073 2.62588C10.6606 1.79601 12.0061 1.79601 12.8359 2.62588L14.3741 4.16408C15.204 4.99394 15.204 6.33941 14.3741 7.16928L6.87587 14.6675C6.74303 14.8004 6.56286 14.875 6.375 14.875H2.83333C2.44213 14.875 2.125 14.5579 2.125 14.1667V10.625C2.125 10.4371 2.19963 10.257 2.33247 10.1241L9.83073 2.62588ZM11.8342 3.62761C11.5576 3.35099 11.1091 3.35099 10.8325 3.62761L10.2101 4.25001L12.75 6.78994L13.3724 6.16754C13.649 5.89092 13.649 5.44243 13.3724 5.16581L11.8342 3.62761ZM11.7483 7.79168L9.20833 5.25174L3.54167 10.9184V13.4583H6.0816L11.7483 7.79168Z" fill="#00A028"/>
 </svg>
 
                 </Link>
@@ -1159,10 +1197,39 @@ export default function ProjectReviewStep({
           : []),
       ]
 
+      // Same requirements the service steps enforce, checked against the saved data.
+      const issues: ReviewIssue[] = []
+      if (!scopeGroups.length) {
+        issues.push({
+          text: isRTL ? 'لم يتم اختيار أي نطاق.' : 'No scopes selected.',
+          stepId: projectWizardStepIds.projectScope,
+          onEdit: select,
+        })
+      } else if (!scopeGroups.some((group) => group.subscopes.length > 0)) {
+        issues.push({
+          text: isRTL ? 'لم يتم اختيار أي نطاق فرعي.' : 'No sub-scopes selected.',
+          stepId: projectWizardStepIds.projectSubscopes,
+          onEdit: select,
+        })
+      }
+      if (stage && !validateDeliverables(deliverables, review.plannedStart, review.deadline)) {
+        issues.push({
+          text: deliverables.length
+            ? isRTL
+              ? 'بعض المخرجات تنقصها بيانات أو تواريخها خارج مدة المشروع.'
+              : 'Some deliverables are missing details or fall outside the project dates.'
+            : isRTL
+              ? 'لم تتم إضافة أي مخرجات.'
+              : 'No deliverables added.',
+          stepId: 'deliverables',
+          onEdit: select,
+        })
+      }
+
       const prefix = isRTL
         ? many ? `الخدمة ${index + 1}` : 'الخدمة'
         : many ? `Service ${index + 1}` : 'Service'
-      return { title: `${prefix}: ${name}`, rows }
+      return { id: `review-service-${service.uuid}`, title: `${prefix}: ${name}`, rows, issues }
     })
   }, [isRTL, locale, review])
 
@@ -1249,12 +1316,12 @@ export default function ProjectReviewStep({
     setError(null)
 
     try {
-      const services = readProjectServices(locale)
       if (!review?.projectServices.length) throw new Error(isRTL ? 'تعذر تحميل الخدمات. أعد تحميل الملخص.' : 'Services could not be loaded. Reload the summary before continuing.')
-      if (!services.length || services.some(s => !s.complete)) throw new Error(isRTL ? 'أكمل تفاصيل جميع الخدمات أولاً.' : 'Complete all service details before continuing.')
-      for (const service of review.projectServices) {
-        const stage = Object.assign({}, ...(service.components || []))['deliverable-stage'] as {deliverables?: Deliverable[]} | undefined
-        if (stage && !validateDeliverables(stage.deliverables || [], review.plannedStart, review.deadline)) throw new Error(isRTL ? 'راجع تواريخ وصيغ مخرجات الخدمات لتتوافق مع مدة المشروع.' : 'Check every service’s deliverable dates and formats against the project schedule.')
+      const incomplete = serviceSections.find((section) => section.issues?.length)
+      if (incomplete?.issues?.length) {
+        if (incomplete.id)
+          document.getElementById(incomplete.id)?.scrollIntoView({ block: 'start', behavior: 'smooth' })
+        throw new Error(`${incomplete.title} — ${incomplete.issues[0].text}`)
       }
       await syncProjectProperties(locale)
       router.push(nav.nextHref || `/${locale}/project`)
@@ -1273,8 +1340,8 @@ export default function ProjectReviewStep({
   if (!review) {
     return (
       <div className="w-full max-w-6xl mx-auto min-h-full flex flex-col" dir={isRTL ? 'rtl' : 'ltr'}>
-        <div className="flex-1 overflow-auto rounded-md px-4 py-8 sm:px-6">
-          <div className="mx-auto max-w-[980px] rounded-[32px] border border-slate-200 bg-white px-8 py-16">
+        <div className="flex-1 overflow-auto pt-3 pb-8 sm:rounded-md sm:px-6 sm:pt-8">
+          <div className="mx-auto max-w-[980px] rounded-2xl border border-slate-200 bg-white px-5 py-16 sm:rounded-[32px] sm:px-8">
             <div className="text-center text-base text-slate-600">
               {isRTL ? 'جاري إعداد ملخص المشروع...' : 'Preparing project summary...'}
             </div>
@@ -1289,9 +1356,9 @@ export default function ProjectReviewStep({
       className="w-full max-w-6xl mx-auto min-h-full flex flex-col"
       dir={isRTL ? 'rtl' : 'ltr'}
     >
-      <div className="flex-1 overflow-auto rounded-md px-4 pb-32 pt-8 sm:px-6 sm:pb-8">
-        <div className="mx-auto max-w-[980px] overflow-hidden rounded-[36px] border border-slate-200 bg-white">
-          <div className="px-6 py-8 sm:px-10 sm:py-10 lg:px-12 lg:py-12">
+      <div className="flex-1 overflow-auto pb-32 pt-3 sm:rounded-md sm:px-6 sm:pb-8 sm:pt-8">
+        <div className="mx-auto max-w-[980px] overflow-hidden rounded-2xl border border-slate-200 bg-white sm:rounded-[36px]">
+          <div className="px-5 py-6 sm:px-10 sm:py-10 lg:px-12 lg:py-12">
             <div className="flex flex-wrap items-start justify-between gap-6 border-b border-slate-200 pb-8">
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
@@ -1342,8 +1409,10 @@ export default function ProjectReviewStep({
                 <SectionBlock
                   locale={locale}
                   key={section.title}
+                  id={section.id}
                   title={section.title}
                   rows={section.rows}
+                  issues={section.issues}
                   emptyText={emptyText}
                   toneIndex={1}
                   isRTL={isRTL}

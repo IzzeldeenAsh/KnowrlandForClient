@@ -273,7 +273,7 @@ export default async function ProjectWizardStepPage({ params }: PageProps) {
 
   if (step === 'project-review') {
     return (
-      <ProjectWizardShell align="top">
+      <ProjectWizardShell align="top" bleed>
         <div className="w-full pt-2 sm:pt-4">
           <ProjectReviewStep locale={locale} />
         </div>

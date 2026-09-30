@@ -6331,6 +6331,21 @@ function futureDateString(daysFromNow) {
 function defaultOfferExpiryDate(projectType) {
     return normalizeProjectType(projectType) === 'urgent_request' ? futureDateString(1) : futureDateString(7);
 }
+// ISO dates (YYYY-MM-DD) compare correctly as strings.
+function clampIsoDate(value, min, max) {
+    if (min && value < min) return min;
+    if (max && value > max) return max;
+    return value;
+}
+function formatIsoDate(value, locale) {
+    const [year, month, day] = value.split('-').map(Number);
+    if (!year || !month || !day) return value;
+    return new Date(year, month - 1, day).toLocaleDateString(locale === 'ar' ? 'ar-u-nu-latn' : 'en-GB', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+    });
+}
 function DeadlineOfferQuestion({ locale }) {
     const router = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRouter"])();
     const nav = (0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$useProjectWizardNavigation$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useProjectWizardNavigation"])(locale);
@@ -6339,6 +6354,8 @@ function DeadlineOfferQuestion({ locale }) {
     const [entered, setEntered] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     const [projectType, setProjectType] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
     const [dateValue, setDateValue] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])('');
+    const [projectStart, setProjectStart] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])('');
+    const [projectEnd, setProjectEnd] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])('');
     const [selectedMatchesCount, setSelectedMatchesCount] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(0);
     const [submitting, setSubmitting] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     const [error, setError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
@@ -6347,8 +6364,17 @@ function DeadlineOfferQuestion({ locale }) {
     const today = todayString();
     const tomorrow = futureDateString(1);
     const isUrgentProject = normalizeProjectType(projectType) === 'urgent_request';
+    // The offer must expire within the project window, and never in the past.
+    const minDate = projectStart > today ? projectStart : today;
+    const maxDate = [
+        projectEnd,
+        isUrgentProject ? tomorrow : ''
+    ].filter(Boolean).sort()[0] || '';
+    const hasSelectableDates = !maxDate || minDate <= maxDate;
     const isPastDate = dateValue !== '' && dateValue < today;
     const isAfterUrgentMaxDate = isUrgentProject && dateValue !== '' && dateValue > tomorrow;
+    const isOutsideProjectDates = dateValue !== '' && (projectStart !== '' && dateValue < projectStart || projectEnd !== '' && dateValue > projectEnd);
+    const isInvalidDate = !hasSelectableDates || isPastDate || isAfterUrgentMaxDate || isOutsideProjectDates;
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
         const timer = window.setTimeout(()=>setEntered(true), 30);
         return ()=>window.clearTimeout(timer);
@@ -6357,8 +6383,20 @@ function DeadlineOfferQuestion({ locale }) {
         try {
             const storedProjectType = window.sessionStorage.getItem(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$wizardStorage$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["projectWizardStorage"].projectTypeKey(locale));
             setProjectType(storedProjectType);
+            const start = window.sessionStorage.getItem(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$wizardStorage$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["projectWizardStorage"].plannedStartDateKey(locale)) || '';
+            const end = window.sessionStorage.getItem(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$wizardStorage$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["projectWizardStorage"].deadlineKey(locale)) || '';
+            setProjectStart(start);
+            setProjectEnd(end);
+            const now = todayString();
+            const urgent = normalizeProjectType(storedProjectType) === 'urgent_request';
+            const min = start > now ? start : now;
+            const max = [
+                end,
+                urgent ? futureDateString(1) : ''
+            ].filter(Boolean).sort()[0] || '';
+            // A stored or default date outside the project window is moved into it.
             const stored = window.sessionStorage.getItem(storageKey);
-            setDateValue(stored || defaultOfferExpiryDate(storedProjectType));
+            setDateValue(!max || min <= max ? clampIsoDate(stored || defaultOfferExpiryDate(storedProjectType), min, max) : stored || '');
             setSelectedMatchesCount((0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$specifiedInsighterProject$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["isSpecifiedInsighterProject"])(locale) ? 1 : (0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectProposalSubmit$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["readStoredSelectedMatchIds"])(locale).length);
         } catch  {
         // ignore
@@ -6382,7 +6420,7 @@ function DeadlineOfferQuestion({ locale }) {
         }
     };
     const onContinue = async ()=>{
-        if (submitting || isPastDate || isAfterUrgentMaxDate) return;
+        if (submitting || isInvalidDate) return;
         if (!dateValue) {
             setError(isRTL ? 'يرجى اختيار تاريخ.' : 'Please select a date.');
             return;
@@ -6394,7 +6432,7 @@ function DeadlineOfferQuestion({ locale }) {
         }
         await submitProposal();
     };
-    const validationError = isPastDate ? isRTL ? 'لا يمكن أن يكون التاريخ في الماضي.' : 'Date cannot be in the past.' : isAfterUrgentMaxDate ? isRTL ? 'يجب أن تنتهي صلاحية عرض الطلب العاجل خلال 24 ساعة.' : 'Urgent request offer must expire within 24 hours.' : null;
+    const validationError = !hasSelectableDates ? isRTL ? 'لا توجد تواريخ متاحة ضمن مدة المشروع. عدّل تاريخ البدء أو الموعد النهائي.' : 'No dates are available within the project dates. Update the start date or delivery deadline.' : isPastDate ? isRTL ? 'لا يمكن أن يكون التاريخ في الماضي.' : 'Date cannot be in the past.' : isAfterUrgentMaxDate ? isRTL ? 'يجب أن تنتهي صلاحية عرض الطلب العاجل خلال 24 ساعة.' : 'Urgent request offer must expire within 24 hours.' : isOutsideProjectDates ? isRTL ? 'اختر تاريخًا ضمن مدة المشروع.' : 'Choose a date within the project dates.' : null;
     const visibleError = validationError || error;
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "w-full max-w-4xl mx-auto min-h-full flex flex-col",
@@ -6409,7 +6447,7 @@ function DeadlineOfferQuestion({ locale }) {
                         projectTypeId: projectType
                     }, void 0, false, {
                         fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                        lineNumber: 169,
+                        lineNumber: 223,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6423,7 +6461,7 @@ function DeadlineOfferQuestion({ locale }) {
             `
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                                lineNumber: 184,
+                                lineNumber: 238,
                                 columnNumber: 13
                             }, this) : null,
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -6432,7 +6470,7 @@ function DeadlineOfferQuestion({ locale }) {
                                 children: isRTL ? 'متى تنتهي صلاحية هذا العرض؟' : 'When should this offer expire?'
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                                lineNumber: 190,
+                                lineNumber: 244,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -6440,7 +6478,7 @@ function DeadlineOfferQuestion({ locale }) {
                                 children: isRTL ? 'إذا لم يتم التعاقد قبل هذا التاريخ، سيتم إزالة العرض تلقائيًا.' : 'If no contract is made by this date, the offer will be automatically removed.'
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                                lineNumber: 198,
+                                lineNumber: 252,
                                 columnNumber: 11
                             }, this),
                             selectedMatchesCount > 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6451,7 +6489,7 @@ function DeadlineOfferQuestion({ locale }) {
                                         children: selectedMatchesCount
                                     }, void 0, false, {
                                         fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                                        lineNumber: 205,
+                                        lineNumber: 259,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -6459,19 +6497,19 @@ function DeadlineOfferQuestion({ locale }) {
                                         children: isRTL ? 'من الخبراء/الجهات المختارة سيتم إرسالهم مع هذا العرض' : `selected match${selectedMatchesCount === 1 ? '' : 'es'} will be submitted with this offer`
                                     }, void 0, false, {
                                         fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                                        lineNumber: 208,
+                                        lineNumber: 262,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                                lineNumber: 204,
+                                lineNumber: 258,
                                 columnNumber: 13
                             }, this) : null
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                        lineNumber: 175,
+                        lineNumber: 229,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6484,8 +6522,8 @@ function DeadlineOfferQuestion({ locale }) {
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$questions$2f$InlineDateCalendar$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
                                     value: dateValue,
-                                    min: today,
-                                    max: isUrgentProject ? tomorrow : undefined,
+                                    min: minDate,
+                                    max: maxDate || undefined,
                                     onChange: (date)=>{
                                         setDateValue(date);
                                         setError(null);
@@ -6494,32 +6532,40 @@ function DeadlineOfferQuestion({ locale }) {
                                     label: isRTL ? 'تاريخ انتهاء العرض' : 'Offer expiry date'
                                 }, void 0, false, {
                                     fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                                    lineNumber: 227,
+                                    lineNumber: 281,
                                     columnNumber: 13
                                 }, this),
+                                projectStart || projectEnd ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                    className: "mt-3 text-xs font-medium text-slate-500",
+                                    children: projectStart && projectEnd ? isRTL ? `مدة المشروع: ${formatIsoDate(projectStart, locale)} – ${formatIsoDate(projectEnd, locale)}` : `Project dates: ${formatIsoDate(projectStart, locale)} – ${formatIsoDate(projectEnd, locale)}` : projectEnd ? isRTL ? `الموعد النهائي للمشروع: ${formatIsoDate(projectEnd, locale)}` : `Project deadline: ${formatIsoDate(projectEnd, locale)}` : isRTL ? `بداية المشروع: ${formatIsoDate(projectStart, locale)}` : `Project start: ${formatIsoDate(projectStart, locale)}`
+                                }, void 0, false, {
+                                    fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
+                                    lineNumber: 293,
+                                    columnNumber: 15
+                                }, this) : null,
                                 visibleError ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "mt-3 text-sm text-rose-700",
                                     children: visibleError
                                 }, void 0, false, {
                                     fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                                    lineNumber: 239,
+                                    lineNumber: 308,
                                     columnNumber: 15
                                 }, this) : null
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                            lineNumber: 226,
+                            lineNumber: 280,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                        lineNumber: 217,
+                        lineNumber: 271,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                lineNumber: 168,
+                lineNumber: 222,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6535,7 +6581,7 @@ function DeadlineOfferQuestion({ locale }) {
                                 children: isRTL ? 'رجوع' : 'Back'
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                                lineNumber: 248,
+                                lineNumber: 317,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6543,39 +6589,39 @@ function DeadlineOfferQuestion({ locale }) {
                                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                     type: "button",
                                     onClick: ()=>void onContinue(),
-                                    disabled: submitting || isPastDate || isAfterUrgentMaxDate,
-                                    className: `btn-sm px-6 py-2 rounded-full ${!submitting && !isPastDate && !isAfterUrgentMaxDate ? 'text-white bg-[#1C7CBB] hover:bg-opacity-90' : 'text-slate-500 bg-slate-200 cursor-not-allowed'}`,
+                                    disabled: submitting || isInvalidDate,
+                                    className: `btn-sm px-6 py-2 rounded-full ${!submitting && !isInvalidDate ? 'text-white bg-[#1C7CBB] hover:bg-opacity-90' : 'text-slate-500 bg-slate-200 cursor-not-allowed'}`,
                                     children: submitting ? isRTL ? 'جاري الإرسال...' : 'Submitting...' : isRTL ? 'إرسال الطلب' : 'Submit proposal'
                                 }, void 0, false, {
                                     fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                                    lineNumber: 256,
+                                    lineNumber: 325,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                                lineNumber: 255,
+                                lineNumber: 324,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                        lineNumber: 247,
+                        lineNumber: 316,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                    lineNumber: 246,
+                    lineNumber: 315,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                lineNumber: 245,
+                lineNumber: 314,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-        lineNumber: 164,
+        lineNumber: 218,
         columnNumber: 5
     }, this);
 }
@@ -8336,11 +8382,12 @@ function buildServiceComponentSections(params) {
         };
     }).filter((section)=>Boolean(section));
 }
-function SectionBlock({ locale, title, rows, emptyText, toneIndex, isRTL, editLabel, editHrefFor }) {
+function SectionBlock({ locale, id, title, rows, issues, emptyText, toneIndex, isRTL, editLabel, editHrefFor }) {
     const sectionIcon = sectionIcons[toneIndex % sectionIcons.length];
     const Icon = sectionIcon.icon;
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
-        className: "border-t border-slate-200 pt-6 first:border-t-0 first:pt-0",
+        id: id,
+        className: "scroll-mt-4 border-t border-slate-200 pt-6 first:border-t-0 first:pt-0",
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 className: "flex flex-wrap items-center justify-between gap-3",
@@ -8354,12 +8401,12 @@ function SectionBlock({ locale, title, rows, emptyText, toneIndex, isRTL, editLa
                                 strokeWidth: 1.35
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                lineNumber: 597,
+                                lineNumber: 610,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                            lineNumber: 594,
+                            lineNumber: 607,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8368,25 +8415,76 @@ function SectionBlock({ locale, title, rows, emptyText, toneIndex, isRTL, editLa
                                 children: title
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                lineNumber: 600,
+                                lineNumber: 613,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                            lineNumber: 599,
+                            lineNumber: 612,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                    lineNumber: 593,
+                    lineNumber: 606,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                lineNumber: 592,
+                lineNumber: 605,
                 columnNumber: 7
             }, this),
+            issues?.length ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                role: "alert",
+                className: "mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900",
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                        className: "font-semibold",
+                        children: isRTL ? 'هذه الخدمة غير مكتملة' : 'This service is incomplete'
+                    }, void 0, false, {
+                        fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
+                        lineNumber: 623,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
+                        className: "mt-1.5 space-y-1.5",
+                        children: issues.map((issue)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
+                                className: "flex flex-wrap items-center justify-between gap-x-3 gap-y-1",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        children: issue.text
+                                    }, void 0, false, {
+                                        fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
+                                        lineNumber: 629,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                        href: editHrefFor(issue.stepId),
+                                        onClick: issue.onEdit,
+                                        className: "inline-flex min-h-[32px] items-center font-semibold text-amber-800 underline underline-offset-2 hover:text-amber-950",
+                                        children: isRTL ? 'إكمال' : 'Complete it'
+                                    }, void 0, false, {
+                                        fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
+                                        lineNumber: 630,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, issue.text, true, {
+                                fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
+                                lineNumber: 628,
+                                columnNumber: 15
+                            }, this))
+                    }, void 0, false, {
+                        fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
+                        lineNumber: 626,
+                        columnNumber: 11
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
+                lineNumber: 619,
+                columnNumber: 9
+            }, this) : null,
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 className: "mt-5 grid gap-x-8 gap-y-5 sm:grid-cols-2 xl:grid-cols-3",
                 children: rows.map((row)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("article", {
@@ -8400,7 +8498,7 @@ function SectionBlock({ locale, title, rows, emptyText, toneIndex, isRTL, editLa
                                         children: row.label
                                     }, void 0, false, {
                                         fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                        lineNumber: 618,
+                                        lineNumber: 656,
                                         columnNumber: 15
                                     }, this),
                                     row.editStepId ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -8416,29 +8514,29 @@ function SectionBlock({ locale, title, rows, emptyText, toneIndex, isRTL, editLa
                                             fill: "none",
                                             xmlns: "http://www.w3.org/2000/svg",
                                             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
-                                                "fill-rule": "evenodd",
-                                                "clip-rule": "evenodd",
+                                                fillRule: "evenodd",
+                                                clipRule: "evenodd",
                                                 d: "M9.83073 2.62588C10.6606 1.79601 12.0061 1.79601 12.8359 2.62588L14.3741 4.16408C15.204 4.99394 15.204 6.33941 14.3741 7.16928L6.87587 14.6675C6.74303 14.8004 6.56286 14.875 6.375 14.875H2.83333C2.44213 14.875 2.125 14.5579 2.125 14.1667V10.625C2.125 10.4371 2.19963 10.257 2.33247 10.1241L9.83073 2.62588ZM11.8342 3.62761C11.5576 3.35099 11.1091 3.35099 10.8325 3.62761L10.2101 4.25001L12.75 6.78994L13.3724 6.16754C13.649 5.89092 13.649 5.44243 13.3724 5.16581L11.8342 3.62761ZM11.7483 7.79168L9.20833 5.25174L3.54167 10.9184V13.4583H6.0816L11.7483 7.79168Z",
                                                 fill: "#00A028"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                                lineNumber: 628,
+                                                lineNumber: 666,
                                                 columnNumber: 1
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                            lineNumber: 627,
+                                            lineNumber: 665,
                                             columnNumber: 17
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                        lineNumber: 620,
+                                        lineNumber: 658,
                                         columnNumber: 17
                                     }, this) : null
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                lineNumber: 617,
+                                lineNumber: 655,
                                 columnNumber: 13
                             }, this),
                             row.value.length > 0 || (row.fileTypes?.length ?? 0) > 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8449,7 +8547,7 @@ function SectionBlock({ locale, title, rows, emptyText, toneIndex, isRTL, editLa
                                         deliverables: row.deliverables
                                     }, void 0, false, {
                                         fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                        lineNumber: 638,
+                                        lineNumber: 676,
                                         columnNumber: 19
                                     }, this) : row.variant === 'scope-table' && row.scopeGroups ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: "overflow-hidden rounded-xl border border-slate-200",
@@ -8465,12 +8563,12 @@ function SectionBlock({ locale, title, rows, emptyText, toneIndex, isRTL, editLa
                                                                     children: group.name
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                                                    lineNumber: 646,
+                                                                    lineNumber: 684,
                                                                     columnNumber: 31
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                                                lineNumber: 645,
+                                                                lineNumber: 683,
                                                                 columnNumber: 29
                                                             }, this),
                                                             group.subscopes.length > 0 ? group.subscopes.map((sub, subIndex)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -8480,33 +8578,33 @@ function SectionBlock({ locale, title, rows, emptyText, toneIndex, isRTL, editLa
                                                                         children: sub
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                                                        lineNumber: 663,
+                                                                        lineNumber: 701,
                                                                         columnNumber: 35
                                                                     }, this)
                                                                 }, `${row.label}-${groupIndex}-${subIndex}`, false, {
                                                                     fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                                                    lineNumber: 659,
+                                                                    lineNumber: 697,
                                                                     columnNumber: 33
                                                                 }, this)) : null
                                                         ]
                                                     }, `${row.label}-${groupIndex}`, true, {
                                                         fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                                        lineNumber: 644,
+                                                        lineNumber: 682,
                                                         columnNumber: 27
                                                     }, this))
                                             }, void 0, false, {
                                                 fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                                lineNumber: 642,
+                                                lineNumber: 680,
                                                 columnNumber: 23
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                            lineNumber: 641,
+                                            lineNumber: 679,
                                             columnNumber: 21
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                        lineNumber: 640,
+                                        lineNumber: 678,
                                         columnNumber: 19
                                     }, this) : row.value.length > 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
                                         className: "space-y-2",
@@ -8517,7 +8615,7 @@ function SectionBlock({ locale, title, rows, emptyText, toneIndex, isRTL, editLa
                                                     className: "mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-sky-600"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                                    lineNumber: 682,
+                                                    lineNumber: 720,
                                                     columnNumber: 25
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8527,18 +8625,18 @@ function SectionBlock({ locale, title, rows, emptyText, toneIndex, isRTL, editLa
                                                             children: item
                                                         }, `${row.label}-${itemIndex}-${item}`, false, {
                                                             fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                                            lineNumber: 685,
+                                                            lineNumber: 723,
                                                             columnNumber: 29
                                                         }, this))
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                                    lineNumber: 683,
+                                                    lineNumber: 721,
                                                     columnNumber: 25
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                            lineNumber: 681,
+                                            lineNumber: 719,
                                             columnNumber: 23
                                         }, this) : row.value.map((item, itemIndex)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
                                                 className: "flex items-start gap-3 text-sm leading-6 text-slate-800",
@@ -8547,25 +8645,25 @@ function SectionBlock({ locale, title, rows, emptyText, toneIndex, isRTL, editLa
                                                         className: "mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-sky-600"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                                        lineNumber: 700,
+                                                        lineNumber: 738,
                                                         columnNumber: 27
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                         children: item
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                                        lineNumber: 701,
+                                                        lineNumber: 739,
                                                         columnNumber: 27
                                                     }, this)
                                                 ]
                                             }, `${row.label}-${itemIndex}-${item}`, true, {
                                                 fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                                lineNumber: 696,
+                                                lineNumber: 734,
                                                 columnNumber: 25
                                             }, this))
                                     }, void 0, false, {
                                         fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                        lineNumber: 679,
+                                        lineNumber: 717,
                                         columnNumber: 19
                                     }, this) : null,
                                     row.fileTypes && row.fileTypes.length > 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8575,7 +8673,7 @@ function SectionBlock({ locale, title, rows, emptyText, toneIndex, isRTL, editLa
                                                 children: isRTL ? 'الصيغ' : 'Formats'
                                             }, void 0, false, {
                                                 fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                                lineNumber: 711,
+                                                lineNumber: 749,
                                                 columnNumber: 23
                                             }, this) : null,
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
@@ -8587,7 +8685,7 @@ function SectionBlock({ locale, title, rows, emptyText, toneIndex, isRTL, editLa
                                                                 className: "h-1.5 w-1.5 shrink-0 rounded-full bg-sky-600"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                                                lineNumber: 721,
+                                                                lineNumber: 759,
                                                                 columnNumber: 27
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -8598,61 +8696,61 @@ function SectionBlock({ locale, title, rows, emptyText, toneIndex, isRTL, editLa
                                                                 className: "h-[23px] w-[18px]"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                                                lineNumber: 722,
+                                                                lineNumber: 760,
                                                                 columnNumber: 27
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                 children: fileType.toUpperCase()
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                                                lineNumber: 729,
+                                                                lineNumber: 767,
                                                                 columnNumber: 27
                                                             }, this)
                                                         ]
                                                     }, `${row.label}-file-${itemIndex}-${fileType}`, true, {
                                                         fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                                        lineNumber: 717,
+                                                        lineNumber: 755,
                                                         columnNumber: 25
                                                     }, this))
                                             }, void 0, false, {
                                                 fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                                lineNumber: 715,
+                                                lineNumber: 753,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                        lineNumber: 709,
+                                        lineNumber: 747,
                                         columnNumber: 19
                                     }, this) : null
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                lineNumber: 636,
+                                lineNumber: 674,
                                 columnNumber: 15
                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "text-sm text-slate-400",
                                 children: emptyText
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                lineNumber: 737,
+                                lineNumber: 775,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, row.label, true, {
                         fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                        lineNumber: 607,
+                        lineNumber: 645,
                         columnNumber: 11
                     }, this))
             }, void 0, false, {
                 fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                lineNumber: 605,
+                lineNumber: 643,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-        lineNumber: 591,
+        lineNumber: 604,
         columnNumber: 5
     }, this);
 }
@@ -8938,10 +9036,34 @@ function ProjectReviewStep({ locale }) {
                     }
                 ] : []
             ];
+            // Same requirements the service steps enforce, checked against the saved data.
+            const issues = [];
+            if (!scopeGroups.length) {
+                issues.push({
+                    text: isRTL ? 'لم يتم اختيار أي نطاق.' : 'No scopes selected.',
+                    stepId: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectWizardFlow$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["projectWizardStepIds"].projectScope,
+                    onEdit: select
+                });
+            } else if (!scopeGroups.some((group)=>group.subscopes.length > 0)) {
+                issues.push({
+                    text: isRTL ? 'لم يتم اختيار أي نطاق فرعي.' : 'No sub-scopes selected.',
+                    stepId: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectWizardFlow$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["projectWizardStepIds"].projectSubscopes,
+                    onEdit: select
+                });
+            }
+            if (stage && !(0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$deliverables$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["validateDeliverables"])(deliverables, review.plannedStart, review.deadline)) {
+                issues.push({
+                    text: deliverables.length ? isRTL ? 'بعض المخرجات تنقصها بيانات أو تواريخها خارج مدة المشروع.' : 'Some deliverables are missing details or fall outside the project dates.' : isRTL ? 'لم تتم إضافة أي مخرجات.' : 'No deliverables added.',
+                    stepId: 'deliverables',
+                    onEdit: select
+                });
+            }
             const prefix = isRTL ? many ? `الخدمة ${index + 1}` : 'الخدمة' : many ? `Service ${index + 1}` : 'Service';
             return {
+                id: `review-service-${service.uuid}`,
                 title: `${prefix}: ${name}`,
-                rows
+                rows,
+                issues
             };
         });
     }, [
@@ -9029,12 +9151,14 @@ function ProjectReviewStep({ locale }) {
         setSubmitting(true);
         setError(null);
         try {
-            const services = (0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectServicesState$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["readProjectServices"])(locale);
             if (!review?.projectServices.length) throw new Error(isRTL ? 'تعذر تحميل الخدمات. أعد تحميل الملخص.' : 'Services could not be loaded. Reload the summary before continuing.');
-            if (!services.length || services.some((s)=>!s.complete)) throw new Error(isRTL ? 'أكمل تفاصيل جميع الخدمات أولاً.' : 'Complete all service details before continuing.');
-            for (const service of review.projectServices){
-                const stage = Object.assign({}, ...service.components || [])['deliverable-stage'];
-                if (stage && !(0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$deliverables$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["validateDeliverables"])(stage.deliverables || [], review.plannedStart, review.deadline)) throw new Error(isRTL ? 'راجع تواريخ وصيغ مخرجات الخدمات لتتوافق مع مدة المشروع.' : 'Check every service’s deliverable dates and formats against the project schedule.');
+            const incomplete = serviceSections.find((section)=>section.issues?.length);
+            if (incomplete?.issues?.length) {
+                if (incomplete.id) document.getElementById(incomplete.id)?.scrollIntoView({
+                    block: 'start',
+                    behavior: 'smooth'
+                });
+                throw new Error(`${incomplete.title} — ${incomplete.issues[0].text}`);
             }
             await (0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectPropertiesSync$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["syncProjectProperties"])(locale);
             router.push(nav.nextHref || `/${locale}/project`);
@@ -9049,30 +9173,30 @@ function ProjectReviewStep({ locale }) {
             className: "w-full max-w-6xl mx-auto min-h-full flex flex-col",
             dir: isRTL ? 'rtl' : 'ltr',
             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "flex-1 overflow-auto rounded-md px-4 py-8 sm:px-6",
+                className: "flex-1 overflow-auto pt-3 pb-8 sm:rounded-md sm:px-6 sm:pt-8",
                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "mx-auto max-w-[980px] rounded-[32px] border border-slate-200 bg-white px-8 py-16",
+                    className: "mx-auto max-w-[980px] rounded-2xl border border-slate-200 bg-white px-5 py-16 sm:rounded-[32px] sm:px-8",
                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "text-center text-base text-slate-600",
                         children: isRTL ? 'جاري إعداد ملخص المشروع...' : 'Preparing project summary...'
                     }, void 0, false, {
                         fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                        lineNumber: 1278,
+                        lineNumber: 1345,
                         columnNumber: 13
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                    lineNumber: 1277,
+                    lineNumber: 1344,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                lineNumber: 1276,
+                lineNumber: 1343,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-            lineNumber: 1275,
+            lineNumber: 1342,
             columnNumber: 7
         }, this);
     }
@@ -9081,11 +9205,11 @@ function ProjectReviewStep({ locale }) {
         dir: isRTL ? 'rtl' : 'ltr',
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "flex-1 overflow-auto rounded-md px-4 pb-32 pt-8 sm:px-6 sm:pb-8",
+                className: "flex-1 overflow-auto pb-32 pt-3 sm:rounded-md sm:px-6 sm:pb-8 sm:pt-8",
                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "mx-auto max-w-[980px] overflow-hidden rounded-[36px] border border-slate-200 bg-white",
+                    className: "mx-auto max-w-[980px] overflow-hidden rounded-2xl border border-slate-200 bg-white sm:rounded-[36px]",
                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "px-6 py-8 sm:px-10 sm:py-10 lg:px-12 lg:py-12",
+                        className: "px-5 py-6 sm:px-10 sm:py-10 lg:px-12 lg:py-12",
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "flex flex-wrap items-start justify-between gap-6 border-b border-slate-200 pb-8",
@@ -9105,12 +9229,12 @@ function ProjectReviewStep({ locale }) {
                                                         className: "h-auto w-auto"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                                        lineNumber: 1299,
+                                                        lineNumber: 1366,
                                                         columnNumber: 21
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                                    lineNumber: 1298,
+                                                    lineNumber: 1365,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9120,18 +9244,18 @@ function ProjectReviewStep({ locale }) {
                                                         children: review.title
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                                        lineNumber: 1309,
+                                                        lineNumber: 1376,
                                                         columnNumber: 21
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                                    lineNumber: 1308,
+                                                    lineNumber: 1375,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                            lineNumber: 1297,
+                                            lineNumber: 1364,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9142,7 +9266,7 @@ function ProjectReviewStep({ locale }) {
                                                     children: review.projectType
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                                    lineNumber: 1316,
+                                                    lineNumber: 1383,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -9150,7 +9274,7 @@ function ProjectReviewStep({ locale }) {
                                                     children: review.service
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                                    lineNumber: 1319,
+                                                    lineNumber: 1386,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -9158,24 +9282,24 @@ function ProjectReviewStep({ locale }) {
                                                     children: review.deliverablesLanguage
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                                    lineNumber: 1322,
+                                                    lineNumber: 1389,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                            lineNumber: 1315,
+                                            lineNumber: 1382,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                    lineNumber: 1296,
+                                    lineNumber: 1363,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                lineNumber: 1295,
+                                lineNumber: 1362,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9192,13 +9316,15 @@ function ProjectReviewStep({ locale }) {
                                         editHrefFor: nav.editHrefFor
                                     }, void 0, false, {
                                         fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                        lineNumber: 1330,
+                                        lineNumber: 1397,
                                         columnNumber: 15
                                     }, this),
                                     serviceSections.map((section)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(SectionBlock, {
                                             locale: locale,
+                                            id: section.id,
                                             title: section.title,
                                             rows: section.rows,
+                                            issues: section.issues,
                                             emptyText: emptyText,
                                             toneIndex: 1,
                                             isRTL: isRTL,
@@ -9206,7 +9332,7 @@ function ProjectReviewStep({ locale }) {
                                             editHrefFor: nav.editHrefFor
                                         }, section.title, false, {
                                             fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                            lineNumber: 1342,
+                                            lineNumber: 1409,
                                             columnNumber: 17
                                         }, this)),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(SectionBlock, {
@@ -9220,7 +9346,7 @@ function ProjectReviewStep({ locale }) {
                                         editHrefFor: nav.editHrefFor
                                     }, void 0, false, {
                                         fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                        lineNumber: 1355,
+                                        lineNumber: 1424,
                                         columnNumber: 15
                                     }, this),
                                     review.serviceComponentSections.map((section, index)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(SectionBlock, {
@@ -9234,7 +9360,7 @@ function ProjectReviewStep({ locale }) {
                                             editHrefFor: nav.editHrefFor
                                         }, section.title, false, {
                                             fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                            lineNumber: 1375,
+                                            lineNumber: 1444,
                                             columnNumber: 17
                                         }, this)),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(SectionBlock, {
@@ -9248,29 +9374,29 @@ function ProjectReviewStep({ locale }) {
                                         editHrefFor: nav.editHrefFor
                                     }, void 0, false, {
                                         fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                        lineNumber: 1388,
+                                        lineNumber: 1457,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                lineNumber: 1329,
+                                lineNumber: 1396,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                        lineNumber: 1294,
+                        lineNumber: 1361,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                    lineNumber: 1293,
+                    lineNumber: 1360,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                lineNumber: 1292,
+                lineNumber: 1359,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9286,7 +9412,7 @@ function ProjectReviewStep({ locale }) {
                                 children: isRTL ? 'رجوع' : 'Back'
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                lineNumber: 1406,
+                                lineNumber: 1475,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -9297,29 +9423,29 @@ function ProjectReviewStep({ locale }) {
                                 children: submitting ? isRTL ? 'جاري الحفظ...' : 'Saving...' : reviewContinueLabel
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                                lineNumber: 1413,
+                                lineNumber: 1482,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                        lineNumber: 1405,
+                        lineNumber: 1474,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                    lineNumber: 1404,
+                    lineNumber: 1473,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-                lineNumber: 1403,
+                lineNumber: 1472,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/project/questions/ProjectReviewStep.tsx",
-        lineNumber: 1288,
+        lineNumber: 1355,
         columnNumber: 5
     }, this);
 }
@@ -9954,11 +10080,48 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$use
 ;
 ;
 ;
+// Industry labels arrive translated, so each entry lists English and Arabic keywords.
+// Arabic keywords are written with a bare alef (see normalizeIndustryLabel).
+// Order matters: the first entry with a matching keyword wins.
 const INDUSTRY_META = [
+    // First: "transportation" contains "sport", and the Arabic for logistics contains "خدمات".
+    {
+        words: [
+            'transportation',
+            'logistics',
+            'نقل',
+            'لوجست'
+        ],
+        meta: {
+            Icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconTruck$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconTruck$3e$__["IconTruck"],
+            iconClass: 'bg-blue-50 text-blue-700'
+        }
+    },
+    // Before commerce: an Arabic professional-services label contains "تجار".
+    {
+        words: [
+            'management',
+            'professional',
+            'service',
+            'اداره',
+            'ادارة',
+            'منهجيه',
+            'منهجية',
+            'تخطيط',
+            'مهني',
+            'خدمات'
+        ],
+        meta: {
+            Icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconBriefcase$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconBriefcase$3e$__["IconBriefcase"],
+            iconClass: 'bg-indigo-50 text-indigo-600'
+        }
+    },
     {
         words: [
             'chemical',
-            'resource'
+            'resource',
+            'كيميا',
+            'موارد'
         ],
         meta: {
             Icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconFlask2$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconFlask2$3e$__["IconFlask2"],
@@ -9967,7 +10130,10 @@ const INDUSTRY_META = [
     },
     {
         words: [
-            'construction'
+            'construction',
+            'بناء',
+            'تشييد',
+            'انشاء'
         ],
         meta: {
             Icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconBuilding$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconBuilding$3e$__["IconBuilding"],
@@ -9978,7 +10144,10 @@ const INDUSTRY_META = [
         words: [
             'commerce',
             'retail',
-            'trade'
+            'trade',
+            'تجار',
+            'تجزئه',
+            'تجزئة'
         ],
         meta: {
             Icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconShoppingCart$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconShoppingCart$3e$__["IconShoppingCart"],
@@ -9988,7 +10157,10 @@ const INDUSTRY_META = [
     {
         words: [
             'economy',
-            'politic'
+            'politic',
+            'اقتصاد',
+            'سياسه',
+            'سياسة'
         ],
         meta: {
             Icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconBuildingMonument$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconBuildingMonument$3e$__["IconBuildingMonument"],
@@ -9998,7 +10170,11 @@ const INDUSTRY_META = [
     {
         words: [
             'energy',
-            'environment'
+            'environment',
+            'طاقه',
+            'طاقة',
+            'بيئه',
+            'بيئة'
         ],
         meta: {
             Icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconBolt$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconBolt$3e$__["IconBolt"],
@@ -10009,7 +10185,13 @@ const INDUSTRY_META = [
         words: [
             'health',
             'pharma',
-            'medtech'
+            'medtech',
+            'صحه',
+            'صحة',
+            'صحي',
+            'صيدل',
+            'طبيه',
+            'طبية'
         ],
         meta: {
             Icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconHeartbeat$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconHeartbeat$3e$__["IconHeartbeat"],
@@ -10018,7 +10200,8 @@ const INDUSTRY_META = [
     },
     {
         words: [
-            'internet'
+            'internet',
+            'انترنت'
         ],
         meta: {
             Icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconWorld$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconWorld$3e$__["IconWorld"],
@@ -10028,7 +10211,10 @@ const INDUSTRY_META = [
     {
         words: [
             'life',
-            'society'
+            'society',
+            'حياه',
+            'حياة',
+            'مجتمع'
         ],
         meta: {
             Icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconUsers$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconUsers$3e$__["IconUsers"],
@@ -10037,7 +10223,8 @@ const INDUSTRY_META = [
     },
     {
         words: [
-            'real estate'
+            'real estate',
+            'عقار'
         ],
         meta: {
             Icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconHome$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconHome$3e$__["IconHome"],
@@ -10047,7 +10234,9 @@ const INDUSTRY_META = [
     {
         words: [
             'sport',
-            'recreation'
+            'recreation',
+            'رياض',
+            'ترفيه'
         ],
         meta: {
             Icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconBallFootball$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconBallFootball$3e$__["IconBallFootball"],
@@ -10056,20 +10245,12 @@ const INDUSTRY_META = [
     },
     {
         words: [
-            'management',
-            'professional',
-            'service'
-        ],
-        meta: {
-            Icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconBriefcase$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconBriefcase$3e$__["IconBriefcase"],
-            iconClass: 'bg-indigo-50 text-indigo-600'
-        }
-    },
-    {
-        words: [
             'travel',
             'tourism',
-            'hospitality'
+            'hospitality',
+            'سفر',
+            'سياح',
+            'ضياف'
         ],
         meta: {
             Icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconPlane$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconPlane$3e$__["IconPlane"],
@@ -10078,7 +10259,8 @@ const INDUSTRY_META = [
     },
     {
         words: [
-            'agriculture'
+            'agriculture',
+            'زراع'
         ],
         meta: {
             Icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconLeaf$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconLeaf$3e$__["IconLeaf"],
@@ -10088,7 +10270,10 @@ const INDUSTRY_META = [
     {
         words: [
             'finance',
-            'insurance'
+            'insurance',
+            'تمويل',
+            'تامين',
+            'مالي'
         ],
         meta: {
             Icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconBuildingBank$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconBuildingBank$3e$__["IconBuildingBank"],
@@ -10099,7 +10284,11 @@ const INDUSTRY_META = [
         words: [
             'advertising',
             'marketing',
-            'media'
+            'media',
+            'اعلان',
+            'تسويق',
+            'اعلام',
+            'وسائط'
         ],
         meta: {
             Icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconSpeakerphone$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconSpeakerphone$3e$__["IconSpeakerphone"],
@@ -10109,7 +10298,8 @@ const INDUSTRY_META = [
     {
         words: [
             'consumer',
-            'fmcg'
+            'fmcg',
+            'استهلاك'
         ],
         meta: {
             Icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconPackage$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconPackage$3e$__["IconPackage"],
@@ -10119,7 +10309,10 @@ const INDUSTRY_META = [
     {
         words: [
             'technology',
-            'telecommunication'
+            'telecommunication',
+            'تكنولوج',
+            'تقني',
+            'اتصالات'
         ],
         meta: {
             Icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconDeviceMobile$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconDeviceMobile$3e$__["IconDeviceMobile"],
@@ -10131,21 +10324,16 @@ const INDUSTRY_META = [
             'metal',
             'electronic',
             'mining',
-            'material'
+            'material',
+            'manufactur',
+            'معادن',
+            'تعدين',
+            'الكترونيات',
+            'تصنيع'
         ],
         meta: {
             Icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconCpu$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconCpu$3e$__["IconCpu"],
             iconClass: 'bg-slate-200 text-slate-700'
-        }
-    },
-    {
-        words: [
-            'transportation',
-            'logistics'
-        ],
-        meta: {
-            Icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconTruck$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconTruck$3e$__["IconTruck"],
-            iconClass: 'bg-blue-50 text-blue-700'
         }
     }
 ];
@@ -10153,8 +10341,12 @@ const FALLBACK_META = {
     Icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconTools$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconTools$3e$__["IconTools"],
     iconClass: 'bg-slate-100 text-slate-600'
 };
+// Lowercases English and folds Arabic alef/hamza variants and tatweel so keywords match either spelling.
+function normalizeIndustryLabel(value) {
+    return value.trim().toLowerCase().replace(/[أإآٱ]/g, 'ا').replace(/ـ/g, '');
+}
 function getIndustryMeta(industry) {
-    const label = industry.label.trim().toLowerCase();
+    const label = normalizeIndustryLabel(industry.label);
     return INDUSTRY_META.find(({ words })=>words.some((word)=>label.includes(word)))?.meta || FALLBACK_META;
 }
 function safeParseId(value) {
@@ -10192,12 +10384,12 @@ function IndustryCard({ industry, checked, entered, index, disabled, onClick, is
                         stroke: 1.8
                     }, void 0, false, {
                         fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                        lineNumber: 167,
+                        lineNumber: 181,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                    lineNumber: 164,
+                    lineNumber: 178,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -10205,7 +10397,7 @@ function IndustryCard({ industry, checked, entered, index, disabled, onClick, is
                     children: industry.label
                 }, void 0, false, {
                     fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                    lineNumber: 169,
+                    lineNumber: 183,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -10216,18 +10408,18 @@ function IndustryCard({ industry, checked, entered, index, disabled, onClick, is
                         stroke: 3
                     }, void 0, false, {
                         fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                        lineNumber: 180,
+                        lineNumber: 194,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                    lineNumber: 172,
+                    lineNumber: 186,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-            lineNumber: 152,
+            lineNumber: 166,
             columnNumber: 7
         }, this);
     }
@@ -10249,12 +10441,12 @@ function IndustryCard({ industry, checked, entered, index, disabled, onClick, is
                     stroke: 1.7
                 }, void 0, false, {
                     fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                    lineNumber: 208,
+                    lineNumber: 222,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                lineNumber: 205,
+                lineNumber: 219,
                 columnNumber: 9
             }, this) : null,
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -10262,7 +10454,7 @@ function IndustryCard({ industry, checked, entered, index, disabled, onClick, is
                 children: industry.label
             }, void 0, false, {
                 fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                lineNumber: 211,
+                lineNumber: 225,
                 columnNumber: 7
             }, this),
             checked ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -10272,18 +10464,18 @@ function IndustryCard({ industry, checked, entered, index, disabled, onClick, is
                     stroke: 3
                 }, void 0, false, {
                     fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                    lineNumber: 226,
+                    lineNumber: 240,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                lineNumber: 219,
+                lineNumber: 233,
                 columnNumber: 9
             }, this) : null
         ]
     }, void 0, true, {
         fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-        lineNumber: 187,
+        lineNumber: 201,
         columnNumber: 5
     }, this);
 }
@@ -10435,7 +10627,7 @@ function InsighterIndustryQuestion({ locale }) {
                 projectTypeId: projectType
             }, void 0, false, {
                 fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                lineNumber: 426,
+                lineNumber: 440,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -10449,7 +10641,7 @@ function InsighterIndustryQuestion({ locale }) {
           `
                     }, void 0, false, {
                         fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                        lineNumber: 442,
+                        lineNumber: 456,
                         columnNumber: 11
                     }, this) : null,
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -10458,13 +10650,13 @@ function InsighterIndustryQuestion({ locale }) {
                         children: title
                     }, void 0, false, {
                         fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                        lineNumber: 448,
+                        lineNumber: 462,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                lineNumber: 432,
+                lineNumber: 446,
                 columnNumber: 7
             }, this),
             error ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -10472,7 +10664,7 @@ function InsighterIndustryQuestion({ locale }) {
                 children: error
             }, void 0, false, {
                 fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                lineNumber: 457,
+                lineNumber: 471,
                 columnNumber: 9
             }, this) : null,
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -10482,7 +10674,7 @@ function InsighterIndustryQuestion({ locale }) {
                     children: isRTL ? 'جاري التحميل…' : 'Loading…'
                 }, void 0, false, {
                     fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                    lineNumber: 462,
+                    lineNumber: 476,
                     columnNumber: 11
                 }, this) : featuredParents.length > 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "grid auto-rows-fr grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4",
@@ -10499,7 +10691,7 @@ function InsighterIndustryQuestion({ locale }) {
                                 isRTL: isRTL
                             }, parent.key, false, {
                                 fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                                lineNumber: 472,
+                                lineNumber: 486,
                                 columnNumber: 15
                             }, this)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -10521,12 +10713,12 @@ function InsighterIndustryQuestion({ locale }) {
                                         stroke: 1.8
                                     }, void 0, false, {
                                         fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                                        lineNumber: 497,
+                                        lineNumber: 511,
                                         columnNumber: 17
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                                    lineNumber: 496,
+                                    lineNumber: 510,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -10534,31 +10726,31 @@ function InsighterIndustryQuestion({ locale }) {
                                     children: isRTL ? 'أخرى' : 'Other'
                                 }, void 0, false, {
                                     fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                                    lineNumber: 499,
+                                    lineNumber: 513,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                            lineNumber: 484,
+                            lineNumber: 498,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                    lineNumber: 466,
+                    lineNumber: 480,
                     columnNumber: 11
                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "text-sm font-semibold text-slate-500",
                     children: isRTL ? 'لا توجد صناعات متاحة.' : 'No industries available.'
                 }, void 0, false, {
                     fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                    lineNumber: 505,
+                    lineNumber: 519,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                lineNumber: 460,
+                lineNumber: 474,
                 columnNumber: 7
             }, this),
             showAllParents ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$dom$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["createPortal"])(/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -10585,7 +10777,7 @@ function InsighterIndustryQuestion({ locale }) {
                                             children: isRTL ? 'جميع الصناعات الرئيسية' : 'All parent industries'
                                         }, void 0, false, {
                                             fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                                            lineNumber: 527,
+                                            lineNumber: 541,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -10593,13 +10785,13 @@ function InsighterIndustryQuestion({ locale }) {
                                             children: isRTL ? 'اختر صناعة رئيسية واحدة للمتابعة.' : 'Choose one parent industry to continue.'
                                         }, void 0, false, {
                                             fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                                            lineNumber: 530,
+                                            lineNumber: 544,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                                    lineNumber: 526,
+                                    lineNumber: 540,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -10611,18 +10803,18 @@ function InsighterIndustryQuestion({ locale }) {
                                         size: 20
                                     }, void 0, false, {
                                         fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                                        lineNumber: 542,
+                                        lineNumber: 556,
                                         columnNumber: 17
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                                    lineNumber: 536,
+                                    lineNumber: 550,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                            lineNumber: 525,
+                            lineNumber: 539,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -10636,12 +10828,12 @@ function InsighterIndustryQuestion({ locale }) {
                                             size: 18
                                         }, void 0, false, {
                                             fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                                            lineNumber: 553,
+                                            lineNumber: 567,
                                             columnNumber: 19
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                                        lineNumber: 548,
+                                        lineNumber: 562,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -10653,18 +10845,18 @@ function InsighterIndustryQuestion({ locale }) {
                                         className: `w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 text-sm font-medium text-slate-900 outline-none transition focus:border-[#1C7CBB] focus:bg-white focus:ring-1 focus:ring-[#1C7CBB] ${isRTL ? 'pr-10 pl-4 text-right' : 'pl-10 pr-4 text-left'}`
                                     }, void 0, false, {
                                         fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                                        lineNumber: 555,
+                                        lineNumber: 569,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                                lineNumber: 547,
+                                lineNumber: 561,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                            lineNumber: 546,
+                            lineNumber: 560,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -10684,35 +10876,35 @@ function InsighterIndustryQuestion({ locale }) {
                                         compact: true
                                     }, parent.key, false, {
                                         fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                                        lineNumber: 576,
+                                        lineNumber: 590,
                                         columnNumber: 21
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                                lineNumber: 570,
+                                lineNumber: 584,
                                 columnNumber: 17
                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "py-10 text-center text-sm font-semibold text-slate-500",
                                 children: isRTL ? 'لا توجد نتائج مطابقة.' : 'No matching industries.'
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                                lineNumber: 590,
+                                lineNumber: 604,
                                 columnNumber: 17
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                            lineNumber: 568,
+                            lineNumber: 582,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                    lineNumber: 519,
+                    lineNumber: 533,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                lineNumber: 512,
+                lineNumber: 526,
                 columnNumber: 9
             }, this), document.body) : null,
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -10728,7 +10920,7 @@ function InsighterIndustryQuestion({ locale }) {
                                 children: isRTL ? 'رجوع' : 'Back'
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                                lineNumber: 603,
+                                lineNumber: 617,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -10739,29 +10931,29 @@ function InsighterIndustryQuestion({ locale }) {
                                 children: nav.continueLabel
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                                lineNumber: 610,
+                                lineNumber: 624,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                        lineNumber: 602,
+                        lineNumber: 616,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                    lineNumber: 601,
+                    lineNumber: 615,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-                lineNumber: 600,
+                lineNumber: 614,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/project/questions/InsighterIndustryQuestion.tsx",
-        lineNumber: 425,
+        lineNumber: 439,
         columnNumber: 5
     }, this);
 }
@@ -12117,7 +12309,9 @@ function ServiceQuestion({ locale }) {
                 if (!cancelled) {
                     const active = (0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectServicesState$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["activeProjectServiceUuid"])(locale);
                     const selected = (0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectServicesState$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["readProjectServices"])(locale);
-                    setServices(availableServices.filter((service)=>!selected.some((s)=>s.serviceId === service.id && s.uuid !== active)));
+                    // DEBUG: temporarily keep "Other" selectable even if already used, so the
+                    // backend's unique(project_id, service_id) rejection surfaces in the UI.
+                    setServices(availableServices.filter((service)=>isOtherService(service) || !selected.some((s)=>s.serviceId === service.id && s.uuid !== active)));
                 }
             } catch (err) {
                 if (!cancelled) {
@@ -12398,7 +12592,7 @@ function ServiceQuestion({ locale }) {
                 projectTypeId: projectType
             }, void 0, false, {
                 fileName: "[project]/components/project/questions/ServiceQuestion.tsx",
-                lineNumber: 663,
+                lineNumber: 665,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12412,7 +12606,7 @@ function ServiceQuestion({ locale }) {
           `
                     }, void 0, false, {
                         fileName: "[project]/components/project/questions/ServiceQuestion.tsx",
-                        lineNumber: 678,
+                        lineNumber: 680,
                         columnNumber: 11
                     }, this) : null,
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -12423,13 +12617,13 @@ function ServiceQuestion({ locale }) {
                         }
                     }, void 0, false, {
                         fileName: "[project]/components/project/questions/ServiceQuestion.tsx",
-                        lineNumber: 684,
+                        lineNumber: 686,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/project/questions/ServiceQuestion.tsx",
-                lineNumber: 669,
+                lineNumber: 671,
                 columnNumber: 7
             }, this),
             error ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12437,7 +12631,7 @@ function ServiceQuestion({ locale }) {
                 children: error
             }, void 0, false, {
                 fileName: "[project]/components/project/questions/ServiceQuestion.tsx",
-                lineNumber: 691,
+                lineNumber: 693,
                 columnNumber: 9
             }, this) : null,
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12447,7 +12641,7 @@ function ServiceQuestion({ locale }) {
                     children: isRTL ? 'جاري التحميل…' : 'Loading…'
                 }, void 0, false, {
                     fileName: "[project]/components/project/questions/ServiceQuestion.tsx",
-                    lineNumber: 696,
+                    lineNumber: 698,
                     columnNumber: 11
                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
                     children: [
@@ -12456,7 +12650,7 @@ function ServiceQuestion({ locale }) {
                             children: (0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$specifiedInsighterProject$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["readStoredSpecifiedInsighterUuid"])(locale) ? isRTL ? 'لا توجد خدمات متاحة من هذا الخبير حاليًا.' : 'This Insighter has no available services right now.' : isRTL ? 'لا توجد خدمات متاحة حاليًا.' : 'No services are available right now.'
                         }, void 0, false, {
                             fileName: "[project]/components/project/questions/ServiceQuestion.tsx",
-                            lineNumber: 702,
+                            lineNumber: 704,
                             columnNumber: 15
                         }, this) : null,
                         predefinedServices.length > 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12486,12 +12680,12 @@ function ServiceQuestion({ locale }) {
                                                     stroke: 1.7
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/project/questions/ServiceQuestion.tsx",
-                                                    lineNumber: 745,
+                                                    lineNumber: 747,
                                                     columnNumber: 27
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/components/project/questions/ServiceQuestion.tsx",
-                                                lineNumber: 742,
+                                                lineNumber: 744,
                                                 columnNumber: 25
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -12502,7 +12696,7 @@ function ServiceQuestion({ locale }) {
                                                         children: service.name
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/project/questions/ServiceQuestion.tsx",
-                                                        lineNumber: 748,
+                                                        lineNumber: 750,
                                                         columnNumber: 27
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -12510,13 +12704,13 @@ function ServiceQuestion({ locale }) {
                                                         children: isRTL ? meta.description.ar : meta.description.en
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/project/questions/ServiceQuestion.tsx",
-                                                        lineNumber: 751,
+                                                        lineNumber: 753,
                                                         columnNumber: 27
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/project/questions/ServiceQuestion.tsx",
-                                                lineNumber: 747,
+                                                lineNumber: 749,
                                                 columnNumber: 25
                                             }, this),
                                             checked ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -12526,29 +12720,29 @@ function ServiceQuestion({ locale }) {
                                                     stroke: 3
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/project/questions/ServiceQuestion.tsx",
-                                                    lineNumber: 759,
+                                                    lineNumber: 761,
                                                     columnNumber: 29
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/components/project/questions/ServiceQuestion.tsx",
-                                                lineNumber: 756,
+                                                lineNumber: 758,
                                                 columnNumber: 27
                                             }, this) : null
                                         ]
                                     }, service.id, true, {
                                         fileName: "[project]/components/project/questions/ServiceQuestion.tsx",
-                                        lineNumber: 726,
+                                        lineNumber: 728,
                                         columnNumber: 23
                                     }, this);
                                 })
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/ServiceQuestion.tsx",
-                                lineNumber: 714,
+                                lineNumber: 716,
                                 columnNumber: 17
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/components/project/questions/ServiceQuestion.tsx",
-                            lineNumber: 713,
+                            lineNumber: 715,
                             columnNumber: 15
                         }, this) : null,
                         otherService && !(0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectServicesState$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["activeProjectServiceUuid"])(locale) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12564,19 +12758,19 @@ function ServiceQuestion({ locale }) {
                                 onSend: onSendAiPrompt
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/ServiceQuestion.tsx",
-                                lineNumber: 770,
+                                lineNumber: 772,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/components/project/questions/ServiceQuestion.tsx",
-                            lineNumber: 769,
+                            lineNumber: 771,
                             columnNumber: 67
                         }, this)
                     ]
                 }, void 0, true)
             }, void 0, false, {
                 fileName: "[project]/components/project/questions/ServiceQuestion.tsx",
-                lineNumber: 694,
+                lineNumber: 696,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12592,7 +12786,7 @@ function ServiceQuestion({ locale }) {
                                 children: isRTL ? 'رجوع' : 'Back'
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/ServiceQuestion.tsx",
-                                lineNumber: 788,
+                                lineNumber: 790,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -12603,29 +12797,29 @@ function ServiceQuestion({ locale }) {
                                 children: submitting ? isRTL ? 'جاري المتابعة…' : 'Continuing…' : nav.continueLabel
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/ServiceQuestion.tsx",
-                                lineNumber: 795,
+                                lineNumber: 797,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/project/questions/ServiceQuestion.tsx",
-                        lineNumber: 787,
+                        lineNumber: 789,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/components/project/questions/ServiceQuestion.tsx",
-                    lineNumber: 786,
+                    lineNumber: 788,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/project/questions/ServiceQuestion.tsx",
-                lineNumber: 785,
+                lineNumber: 787,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/project/questions/ServiceQuestion.tsx",
-        lineNumber: 662,
+        lineNumber: 664,
         columnNumber: 5
     }, this);
 }
@@ -12916,7 +13110,7 @@ function AiClarificationQuestions({ isRTL, questions, answers, submitting, onAns
                                 rows: 2,
                                 dir: "auto",
                                 placeholder: isRTL ? 'اكتب إجابتك...' : 'Type your answer...',
-                                className: "mt-2 min-h-[54px] w-full resize-none rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-900 outline-none focus:border-sky-300 focus:ring-2 focus:ring-sky-100"
+                                className: "mt-2 min-h-[54px] w-full resize-none rounded-xl border border-slate-200 bg-white px-3 py-2 text-base font-medium text-slate-900 outline-none sm:text-sm focus:border-sky-300 focus:ring-2 focus:ring-sky-100"
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
                                 lineNumber: 260,
@@ -13391,6 +13585,11 @@ function ProjectScopeQuestion({ locale, intakeOnly = false }) {
             ]);
     };
     const selectableCount = availableScopes.length + namedManualScopes.length;
+    // Stagger only the entrance (opacity/transform); checked styling must respond immediately.
+    const entranceTransition = (delayMs)=>({
+            transitionDelay: `${delayMs}ms, ${delayMs}ms, 0ms, 0ms`
+        });
+    const entranceTransitionClass = 'transition-[opacity,transform,background-color,border-color] duration-300';
     const allSelected = selectableCount > 0 && availableScopes.every((s)=>selectedParentIds.includes(s.id)) && namedManualScopes.every((s)=>selectedManualScopeIds.includes(s.id));
     const toggleSelectAll = ()=>{
         if (allSelected) {
@@ -13551,7 +13750,7 @@ function ProjectScopeQuestion({ locale, intakeOnly = false }) {
         nav.goNext();
     };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-        className: "mx-auto w-full max-w-5xl",
+        className: "mx-auto w-full max-w-5xl touch-manipulation",
         dir: isRTL ? 'rtl' : 'ltr',
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$ProjectSelectedTypeHeader$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -13567,30 +13766,30 @@ function ProjectScopeQuestion({ locale, intakeOnly = false }) {
                                 className: "absolute inline-flex h-full w-full rounded-full bg-blue-500 opacity-40 animate-ping"
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                                lineNumber: 1084,
+                                lineNumber: 1091,
                                 columnNumber: 17
                             }, void 0),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                 className: "relative inline-flex h-2 w-2 rounded-full bg-blue-600"
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                                lineNumber: 1085,
+                                lineNumber: 1092,
                                 columnNumber: 17
                             }, void 0)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                        lineNumber: 1083,
+                        lineNumber: 1090,
                         columnNumber: 15
                     }, void 0)
                 }, void 0, false, {
                     fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                    lineNumber: 1082,
+                    lineNumber: 1089,
                     columnNumber: 13
                 }, void 0) : null
             }, void 0, false, {
                 fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                lineNumber: 1076,
+                lineNumber: 1083,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -13605,7 +13804,7 @@ function ProjectScopeQuestion({ locale, intakeOnly = false }) {
           `
                     }, void 0, false, {
                         fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                        lineNumber: 1102,
+                        lineNumber: 1109,
                         columnNumber: 11
                     }, this) : null,
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -13616,7 +13815,7 @@ function ProjectScopeQuestion({ locale, intakeOnly = false }) {
                         }
                     }, void 0, false, {
                         fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                        lineNumber: 1109,
+                        lineNumber: 1116,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -13624,13 +13823,13 @@ function ProjectScopeQuestion({ locale, intakeOnly = false }) {
                         children: subtitle
                     }, void 0, false, {
                         fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                        lineNumber: 1114,
+                        lineNumber: 1121,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                lineNumber: 1093,
+                lineNumber: 1100,
                 columnNumber: 7
             }, this),
             error ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -13638,7 +13837,7 @@ function ProjectScopeQuestion({ locale, intakeOnly = false }) {
                 children: error
             }, void 0, false, {
                 fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                lineNumber: 1119,
+                lineNumber: 1126,
                 columnNumber: 16
             }, this) : null,
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -13648,14 +13847,14 @@ function ProjectScopeQuestion({ locale, intakeOnly = false }) {
                     requestUnderstood: aiRequestUnderstood
                 }, void 0, false, {
                     fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                    lineNumber: 1126,
+                    lineNumber: 1133,
                     columnNumber: 13
                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "text-sm font-semibold text-slate-600",
                     children: isRTL ? 'جاري التحميل…' : 'Loading…'
                 }, void 0, false, {
                     fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                    lineNumber: 1131,
+                    lineNumber: 1138,
                     columnNumber: 13
                 }, this) : isOtherFlow && aiMode === 'clarification' ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(AiClarificationQuestions, {
                     isRTL: isRTL,
@@ -13672,7 +13871,7 @@ function ProjectScopeQuestion({ locale, intakeOnly = false }) {
                     onSubmit: submitAiClarificationAnswers
                 }, void 0, false, {
                     fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                    lineNumber: 1136,
+                    lineNumber: 1143,
                     columnNumber: 11
                 }, this) : isOtherFlow && (aiMode === 'failed' || aiMode === 'timeout') ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(AiIntakeFallback, {
                     isRTL: isRTL,
@@ -13680,7 +13879,7 @@ function ProjectScopeQuestion({ locale, intakeOnly = false }) {
                     onBackToServices: returnToDefinedServices
                 }, void 0, false, {
                     fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                    lineNumber: 1148,
+                    lineNumber: 1155,
                     columnNumber: 11
                 }, this) : showScopePicker ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
                     children: [
@@ -13689,7 +13888,8 @@ function ProjectScopeQuestion({ locale, intakeOnly = false }) {
                             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                 type: "button",
                                 onClick: toggleSelectAll,
-                                className: `inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors ${allSelected ? 'border-blue-300 bg-blue-50 text-[#1C7CBB]' : 'border-slate-200 bg-white/70 text-slate-600 hover:bg-white'} ${isRTL ? 'flex-row-reverse' : ''}`,
+                                "aria-pressed": allSelected,
+                                className: `inline-flex min-h-[36px] select-none items-center gap-2 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors [-webkit-tap-highlight-color:transparent] ${allSelected ? 'border-blue-300 bg-blue-50 text-[#1C7CBB]' : 'border-slate-200 bg-white/70 text-slate-600 hover:bg-white'} ${isRTL ? 'flex-row-reverse' : ''}`,
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                         className: `inline-flex h-4 w-4 items-center justify-center rounded border ${allSelected ? 'border-[#1C7CBB] bg-[#1C7CBB] text-white' : 'border-slate-300 bg-white'}`,
@@ -13698,47 +13898,45 @@ function ProjectScopeQuestion({ locale, intakeOnly = false }) {
                                             stroke: 3
                                         }, void 0, false, {
                                             fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                                            lineNumber: 1175,
+                                            lineNumber: 1183,
                                             columnNumber: 34
                                         }, this) : null
                                     }, void 0, false, {
                                         fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                                        lineNumber: 1168,
+                                        lineNumber: 1176,
                                         columnNumber: 17
                                     }, this),
                                     allSelected ? isRTL ? 'إلغاء تحديد الكل' : 'Deselect all' : isRTL ? 'تحديد الكل' : 'Select all'
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                                lineNumber: 1159,
+                                lineNumber: 1166,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                            lineNumber: 1156,
+                            lineNumber: 1163,
                             columnNumber: 13
                         }, this) : null,
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3",
                             role: "group",
-                            "aria-label": title,
+                            "aria-label": title.replace(/<[^>]*>/g, ''),
                             children: [
                                 availableScopes.map((scope, index)=>{
                                     const checked = selectedParentIds.includes(scope.id);
                                     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                        className: `flex min-h-[56px] cursor-pointer items-center gap-2.5 rounded-xl border px-3.5 py-3 text-start shadow-sm backdrop-blur-md transition-all duration-300 sm:px-4 ${checked ? 'border-blue-300 bg-white/70' : 'border-white/30 bg-white/40 hover:bg-white/55'} ${entered ? 'translate-x-0 opacity-100' : isRTL ? 'translate-x-4 opacity-0' : '-translate-x-4 opacity-0'}`,
-                                        style: {
-                                            transitionDelay: `${110 + index * 45}ms`
-                                        },
+                                        className: `flex min-h-[56px] cursor-pointer select-none items-center gap-3 rounded-xl border px-3.5 py-3 text-start shadow-sm backdrop-blur-md [-webkit-tap-highlight-color:transparent] sm:px-4 ${entranceTransitionClass} ${checked ? 'border-blue-300 bg-white/70' : 'border-white/30 bg-white/40 hover:bg-white/55 active:bg-white/60'} ${entered ? 'translate-x-0 opacity-100' : isRTL ? 'translate-x-4 opacity-0' : '-translate-x-4 opacity-0'}`,
+                                        style: entranceTransition(110 + index * 45),
                                         children: [
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
                                                 type: "checkbox",
                                                 checked: checked,
                                                 onChange: ()=>toggleParent(scope.id),
-                                                className: "h-4 w-4 shrink-0 rounded border-slate-300 text-[#1C7CBB] focus:ring-2 focus:ring-blue-200"
+                                                className: "h-5 w-5 shrink-0 cursor-pointer rounded border-slate-300 text-[#1C7CBB] focus:ring-2 focus:ring-blue-200"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                                                lineNumber: 1210,
+                                                lineNumber: 1218,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -13746,72 +13944,88 @@ function ProjectScopeQuestion({ locale, intakeOnly = false }) {
                                                 children: scope.name
                                             }, void 0, false, {
                                                 fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                                                lineNumber: 1216,
+                                                lineNumber: 1224,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, scope.id, true, {
                                         fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                                        lineNumber: 1195,
+                                        lineNumber: 1203,
                                         columnNumber: 17
                                     }, this);
                                 }),
                                 namedManualScopes.map((scope)=>{
                                     const checked = selectedManualScopeIds.includes(scope.id);
                                     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: `flex min-h-[56px] items-center gap-2.5 rounded-xl border px-3.5 py-3 shadow-sm backdrop-blur-md sm:px-4 ${checked ? 'border-blue-300 bg-white/70' : 'border-white/30 bg-white/40'} ${isRTL ? 'flex-row-reverse' : ''}`,
+                                        className: `flex min-h-[56px] items-stretch rounded-xl border shadow-sm backdrop-blur-md transition-colors duration-300 ${checked ? 'border-blue-300 bg-white/70' : 'border-white/30 bg-white/40 hover:bg-white/55'}`,
                                         children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                                type: "checkbox",
-                                                checked: checked,
-                                                onChange: ()=>toggleManualScope(scope.id),
-                                                className: "h-4 w-4 shrink-0 rounded border-slate-300 text-[#1C7CBB] focus:ring-2 focus:ring-blue-200"
-                                            }, void 0, false, {
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                className: "flex min-w-0 flex-1 cursor-pointer select-none items-center gap-3 py-3 ps-3.5 text-start [-webkit-tap-highlight-color:transparent] sm:ps-4",
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                        type: "checkbox",
+                                                        checked: checked,
+                                                        onChange: ()=>toggleManualScope(scope.id),
+                                                        className: "h-5 w-5 shrink-0 cursor-pointer rounded border-slate-300 text-[#1C7CBB] focus:ring-2 focus:ring-blue-200"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
+                                                        lineNumber: 1243,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                        className: "min-w-0 flex-1 break-words text-sm font-semibold leading-snug text-slate-900",
+                                                        children: scope.name
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
+                                                        lineNumber: 1249,
+                                                        columnNumber: 19
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
                                                 fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                                                lineNumber: 1234,
-                                                columnNumber: 17
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                className: `flex-1 text-sm font-semibold leading-snug text-slate-900 ${isRTL ? 'text-right' : 'text-left'}`,
-                                                children: scope.name
-                                            }, void 0, false, {
-                                                fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                                                lineNumber: 1240,
+                                                lineNumber: 1242,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                                 type: "button",
                                                 onClick: ()=>removeManualScope(scope.id),
                                                 "aria-label": isRTL ? 'إزالة النطاق' : 'Remove scope',
-                                                className: "inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white/80 text-slate-500 hover:bg-white hover:text-slate-700",
-                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconXboxXFilled$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconXboxXFilled$3e$__["IconXboxXFilled"], {
-                                                    size: 14
+                                                className: "group inline-flex w-11 shrink-0 items-center justify-center [-webkit-tap-highlight-color:transparent] sm:w-12",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-200 bg-white/80 text-slate-500 group-hover:bg-white group-hover:text-slate-700 group-active:bg-slate-100",
+                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconXboxXFilled$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconXboxXFilled$3e$__["IconXboxXFilled"], {
+                                                        size: 14
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
+                                                        lineNumber: 1260,
+                                                        columnNumber: 21
+                                                    }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                                                    lineNumber: 1249,
+                                                    lineNumber: 1259,
                                                     columnNumber: 19
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                                                lineNumber: 1243,
+                                                lineNumber: 1253,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, scope.id, true, {
                                         fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                                        lineNumber: 1226,
+                                        lineNumber: 1234,
                                         columnNumber: 15
                                     }, this);
                                 }),
                                 pendingScopeName !== null ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: `flex min-h-[56px] items-center gap-2.5 rounded-xl border border-white/30 bg-white/55 px-3.5 py-3 shadow-sm backdrop-blur-md sm:px-4 ${isRTL ? 'flex-row-reverse' : ''}`,
+                                    className: "flex min-h-[56px] items-center gap-3 rounded-xl border border-white/30 bg-white/55 px-3.5 py-3 shadow-sm backdrop-blur-md sm:px-4",
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            className: "inline-flex h-4 w-4 shrink-0 items-center justify-center rounded border border-slate-300 bg-white/80",
+                                            className: "inline-flex h-5 w-5 shrink-0 items-center justify-center rounded border border-slate-300 bg-white/80",
                                             "aria-hidden": "true"
                                         }, void 0, false, {
                                             fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                                            lineNumber: 1259,
+                                            lineNumber: 1271,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -13824,11 +14038,11 @@ function ProjectScopeQuestion({ locale, intakeOnly = false }) {
                                                 if (e.key === 'Escape') cancelPendingScope();
                                             },
                                             placeholder: isRTL ? 'اسم النطاق…' : 'Scope name…',
-                                            className: `flex-1 border-0 bg-transparent p-0 text-sm font-semibold text-slate-900 shadow-none outline-none ring-0 placeholder:text-slate-400 focus:border-transparent focus:outline-none focus:ring-0 ${isRTL ? 'text-right' : 'text-left'}`,
+                                            className: "min-w-0 flex-1 border-0 bg-transparent p-0 text-start text-base font-semibold text-slate-900 shadow-none outline-none ring-0 placeholder:text-slate-400 focus:border-transparent focus:outline-none focus:ring-0 sm:text-sm",
                                             autoFocus: true
                                         }, void 0, false, {
                                             fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                                            lineNumber: 1263,
+                                            lineNumber: 1275,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -13836,18 +14050,18 @@ function ProjectScopeQuestion({ locale, intakeOnly = false }) {
                                             onMouseDown: (event)=>event.preventDefault(),
                                             onClick: commitPendingScope,
                                             "aria-label": isRTL ? 'إضافة النطاق' : 'Add scope',
-                                            className: "inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white shadow-sm hover:bg-emerald-600 active:bg-emerald-700",
+                                            className: "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-500 sm:h-6 sm:w-6 text-white shadow-sm hover:bg-emerald-600 active:bg-emerald-700",
                                             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconCheck$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconCheck$3e$__["IconCheck"], {
                                                 size: 13,
                                                 stroke: 2.5
                                             }, void 0, false, {
                                                 fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                                                lineNumber: 1283,
+                                                lineNumber: 1295,
                                                 columnNumber: 19
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                                            lineNumber: 1276,
+                                            lineNumber: 1288,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -13855,23 +14069,23 @@ function ProjectScopeQuestion({ locale, intakeOnly = false }) {
                                             onMouseDown: (event)=>event.preventDefault(),
                                             onClick: cancelPendingScope,
                                             "aria-label": isRTL ? 'إلغاء' : 'Cancel',
-                                            className: "inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-rose-500 text-white shadow-sm hover:bg-rose-600 active:bg-rose-700",
+                                            className: "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-rose-500 sm:h-6 sm:w-6 text-white shadow-sm hover:bg-rose-600 active:bg-rose-700",
                                             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconXboxXFilled$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconXboxXFilled$3e$__["IconXboxXFilled"], {
                                                 size: 13
                                             }, void 0, false, {
                                                 fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                                                lineNumber: 1292,
+                                                lineNumber: 1304,
                                                 columnNumber: 19
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                                            lineNumber: 1285,
+                                            lineNumber: 1297,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                                    lineNumber: 1256,
+                                    lineNumber: 1268,
                                     columnNumber: 15
                                 }, this) : null,
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -13880,17 +14094,15 @@ function ProjectScopeQuestion({ locale, intakeOnly = false }) {
                                         if (pendingScopeName !== null) event.preventDefault();
                                     },
                                     onClick: startAddScope,
-                                    className: `flex min-h-[56px] w-full items-center justify-center gap-2 rounded-xl border border-dashed border-blue-300 bg-white/35 px-3.5 py-3 shadow-sm backdrop-blur-md transition-all duration-200 hover:bg-blue-50/30 sm:px-4 ${entered ? 'translate-x-0 opacity-100' : isRTL ? 'translate-x-4 opacity-0' : '-translate-x-4 opacity-0'}`,
-                                    style: {
-                                        transitionDelay: `${110 + availableScopes.length * 45}ms`
-                                    },
+                                    className: `flex min-h-[56px] w-full items-center justify-center gap-2 rounded-xl border border-dashed border-blue-300 bg-white/35 px-3.5 py-3 shadow-sm backdrop-blur-md [-webkit-tap-highlight-color:transparent] hover:bg-blue-50/30 active:bg-blue-50/40 sm:px-4 ${entranceTransitionClass} ${entered ? 'translate-x-0 opacity-100' : isRTL ? 'translate-x-4 opacity-0' : '-translate-x-4 opacity-0'}`,
+                                    style: entranceTransition(110 + availableScopes.length * 45),
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconPlusFilled$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconPlusFilled$3e$__["IconPlusFilled"], {
                                             size: 15,
                                             className: "shrink-0 text-blue-500"
                                         }, void 0, false, {
                                             fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                                            lineNumber: 1312,
+                                            lineNumber: 1324,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -13898,30 +14110,30 @@ function ProjectScopeQuestion({ locale, intakeOnly = false }) {
                                             children: isRTL ? 'إضافة نطاق' : 'Add Scope'
                                         }, void 0, false, {
                                             fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                                            lineNumber: 1313,
+                                            lineNumber: 1325,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                                    lineNumber: 1297,
+                                    lineNumber: 1309,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                            lineNumber: 1187,
+                            lineNumber: 1195,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true) : isOtherFlow ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {}, void 0, false, {
                     fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                    lineNumber: 1320,
+                    lineNumber: 1332,
                     columnNumber: 11
                 }, this) : null
             }, void 0, false, {
                 fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                lineNumber: 1123,
+                lineNumber: 1130,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -13937,7 +14149,7 @@ function ProjectScopeQuestion({ locale, intakeOnly = false }) {
                                 children: isRTL ? 'رجوع' : 'Back'
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                                lineNumber: 1326,
+                                lineNumber: 1338,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -13948,29 +14160,29 @@ function ProjectScopeQuestion({ locale, intakeOnly = false }) {
                                 children: nav.continueLabel
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                                lineNumber: 1333,
+                                lineNumber: 1345,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                        lineNumber: 1325,
+                        lineNumber: 1337,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                    lineNumber: 1324,
+                    lineNumber: 1336,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-                lineNumber: 1323,
+                lineNumber: 1335,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/project/questions/ProjectScopeQuestion.tsx",
-        lineNumber: 1075,
+        lineNumber: 1082,
         columnNumber: 5
     }, this);
 }
