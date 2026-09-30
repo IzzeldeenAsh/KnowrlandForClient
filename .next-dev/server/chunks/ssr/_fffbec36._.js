@@ -11190,12 +11190,14 @@ __turbopack_context__.s([
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react-jsx-dev-runtime.js [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$DocumentsListCard$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/feed/DocumentsListCard.tsx [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$FeedSearchInsightsContext$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/feed/FeedSearchInsightsContext.tsx [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$FeedSearchScopeToggle$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/feed/FeedSearchScopeToggle.tsx [app-ssr] (ecmascript)");
 'use client';
 ;
 ;
 ;
+;
 const VISIBLE_DOCUMENTS = 3;
-function RelatedDocumentsCard({ locale, className }) {
+function RelatedDocumentsCard({ locale, keyword, className }) {
     const isRTL = locale === 'ar';
     const { insights, isLoading } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$FeedSearchInsightsContext$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useFeedSearchInsights"])();
     const copy = isRTL ? {
@@ -11221,7 +11223,8 @@ function RelatedDocumentsCard({ locale, className }) {
         viewAll: 'View all',
         viewAllDescription: 'Advanced documents search'
     };
-    const viewAllHref = `/${locale}/home`;
+    // Continue the same keyword in the advanced documents search.
+    const viewAllHref = (0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$FeedSearchScopeToggle$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getInsightsSearchHref"])(locale, keyword);
     const documents = insights.slice(0, VISIBLE_DOCUMENTS).map((insight)=>({
             id: `${insight.type}-${insight.searchable_id}`,
             href: insight.url.startsWith('/') ? `/${locale}${insight.url}` : insight.url,
@@ -11249,7 +11252,7 @@ function RelatedDocumentsCard({ locale, className }) {
         className: className
     }, void 0, false, {
         fileName: "[project]/components/feed/RelatedDocumentsCard.tsx",
-        lineNumber: 61,
+        lineNumber: 63,
         columnNumber: 5
     }, this);
 }
@@ -12201,7 +12204,11 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconX$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconX$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconX.mjs [app-ssr] (ecmascript) <export default as IconX>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/navigation.js [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$feedEvents$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/feed/feedEvents.ts [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$FeedSearchScopeToggle$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/feed/FeedSearchScopeToggle.tsx [app-ssr] (ecmascript)");
 'use client';
+;
+;
 ;
 ;
 ;
@@ -12212,13 +12219,15 @@ function FeedMobileSearch({ locale }) {
     const searchParams = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useSearchParams"])();
     const activeKeyword = searchParams.get('keyword') ?? '';
     const [query, setQuery] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(activeKeyword);
+    // When on, the query goes to the Insights (documents) search instead of the feed.
+    const [searchInsights, setSearchInsights] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
         setQuery(activeKeyword);
     }, [
         activeKeyword
     ]);
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
-        if (pathname !== `/${locale}`) return;
+        if (pathname !== `/${locale}` || searchInsights) return;
         const keyword = query.trim();
         if (keyword === activeKeyword.trim()) return;
         const timeoutId = window.setTimeout(()=>{
@@ -12232,11 +12241,21 @@ function FeedMobileSearch({ locale }) {
         locale,
         pathname,
         query,
-        router
+        router,
+        searchInsights
     ]);
     const submit = (event)=>{
         event.preventDefault();
         const keyword = query.trim();
+        if (searchInsights) {
+            router.push((0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$FeedSearchScopeToggle$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getInsightsSearchHref"])(locale, keyword));
+            return;
+        }
+        // The keyword is live-applied while typing, so re-submitting it re-runs the search.
+        if (keyword === activeKeyword.trim()) {
+            window.dispatchEvent(new Event(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$feedEvents$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["FEED_REFRESH_REQUESTED_EVENT"]));
+            return;
+        }
         router.push(keyword ? `/${locale}?keyword=${encodeURIComponent(keyword)}` : `/${locale}`);
     };
     const clearSearch = ()=>{
@@ -12244,6 +12263,7 @@ function FeedMobileSearch({ locale }) {
         if (activeKeyword.trim()) router.push(`/${locale}`);
     };
     const hasQuery = query.trim().length > 0;
+    const isRTL = locale === 'ar';
     if (pathname !== `/${locale}`) return null;
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
         onSubmit: submit,
@@ -12253,10 +12273,10 @@ function FeedMobileSearch({ locale }) {
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
                 className: "sr-only",
                 htmlFor: `feed-mobile-search-${locale}`,
-                children: locale === 'ar' ? 'البحث في الموجز' : 'Search the feed'
+                children: isRTL ? 'البحث في الموجز أو المستندات' : 'Search in Feed or Insights'
             }, void 0, false, {
                 fileName: "[project]/components/feed/FeedMobileSearch.tsx",
-                lineNumber: 48,
+                lineNumber: 62,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12267,61 +12287,79 @@ function FeedMobileSearch({ locale }) {
                         type: "search",
                         value: query,
                         onChange: (event)=>setQuery(event.target.value),
-                        placeholder: locale === 'ar' ? 'ابحث في الموجز...' : 'Search ..',
-                        dir: locale === 'ar' ? 'rtl' : 'ltr',
-                        className: `h-11 w-full rounded-lg border border-[#D7E1EE] bg-white px-4 text-[14px] text-[#1E293B] shadow-sm outline-none transition-colors placeholder:text-[#94A3B8] focus:border-[#2378E8] focus:ring-2 focus:ring-[#2378E8]/15 ${locale === 'ar' ? 'pl-20' : 'pr-20'}`
+                        placeholder: (0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$FeedSearchScopeToggle$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getFeedSearchPlaceholder"])(locale),
+                        dir: isRTL ? 'rtl' : 'ltr',
+                        className: `h-11 w-full rounded-lg border border-[#D7E1EE] bg-white text-[14px] text-[#1E293B] shadow-sm outline-none transition-colors placeholder:text-[#94A3B8] focus:border-[#2378E8] focus:ring-2 focus:ring-[#2378E8]/15 [&::-webkit-search-cancel-button]:appearance-none ${isRTL ? 'pr-10 pl-44' : 'pl-10 pr-40'}`
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedMobileSearch.tsx",
-                        lineNumber: 52,
+                        lineNumber: 66,
                         columnNumber: 9
-                    }, this),
-                    hasQuery && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                        type: "button",
-                        onClick: clearSearch,
-                        "aria-label": locale === 'ar' ? 'مسح البحث' : 'Clear search',
-                        className: `absolute top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-md text-[#94A3B8] transition-colors hover:bg-[#F1F5F9] hover:text-[#475569] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] ${locale === 'ar' ? 'left-10' : 'right-10'}`,
-                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconX$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconX$3e$__["IconX"], {
-                            "aria-hidden": true,
-                            className: "h-[17px] w-[17px]",
-                            stroke: 2
-                        }, void 0, false, {
-                            fileName: "[project]/components/feed/FeedMobileSearch.tsx",
-                            lineNumber: 68,
-                            columnNumber: 13
-                        }, this)
-                    }, void 0, false, {
-                        fileName: "[project]/components/feed/FeedMobileSearch.tsx",
-                        lineNumber: 62,
-                        columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                         type: "submit",
-                        "aria-label": locale === 'ar' ? 'بحث' : 'Search',
-                        className: `absolute top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-md text-[#64748B] transition-colors hover:bg-[#EEF5FF] hover:text-[#2378E8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] ${locale === 'ar' ? 'left-1.5' : 'right-1.5'}`,
+                        "aria-label": isRTL ? 'بحث' : 'Search',
+                        className: `absolute top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-md text-[#64748B] transition-colors hover:bg-[#EEF5FF] hover:text-[#2378E8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] ${isRTL ? 'right-1.5' : 'left-1.5'}`,
                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconSearch$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconSearch$3e$__["IconSearch"], {
                             "aria-hidden": true,
                             className: "h-[18px] w-[18px]",
                             stroke: 2
                         }, void 0, false, {
                             fileName: "[project]/components/feed/FeedMobileSearch.tsx",
-                            lineNumber: 76,
+                            lineNumber: 80,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedMobileSearch.tsx",
-                        lineNumber: 71,
+                        lineNumber: 75,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: `absolute top-1/2 flex -translate-y-1/2 items-center gap-1 ${isRTL ? 'left-2' : 'right-2'}`,
+                        children: [
+                            hasQuery && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                type: "button",
+                                onClick: clearSearch,
+                                "aria-label": isRTL ? 'مسح البحث' : 'Clear search',
+                                className: "flex h-8 w-8 items-center justify-center rounded-md text-[#94A3B8] transition-colors hover:bg-[#F1F5F9] hover:text-[#475569] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8]",
+                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconX$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconX$3e$__["IconX"], {
+                                    "aria-hidden": true,
+                                    className: "h-[17px] w-[17px]",
+                                    stroke: 2
+                                }, void 0, false, {
+                                    fileName: "[project]/components/feed/FeedMobileSearch.tsx",
+                                    lineNumber: 90,
+                                    columnNumber: 15
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "[project]/components/feed/FeedMobileSearch.tsx",
+                                lineNumber: 84,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$FeedSearchScopeToggle$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                locale: locale,
+                                active: searchInsights,
+                                onChange: setSearchInsights
+                            }, void 0, false, {
+                                fileName: "[project]/components/feed/FeedMobileSearch.tsx",
+                                lineNumber: 93,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/components/feed/FeedMobileSearch.tsx",
+                        lineNumber: 82,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/FeedMobileSearch.tsx",
-                lineNumber: 51,
+                lineNumber: 65,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/feed/FeedMobileSearch.tsx",
-        lineNumber: 47,
+        lineNumber: 61,
         columnNumber: 5
     }, this);
 }

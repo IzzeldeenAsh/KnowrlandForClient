@@ -21,6 +21,7 @@ import { getAuthToken } from '@/lib/authToken'
 import { getCookieDomain as sharedGetCookieDomain, isSharedCookieHost } from '@/lib/cookieDomain'
 import { copyProjectWizardStorageLocale } from '@/components/project/wizardStorage'
 import { FEED_REFRESH_REQUESTED_EVENT } from '@/components/feed/feedEvents'
+import FeedSearchScopeToggle, { getFeedSearchPlaceholder, getInsightsSearchHref } from '@/components/feed/FeedSearchScopeToggle'
 
 interface Industry {
   id: number;
@@ -116,6 +117,8 @@ export default function Header() {
   const [industries, setIndustries] = useState<Industry[]>(industriesCache.data);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  // Feed search only: when on, the query goes to the Insights (documents) search instead of the feed.
+  const [searchInsights, setSearchInsights] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
   const pathname = usePathname();
@@ -191,8 +194,19 @@ export default function Header() {
 
   // Handle search submission
   const handleSearch = (query: string, searchType: 'knowledge' | 'insighter' = 'knowledge') => {
+    if (isFeedPage && searchInsights) {
+      router.push(getInsightsSearchHref(currentLocale, query));
+      return;
+    }
+
     if (isFeedPage) {
       const keyword = query.trim();
+      // The feed live-applies the keyword while typing, so an explicit submit of
+      // the same keyword re-runs the search instead of pushing an identical URL.
+      if (keyword === activeFeedKeyword.trim()) {
+        window.dispatchEvent(new Event(FEED_REFRESH_REQUESTED_EVENT));
+        return;
+      }
       router.push(keyword ? `/${currentLocale}?keyword=${encodeURIComponent(keyword)}` : `/${currentLocale}`);
       return;
     }
@@ -221,7 +235,7 @@ export default function Header() {
   }, [activeFeedKeyword, isFeedPage]);
 
   useEffect(() => {
-    if (!isFeedPage) return;
+    if (!isFeedPage || searchInsights) return;
 
     const keyword = searchQuery.trim();
     if (keyword === activeFeedKeyword.trim()) return;
@@ -234,7 +248,7 @@ export default function Header() {
     }, 1000);
 
     return () => window.clearTimeout(timeoutId);
-  }, [activeFeedKeyword, currentLocale, isFeedPage, router, searchQuery]);
+  }, [activeFeedKeyword, currentLocale, isFeedPage, router, searchInsights, searchQuery]);
 
   useEffect(() => {
     setAnimatedCtaWordIndex(0);
@@ -302,7 +316,8 @@ export default function Header() {
   // Handle search input submission
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!searchQuery.trim()) return;
+    // On the feed, an empty submit still searches (clears the feed filter, or opens Insights).
+    if (!isFeedPage && !searchQuery.trim()) return;
 
     handleSearch(searchQuery);
   };
@@ -918,8 +933,8 @@ export default function Header() {
                   >
                     <TextInput
                       id={`header-search-${currentLocale}`}
-                      placeholder={currentLocale === 'ar' ? 'ابحث في الموجز...' : 'Search ..'}
-                      aria-label={currentLocale === 'ar' ? 'البحث في الموجز' : 'Search the feed'}
+                      placeholder={getFeedSearchPlaceholder(currentLocale)}
+                      aria-label={currentLocale === 'ar' ? 'البحث في الموجز أو المستندات' : 'Search in Feed or Insights'}
                       value={searchQuery}
                       onChange={(event) => setSearchQuery(event.currentTarget.value)}
                       onKeyDown={(event) => {
@@ -930,54 +945,37 @@ export default function Header() {
                       size="sm"
                       radius="md"
                       className="w-full"
-                      {...(currentLocale === 'ar'
-                        ? {
-                          rightSectionWidth: 38,
-                          rightSection: (
-                            <button
-                              type="submit"
-                              className="p-1 text-[#475569] transition-colors hover:text-[#1E293B]"
-                              aria-label="بحث"
-                            >
-                              <IconSearch size={17} aria-hidden />
-                            </button>
-                          ),
-                          leftSectionWidth: hasSearchQuery ? 38 : undefined,
-                          leftSection: hasSearchQuery ? (
-                            <button
-                              type="button"
-                              onClick={clearFeedSearch}
-                              className="p-1 text-[#64748B] transition-colors hover:text-[#1E293B]"
-                              aria-label="مسح البحث"
-                            >
-                              <IconX size={17} />
-                            </button>
-                          ) : undefined
-                        }
-                        : {
-                          leftSectionWidth: 38,
-                          leftSection: (
-                            <button
-                              type="submit"
-                              className="p-1 text-[#475569] transition-colors hover:text-[#1E293B]"
-                              aria-label="Search"
-                            >
-                              <IconSearch size={17} aria-hidden />
-                            </button>
-                          ),
-                          rightSectionWidth: hasSearchQuery ? 38 : undefined,
-                          rightSection: hasSearchQuery ? (
-                            <button
-                              type="button"
-                              onClick={clearFeedSearch}
-                              className="p-1 text-[#64748B] transition-colors hover:text-[#1E293B]"
-                              aria-label="Clear search"
-                            >
-                              <IconX size={17} />
-                            </button>
-                          ) : undefined
-                        }
-                      )}
+                      {...(() => {
+                        const submitSection = (
+                          <button
+                            type="submit"
+                            className="p-1 text-[#475569] transition-colors hover:text-[#1E293B]"
+                            aria-label={isArabicLocale ? 'بحث' : 'Search'}
+                          >
+                            <IconSearch size={17} aria-hidden />
+                          </button>
+                        );
+                        // Clear + Insights toggle sit at the inline end of the field.
+                        const endSection = (
+                          <div className="flex items-center gap-1">
+                            {hasSearchQuery && (
+                              <button
+                                type="button"
+                                onClick={clearFeedSearch}
+                                className="p-1 text-[#64748B] transition-colors hover:text-[#1E293B]"
+                                aria-label={isArabicLocale ? 'مسح البحث' : 'Clear search'}
+                              >
+                                <IconX size={17} />
+                              </button>
+                            )}
+                            <FeedSearchScopeToggle locale={currentLocale} active={searchInsights} onChange={setSearchInsights} />
+                          </div>
+                        );
+                        const endSectionWidth = (isArabicLocale ? 138 : 112) + (hasSearchQuery ? 30 : 0);
+
+                        // Mantine sections are logical and mirror under RTL, so one layout covers both locales.
+                        return { leftSectionWidth: 38, leftSection: submitSection, rightSectionWidth: endSectionWidth, rightSection: endSection };
+                      })()}
                       leftSectionPointerEvents="all"
                       rightSectionPointerEvents="all"
                       styles={feedSearchInputStyles}

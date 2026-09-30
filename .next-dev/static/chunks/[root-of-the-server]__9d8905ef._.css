@@ -10375,6 +10375,22 @@ input[type="search"]::-webkit-search-results-decoration {
   padding-top: 2rem;
 }
 
+.pl-36 {
+  padding-left: 9rem;
+}
+
+.pr-32 {
+  padding-right: 8rem;
+}
+
+.pl-44 {
+  padding-left: 11rem;
+}
+
+.pr-40 {
+  padding-right: 10rem;
+}
+
 .text-left {
   text-align: left;
 }
@@ -14376,6 +14392,10 @@ img.feed-media-contain {
   border-color: rgba(255, 255, 255, .5);
 }
 
+.hover\:border-\[\#2378E8\]\/40:hover {
+  border-color: rgba(35, 120, 232, .4);
+}
+
 .hover\:border-opacity-50:hover {
   --tw-border-opacity: .5;
 }
@@ -14871,6 +14891,11 @@ img.feed-media-contain {
 .hover\:bg-yellow-200:hover {
   --tw-bg-opacity: 1;
   background-color: rgba(254, 240, 138, var(--tw-bg-opacity, 1));
+}
+
+.hover\:bg-\[\#1D6AD0\]:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgba(29, 106, 208, var(--tw-bg-opacity, 1));
 }
 
 .hover\:bg-opacity-90:hover {
@@ -18661,6 +18686,12 @@ img.feed-media-contain {
 
 .\[\&\:\:-webkit-scrollbar\]\:hidden::-webkit-scrollbar {
   display: none;
+}
+
+.\[\&\:\:-webkit-search-cancel-button\]\:appearance-none::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
 }
 
 .\[\&\>\*\:last-child\]\:mb-0 > :last-child {
