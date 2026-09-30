@@ -26,6 +26,7 @@ import {
   type FeedItem,
 } from '@/services/feed.service'
 import { FeedCard, FeedSkeleton } from './MyFeedsTimeline'
+import { useFeedItemMediaUpdates } from './feedImageProcessing'
 import { useFeedSearchInsights } from './FeedSearchInsightsContext'
 import RoleUpgradeCard from './RoleUpgradeCard'
 import TopDocumentsCard from './TopDocumentsCard'
@@ -304,6 +305,7 @@ export default function CommunityFeedTimeline({
     setIsLoading: setRelatedDocumentsLoading,
   } = useFeedSearchInsights()
   const [items, setItems] = useState<FeedItem[]>([])
+  useFeedItemMediaUpdates(setItems)
   const [meta, setMeta] = useState<FeedMeta | null>(null)
   // When a search runs out of matches we keep the timeline alive by streaming
   // in the regular community feed (social-media style). These track that phase.

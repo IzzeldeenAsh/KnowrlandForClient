@@ -12,6 +12,7 @@ import {
   type SavedCommunityFeedMeta,
 } from '@/services/feed.service'
 import { FeedCard, FeedSkeleton } from './MyFeedsTimeline'
+import { useFeedItemMediaUpdates } from './feedImageProcessing'
 
 type SavedPostsTimelineProps = {
   locale: string
@@ -55,6 +56,7 @@ export default function SavedPostsTimeline({ locale }: SavedPostsTimelineProps) 
   const toast = useToast()
   const { user, isAuthResolved } = useUserProfile()
   const [items, setItems] = useState<FeedItem[]>([])
+  useFeedItemMediaUpdates(setItems)
   const [meta, setMeta] = useState<SavedCommunityFeedMeta | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isLoadingMore, setIsLoadingMore] = useState(false)

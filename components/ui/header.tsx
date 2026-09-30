@@ -322,6 +322,16 @@ export default function Header() {
     handleSearch(searchQuery);
   };
 
+  // With a query typed, "By Insights" searches Insights right away; on an empty
+  // field it only switches where the next search goes.
+  const handleSearchInsightsChange = (active: boolean) => {
+    if (searchQuery.trim()) {
+      router.push(getInsightsSearchHref(currentLocale, searchQuery));
+      return;
+    }
+    setSearchInsights(active);
+  };
+
   const clearFeedSearch = () => {
     setSearchQuery('');
     router.push(`/${currentLocale}`);
@@ -968,10 +978,10 @@ export default function Header() {
                                 <IconX size={17} />
                               </button>
                             )}
-                            <FeedSearchScopeToggle locale={currentLocale} active={searchInsights} onChange={setSearchInsights} />
+                            <FeedSearchScopeToggle locale={currentLocale} active={searchInsights} onChange={handleSearchInsightsChange} />
                           </div>
                         );
-                        const endSectionWidth = (isArabicLocale ? 138 : 112) + (hasSearchQuery ? 30 : 0);
+                        const endSectionWidth = (isArabicLocale ? 118 : 96) + (hasSearchQuery ? 30 : 0);
 
                         // Mantine sections are logical and mirror under RTL, so one layout covers both locales.
                         return { leftSectionWidth: 38, leftSection: submitSection, rightSectionWidth: endSectionWidth, rightSection: endSection };

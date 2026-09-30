@@ -36,6 +36,8 @@ import KnowledgeTypeIcon from '@/components/icons/KnowledgeTypeIcon'
 import { dashboardUrl, publicBaseUrl } from '@/app/config'
 import FeedShare from '@/components/feed/FeedShare'
 import FeedSaveButton from '@/components/feed/FeedSaveButton'
+import FeedImage, { FEED_IMAGE_SIZES } from '@/components/feed/FeedImage'
+import { useFeedItemMediaUpdates, watchFeedImageProcessing } from '@/components/feed/feedImageProcessing'
 import RoleUpgradeCard from '@/components/feed/RoleUpgradeCard'
 import TopDocumentsCard from '@/components/feed/TopDocumentsCard'
 import { useToast } from '@/components/toast/ToastContext'
@@ -482,10 +484,10 @@ function ImageGallery({
             aria-label={copy.openImage}
             className="relative flex w-full cursor-zoom-in items-center justify-center overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2378E8]"
           >
-            <img
-              src={media[0].url ?? ''}
+            <FeedImage
+              media={media[0]}
               alt={media[0].name || imageAlt}
-              loading="lazy"
+              sizes={FEED_IMAGE_SIZES.fullWidth}
               className="feed-media-contain block h-auto max-w-full object-contain"
               style={{ maxHeight: 'min(650px, 70dvh)' }}
             />
@@ -508,10 +510,10 @@ function ImageGallery({
               aria-label={`${copy.openImage}: ${copy.imageCount(index + 1, media.length)}`}
               className="relative flex h-[240px] cursor-zoom-in items-center justify-center overflow-hidden rounded-md bg-[#101724] focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2378E8] sm:h-[300px]"
             >
-              <img
-                src={item.url ?? ''}
+              <FeedImage
+                media={item}
                 alt={item.name || imageAlt}
-                loading="lazy"
+                sizes={FEED_IMAGE_SIZES.half}
                 className="feed-media-contain block h-full w-full object-contain"
               />
             </button>
@@ -553,10 +555,10 @@ function ImageGallery({
                 aria-label={`${copy.openImage}: ${copy.imageCount(index + 1, media.length)}`}
                 className="relative flex h-[280px] w-[84%] shrink-0 snap-center items-center justify-center cursor-zoom-in overflow-hidden rounded-md bg-[#101724] shadow-sm focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white sm:h-[340px] sm:w-[76%]"
               >
-                <img
-                  src={item.url ?? ''}
+                <FeedImage
+                  media={item}
                   alt={item.name || imageAlt}
-                  loading="lazy"
+                  sizes={FEED_IMAGE_SIZES.carousel}
                   className="feed-media-contain block h-full w-full object-contain"
                 />
               </button>
@@ -625,9 +627,12 @@ function ImageGallery({
             >
               <IconX aria-hidden className="h-5 w-5" stroke={2.2} />
             </button>
-            <img
-              src={activeMedia.url ?? ''}
+            <FeedImage
+              key={activeMedia.id}
+              media={activeMedia}
               alt={activeMedia.name || imageAlt}
+              sizes={FEED_IMAGE_SIZES.lightbox}
+              loading="eager"
               className="feed-media-contain block h-full w-full"
             />
 
@@ -1071,10 +1076,10 @@ function ArticlePreview({
     >
       {cover?.url ? (
         <div className="relative aspect-[1.91/1] w-full overflow-hidden bg-[#E8EDF2]">
-          <img
-            src={cover.url}
+          <FeedImage
+            media={cover}
             alt={cover.name || item.title || copy.articleCoverAlt}
-            loading="lazy"
+            sizes={FEED_IMAGE_SIZES.fullWidth}
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.015]"
           />
         </div>
@@ -1713,6 +1718,7 @@ export default function MyFeedsTimeline({ locale }: MyFeedsTimelineProps) {
   const router = useRouter()
   const { user, roles, isAuthResolved } = useUserProfile()
   const [items, setItems] = useState<FeedItem[]>([])
+  useFeedItemMediaUpdates(setItems)
   const [page, setPage] = useState(1)
   const [lastPage, setLastPage] = useState(1)
   const [total, setTotal] = useState(0)
@@ -1942,18 +1948,20 @@ export default function MyFeedsTimeline({ locale }: MyFeedsTimelineProps) {
         opened={editCandidate !== null}
         draft={editCandidate}
         onClose={() => setEditCandidate(null)}
-        onDraftSaved={() => {
+        onDraftSaved={(savedDraft) => {
           setEditCandidate(null)
           void loadFirstPage()
+          watchFeedImageProcessing(savedDraft.uuid, locale)
         }}
         onDraftDiscarded={() => {
           setEditCandidate(null)
           void loadFirstPage()
         }}
-        onPublished={() => {
+        onPublished={(publication) => {
           setEditCandidate(null)
           void loadFirstPage()
           window.dispatchEvent(new Event('feed:published'))
+          watchFeedImageProcessing(publication.uuid, locale)
         }}
       />
     </section>

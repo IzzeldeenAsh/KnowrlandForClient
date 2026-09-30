@@ -47,6 +47,16 @@ export default function FeedMobileSearch({ locale }: { locale: string }) {
     router.push(keyword ? `/${locale}?keyword=${encodeURIComponent(keyword)}` : `/${locale}`)
   }
 
+  // With a query typed, "By Insights" searches Insights right away; on an empty
+  // field it only switches where the next search goes.
+  const handleSearchInsightsChange = (active: boolean) => {
+    if (query.trim()) {
+      router.push(getInsightsSearchHref(locale, query))
+      return
+    }
+    setSearchInsights(active)
+  }
+
   const clearSearch = () => {
     setQuery('')
     if (activeKeyword.trim()) router.push(`/${locale}`)
@@ -70,7 +80,7 @@ export default function FeedMobileSearch({ locale }: { locale: string }) {
           onChange={(event) => setQuery(event.target.value)}
           placeholder={getFeedSearchPlaceholder(locale)}
           dir={isRTL ? 'rtl' : 'ltr'}
-          className={`h-11 w-full rounded-lg border border-[#D7E1EE] bg-white text-[14px] text-[#1E293B] shadow-sm outline-none transition-colors placeholder:text-[#94A3B8] focus:border-[#2378E8] focus:ring-2 focus:ring-[#2378E8]/15 [&::-webkit-search-cancel-button]:appearance-none ${isRTL ? 'pr-10 pl-44' : 'pl-10 pr-40'}`}
+          className={`h-11 w-full rounded-lg border border-[#D7E1EE] bg-white text-[14px] text-[#1E293B] shadow-sm outline-none transition-colors placeholder:text-[#94A3B8] focus:border-[#2378E8] focus:ring-2 focus:ring-[#2378E8]/15 [&::-webkit-search-cancel-button]:appearance-none ${isRTL ? 'pr-10 pl-40' : 'pl-10 pr-36'}`}
         />
         <button
           type="submit"
@@ -90,7 +100,7 @@ export default function FeedMobileSearch({ locale }: { locale: string }) {
               <IconX aria-hidden className="h-[17px] w-[17px]" stroke={2} />
             </button>
           )}
-          <FeedSearchScopeToggle locale={locale} active={searchInsights} onChange={setSearchInsights} />
+          <FeedSearchScopeToggle locale={locale} active={searchInsights} onChange={handleSearchInsightsChange} />
         </div>
       </div>
     </form>

@@ -9,6 +9,7 @@ import { getFeedDraft, type FeedItem } from '@/services/feed.service'
 import BecomeInsighterCard from './BecomeInsighterCard'
 import PostModal, { type PostModalMode } from './PostModal'
 import PublishSuccessModal, { type PublishedPostSummary } from '../PublishSuccessModal'
+import { watchFeedImageProcessing } from '../feedImageProcessing'
 
 type FeedComposerProps = {
   locale: string
@@ -239,6 +240,7 @@ export default function FeedComposer({ locale }: FeedComposerProps) {
           setDraft(null)
           setPublishedPost(publication)
           window.dispatchEvent(new Event('feed:published'))
+          watchFeedImageProcessing(publication.uuid, locale)
         }}
       />
 
