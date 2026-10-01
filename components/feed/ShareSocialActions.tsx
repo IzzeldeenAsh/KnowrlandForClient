@@ -86,9 +86,20 @@ const ShareSocialActions = ({
   const openShareWindow = (url: string) => {
     // Always a new tab: passing no window features keeps the browser's default
     // tab behaviour, and the current page must stay put so the share surface
-    // survives.
-    const opened = window.open(url, '_blank', 'noopener,noreferrer')
-    if (opened) return
+    // survives. No `noopener` feature: with it `window.open` returns null even
+    // when the tab opened, so the fallbacks below ran on every click and opened
+    // the share twice (on mobile, also navigating this page away). The opener
+    // is cut by hand instead, while the new tab is still on its initial
+    // same-origin about:blank.
+    const opened = window.open(url, '_blank')
+    if (opened) {
+      try {
+        opened.opener = null
+      } catch {
+        // Already cross-origin; nothing more to do.
+      }
+      return
+    }
 
     // On mobile a synthetic <a> click is what iOS/Android treat as a user tap on
     // a universal/app link, which hands facebook.com URLs to the Facebook app —
@@ -143,9 +154,15 @@ const ShareSocialActions = ({
       //
       // Facebook removed pre-filled share text (the `quote` parameter) back in
       // 2017, so the personal message is copied to the clipboard for pasting.
-      const copied = await copyToClipboard(customShareMessage)
-      setFacebookNotice(copied ? 'copied' : 'manual')
+      //
+      // Both calls must happen synchronously inside the click: Safari blocks a
+      // `window.open` that follows an `await`, and Chrome rejects a clipboard
+      // write once the new tab has taken focus. So the copy starts first, the
+      // tab opens, and only then is the copy result awaited.
+      const copyResult = copyToClipboard(customShareMessage)
       openShareWindow(socialUrl)
+      const copied = await copyResult
+      setFacebookNotice(copied ? 'copied' : 'manual')
       return
     }
 
