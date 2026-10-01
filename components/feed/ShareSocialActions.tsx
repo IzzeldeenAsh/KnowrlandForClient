@@ -36,7 +36,9 @@ const ShareSocialActions = ({
   const isWhitePaper = shareKind === 'white-paper'
 
   const [customShareMessage, setCustomShareMessage] = useState('')
-  const [facebookNotice, setFacebookNotice] = useState<'copied' | 'manual' | null>(null)
+  const [facebookNotice, setFacebookNotice] = useState<
+    'copied' | 'manual' | 'shareSheetCopied' | 'shareSheetManual' | null
+  >(null)
   const shareTextareaRef = useRef<HTMLTextAreaElement | null>(null)
 
   const t = {
@@ -54,6 +56,12 @@ const ShareSocialActions = ({
     facebookTextManual: isRTL
       ? 'لا يسمح فيسبوك بتعبئة النص مسبقًا. انسخ رسالتك من الأعلى والصقها في مربع النشر على فيسبوك.'
       : 'Facebook does not allow pre-filled text. Copy your message above and paste it into the Facebook composer.',
+    facebookShareSheetCopied: isRTL
+      ? 'اختر فيسبوك من قائمة المشاركة. نسخنا رسالتك — الصقها في منشورك على فيسبوك.'
+      : 'Choose Facebook in the share menu. We copied your message — paste it into your Facebook post.',
+    facebookShareSheetManual: isRTL
+      ? 'اختر فيسبوك من قائمة المشاركة، ثم انسخ رسالتك من الأعلى والصقها في منشورك على فيسبوك.'
+      : 'Choose Facebook in the share menu, then copy your message above and paste it into your Facebook post.',
   }
 
   useEffect(() => {
@@ -147,19 +155,38 @@ const ShareSocialActions = ({
     if (!socialUrl) return
 
     if (platform === 'facebook') {
-      // The Facebook button goes to Facebook on every platform. It used to hand
-      // mobile off to `navigator.share`, which showed the OS share sheet
-      // (AirDrop, Messages, Mail…) on top of our own share modal instead of the
-      // Facebook composer the button promises.
-      //
       // Facebook removed pre-filled share text (the `quote` parameter) back in
       // 2017, so the personal message is copied to the clipboard for pasting.
       //
-      // Both calls must happen synchronously inside the click: Safari blocks a
-      // `window.open` that follows an `await`, and Chrome rejects a clipboard
-      // write once the new tab has taken focus. So the copy starts first, the
-      // tab opens, and only then is the copy result awaited.
+      // Every call below must start synchronously inside the click: Safari
+      // blocks a `window.open` that follows an `await`, `navigator.share`
+      // needs the tap's user activation, and Chrome rejects a clipboard write
+      // once the new tab has taken focus. So the copy starts first, the share
+      // opens, and only then is the copy result awaited.
       const copyResult = copyToClipboard(customShareMessage)
+
+      // On phones the Facebook app claims facebook.com links, has no handler
+      // for sharer.php, and drops the user on its home feed without a
+      // composer. The OS share sheet hands the link to the app's own share
+      // composer instead. Only the URL is passed: Facebook discards shared
+      // text, and the link is what it builds the post preview from.
+      if (isMobileDevice() && typeof navigator.share === 'function') {
+        const shareResult = navigator.share({ url: shareUrl })
+        const copied = await copyResult
+        setFacebookNotice(copied ? 'shareSheetCopied' : 'shareSheetManual')
+        try {
+          await shareResult
+        } catch (err) {
+          // Closing the sheet is a normal outcome; anything else means the
+          // sheet could not open, so fall back to the web composer.
+          if (!(err instanceof DOMException && err.name === 'AbortError')) {
+            setFacebookNotice(copied ? 'copied' : 'manual')
+            openShareWindow(socialUrl)
+          }
+        }
+        return
+      }
+
       openShareWindow(socialUrl)
       const copied = await copyResult
       setFacebookNotice(copied ? 'copied' : 'manual')
@@ -250,7 +277,12 @@ const ShareSocialActions = ({
 
       {facebookNotice && (
         <p className="-mt-3 mb-4 rounded-lg bg-blue-50 px-3 py-2 text-start text-xs text-blue-800 dark:bg-blue-900/30 dark:text-blue-200">
-          {facebookNotice === 'copied' ? t.facebookTextCopied : t.facebookTextManual}
+          {{
+            copied: t.facebookTextCopied,
+            manual: t.facebookTextManual,
+            shareSheetCopied: t.facebookShareSheetCopied,
+            shareSheetManual: t.facebookShareSheetManual,
+          }[facebookNotice]}
         </p>
       )}
     </>
