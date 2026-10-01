@@ -18,7 +18,7 @@ export const projectWizardStepIds = {
   companyTeamSize: 'company-team-size',
   projectDescription: 'project-description',
   deadlineOffer: 'deadline-offer',
-  projectDeadline: 'project-deadline',
+  projectSchedule: 'project-schedule',
   addonsIntro: 'addons-intro',
   kickoffMeeting: 'kickoff-meeting',
   projectReview: 'project-review',
@@ -28,7 +28,10 @@ export const projectWizardStepIds = {
 
 export type ProjectWizardStepId = string
 
-export const deliverableStageStepSlugs = [
+export const deliverableStageStepSlugs = ['deliverables-plan', 'deliverables-format'] as const
+
+/** Retired deliverable step slugs (pre-phase-2), redirected to the plan step. */
+export const legacyDeliverableStepSlugs = [
   'deliverable-first-draft-date',
   'deliverable-first-draft-type',
   'deliverable-first-draft-way',
@@ -42,6 +45,7 @@ const deliverableComponentSlugs = new Set<string>([
   'deliverable-type-first-draft',
   'deliverable-type-final-version',
   ...deliverableStageStepSlugs,
+  ...legacyDeliverableStepSlugs,
 ])
 
 export function normalizeServiceComponentSlug(value: string): string {
@@ -127,13 +131,11 @@ export function normalizeProjectWizardStepId(step: string): string {
   return trimmed
 }
 
-export function readServiceComponentSlugs(locale: WizardLocale): string[] {
+function readSlugList(key: string): string[] {
   if (typeof window === 'undefined') return []
 
   try {
-    const raw = window.sessionStorage.getItem(
-      projectWizardStorage.serviceComponentSlugsKey(locale)
-    )
+    const raw = window.sessionStorage.getItem(key)
     if (!raw) return []
     const parsed = JSON.parse(raw) as unknown
     if (!Array.isArray(parsed)) return []
@@ -144,6 +146,37 @@ export function readServiceComponentSlugs(locale: WizardLocale): string[] {
     )
   } catch {
     return []
+  }
+}
+
+/** Component steps of the active project service only. */
+export function readProjectServiceStepSlugs(locale: WizardLocale): string[] {
+  return readSlugList(projectWizardStorage.serviceComponentSlugsKey(locale))
+}
+
+/** True when continuing from a component step moves past the last component step. */
+export function isLeavingComponentSteps(
+  locale: WizardLocale,
+  nextStepId: string | null,
+  isReviewEditMode: boolean
+): boolean {
+  return isReviewEditMode || !nextStepId || !readServiceComponentSlugs(locale).includes(nextStepId)
+}
+
+/** All component steps: the active project service's, then the project-level ones. */
+export function readServiceComponentSlugs(locale: WizardLocale): string[] {
+  return expandServiceComponentSlugs([
+    ...readProjectServiceStepSlugs(locale),
+    ...readSlugList(projectWizardStorage.projectComponentSlugsKey(locale)),
+  ])
+}
+
+export function isServiceFlowActive(locale: WizardLocale): boolean {
+  if (typeof window === 'undefined') return false
+  try {
+    return Boolean(window.sessionStorage.getItem(projectWizardStorage.serviceFlowKey(locale)))
+  } catch {
+    return false
   }
 }
 
@@ -182,6 +215,16 @@ function selectedIndustryParentHasChildren(locale: WizardLocale): boolean {
 }
 
 export function getProjectWizardStepOrder(locale: WizardLocale): string[] {
+  // Adding/editing an additional service from the review: only that service's steps.
+  if (isServiceFlowActive(locale)) {
+    return [
+      projectWizardStepIds.projectScope,
+      projectWizardStepIds.projectSubscopes,
+      ...readProjectServiceStepSlugs(locale),
+      projectWizardStepIds.projectReview,
+    ]
+  }
+
   const serviceComponentSlugs = readServiceComponentSlugs(locale)
   const preferredInsighterType = readPreferredInsighterType(locale)
   const skipKickoffMeeting = readProjectAddonsState(locale).kickoffMeeting.skipped
@@ -212,14 +255,17 @@ export function getProjectWizardStepOrder(locale: WizardLocale): string[] {
     ...(includeSubIndustryStep
       ? [projectWizardStepIds.insighterSubIndustry]
       : []),
+    // Project questions first…
+    projectWizardStepIds.projectStatus,
+    projectWizardStepIds.whoAreYou,
+    ...insighterPreferenceSteps,
+    projectWizardStepIds.projectSchedule,
+    // …then the service and its questions (the project is created at the service step)…
     projectWizardStepIds.service,
     projectWizardStepIds.projectScope,
     projectWizardStepIds.projectSubscopes,
     ...serviceComponentSlugs,
-    projectWizardStepIds.projectStatus,
-    projectWizardStepIds.whoAreYou,
-    ...insighterPreferenceSteps,
-    projectWizardStepIds.projectDeadline,
+    // …then description and add-ons, the summary, and insighter selection.
     projectWizardStepIds.projectDescription,
     projectWizardStepIds.addonsIntro,
     ...(skipKickoffMeeting ? [] : [projectWizardStepIds.kickoffMeeting]),

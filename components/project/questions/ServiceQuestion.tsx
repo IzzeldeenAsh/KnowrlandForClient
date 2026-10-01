@@ -31,6 +31,12 @@ import {
   extractProjectProposalMatchUuid,
   writeStoredProposalMatchUuid,
 } from '../projectProposalMatchUuid'
+import {
+  clearStoredProjectServiceUuid,
+  extractProjectServiceUuid,
+  writeStoredProjectServiceUuid,
+} from '../projectServiceUuid'
+import { writePrimaryProjectServiceUuid } from '../projectServiceSessions'
 import { readStoredSpecifiedInsighterUuid } from '../specifiedInsighterProject'
 import { projectWizardStorage, type WizardLocale } from '../wizardStorage'
 import { getApiUrl } from '@/app/config'
@@ -450,6 +456,7 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
   const resetDownstreamWizardState = (preservePrompt: boolean) => {
     try {
       clearStoredProjectRequestUuid(locale)
+      clearStoredProjectServiceUuid(locale)
       clearStoredProposalMatchUuid(locale)
       window.sessionStorage.removeItem(projectWizardStorage.projectScopeSnapshotKey(locale))
       window.sessionStorage.removeItem(projectWizardStorage.selectedMatchIdsKey(locale))
@@ -464,6 +471,10 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
       )
       window.sessionStorage.setItem(
         projectWizardStorage.serviceComponentSlugsKey(locale),
+        JSON.stringify([])
+      )
+      window.sessionStorage.setItem(
+        projectWizardStorage.projectComponentSlugsKey(locale),
         JSON.stringify([])
       )
       window.sessionStorage.setItem(
@@ -554,7 +565,12 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
       const projectUuid = extractProjectRequestUuid(initJson)
       if (!projectUuid) throw new Error('init_bad_response')
 
+      const projectServiceUuid = extractProjectServiceUuid(initJson)
+      if (!projectServiceUuid) throw new Error('init_bad_response')
+
       writeStoredProjectRequestUuid(locale, projectUuid)
+      writeStoredProjectServiceUuid(locale, projectServiceUuid)
+      writePrimaryProjectServiceUuid(locale, projectServiceUuid)
       if (specifiedInsighterUuid) {
         const proposalMatchUuid = extractProjectProposalMatchUuid(initJson)
         if (!proposalMatchUuid) throw new Error('init_bad_response')
@@ -574,6 +590,10 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
       try {
         window.sessionStorage.setItem(
           projectWizardStorage.serviceComponentSlugsKey(locale),
+          JSON.stringify([])
+        )
+        window.sessionStorage.setItem(
+          projectWizardStorage.projectComponentSlugsKey(locale),
           JSON.stringify([])
         )
         window.sessionStorage.setItem(

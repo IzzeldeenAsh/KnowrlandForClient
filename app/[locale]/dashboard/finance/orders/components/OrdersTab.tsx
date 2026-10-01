@@ -42,7 +42,6 @@ const CHIP_BUTTON_INACTIVE_CLASS = 'border-slate-200 bg-white text-slate-700 hov
 
 type OrderTabKey = 'knowledge' | 'meetings' | 'projects';
 type CompletionFilter = 'all' | 'complete' | 'incomplete';
-type PaymentTypeFilter = 'all' | 'down_payment' | 'final_payment' | 'full_payment';
 type PaymentStateFilter = 'all' | 'attempt' | 'failed';
 
 const ORDER_TAB_CONFIG: Array<{ key: OrderTabKey; label: string; endpoint: string }> = [
@@ -55,13 +54,6 @@ const COMPLETION_FILTER_OPTIONS: Array<{ value: CompletionFilter; label: string 
   { value: 'all', label: 'All' },
   { value: 'complete', label: 'Complete' },
   { value: 'incomplete', label: 'Incomplete' },
-];
-
-const PAYMENT_TYPE_FILTER_OPTIONS: Array<{ value: PaymentTypeFilter; label: string }> = [
-  { value: 'all', label: 'All payments' },
-  { value: 'down_payment', label: 'Down payment' },
-  { value: 'final_payment', label: 'Final payment' },
-  { value: 'full_payment', label: 'Full payment' },
 ];
 
 const PAYMENT_STATE_FILTER_OPTIONS: Array<{ value: PaymentStateFilter; label: string }> = [
@@ -156,7 +148,6 @@ export default function OrdersTab() {
 
   const [perPage, setPerPage] = useState<number>(10);
   const [completionFilter, setCompletionFilter] = useState<CompletionFilter>('all');
-  const [paymentTypeFilter, setPaymentTypeFilter] = useState<PaymentTypeFilter>('all');
   const [paymentStateFilter, setPaymentStateFilter] = useState<PaymentStateFilter>('all');
   const [searchInput, setSearchInput] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -182,7 +173,6 @@ export default function OrdersTab() {
       page = 1,
       perPageValue = perPage,
       statusFilter: CompletionFilter = completionFilter,
-      paymentTypeValue: PaymentTypeFilter = paymentTypeFilter,
       paymentStateValue: PaymentStateFilter = paymentStateFilter,
       signal?: AbortSignal,
     ) => {
@@ -204,9 +194,6 @@ export default function OrdersTab() {
         url.searchParams.set('per_page', String(perPageValue));
         url.searchParams.set('status', statusFilter);
         if (statusFilter === 'incomplete') {
-          if (tab === 'projects') {
-            url.searchParams.set('order_payment_type', paymentTypeValue);
-          }
           url.searchParams.set('payment_state', paymentStateValue);
         }
         if (searchQuery) {
@@ -245,7 +232,7 @@ export default function OrdersTab() {
         setIsLoading(false);
       }
     },
-    [completionFilter, handleServerErrors, paymentStateFilter, paymentTypeFilter, perPage, searchQuery],
+    [completionFilter, handleServerErrors, paymentStateFilter, perPage, searchQuery],
   );
 
   const refresh = useCallback(
@@ -254,26 +241,25 @@ export default function OrdersTab() {
       page: number,
       perPageValue: number,
       statusFilter: CompletionFilter,
-      paymentTypeValue: PaymentTypeFilter,
       paymentStateValue: PaymentStateFilter,
     ) => {
       currentRequestAbort.current?.abort();
       const controller = new AbortController();
       currentRequestAbort.current = controller;
-      void fetchOrders(tab, page, perPageValue, statusFilter, paymentTypeValue, paymentStateValue, controller.signal);
+      void fetchOrders(tab, page, perPageValue, statusFilter, paymentStateValue, controller.signal);
     },
     [fetchOrders],
   );
 
   useEffect(() => {
-    refresh(activeTab, 1, perPage, completionFilter, paymentTypeFilter, paymentStateFilter);
+    refresh(activeTab, 1, perPage, completionFilter, paymentStateFilter);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab, completionFilter, paymentTypeFilter, paymentStateFilter, perPage, searchQuery]);
+  }, [activeTab, completionFilter, paymentStateFilter, perPage, searchQuery]);
 
   const pages = getPaginationWindow(meta.current_page, meta.last_page, 5);
 
   const onPageChange = (page: number) => {
-    refresh(activeTab, page, perPage, completionFilter, paymentTypeFilter, paymentStateFilter);
+    refresh(activeTab, page, perPage, completionFilter, paymentStateFilter);
   };
 
   const onSearchKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -301,9 +287,6 @@ export default function OrdersTab() {
     setMeta({ ...DEFAULT_META, per_page: perPage });
     setError('');
     setActiveTab(tab);
-    if (tab !== 'projects') {
-      setPaymentTypeFilter('all');
-    }
   };
 
   const resetListForFilterChange = () => {
@@ -319,15 +302,8 @@ export default function OrdersTab() {
     resetListForFilterChange();
     setCompletionFilter(value);
     if (value !== 'incomplete') {
-      setPaymentTypeFilter('all');
       setPaymentStateFilter('all');
     }
-  };
-
-  const handlePaymentTypeFilterChange = (value: PaymentTypeFilter) => {
-    if (value === paymentTypeFilter) return;
-    resetListForFilterChange();
-    setPaymentTypeFilter(value);
   };
 
   const handlePaymentStateFilterChange = (value: PaymentStateFilter) => {
@@ -400,31 +376,6 @@ export default function OrdersTab() {
 
       {completionFilter === 'incomplete' ? (
         <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
-          {activeTab === 'projects' ? (
-            <>
-              <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Filter orders by payment type">
-                {PAYMENT_TYPE_FILTER_OPTIONS.map((option) => {
-                  const isActive = option.value === paymentTypeFilter;
-                  return (
-                    <button
-                      key={option.value}
-                      type="button"
-                      onClick={() => handlePaymentTypeFilterChange(option.value)}
-                      aria-pressed={isActive}
-                      className={[
-                        CHIP_BUTTON_BASE_CLASS,
-                        isActive ? CHIP_BUTTON_ACTIVE_CLASS : CHIP_BUTTON_INACTIVE_CLASS,
-                      ].join(' ')}
-                    >
-                      {option.label}
-                    </button>
-                  );
-                })}
-              </div>
-
-              <span className="hidden h-5 w-px bg-slate-200 sm:block" aria-hidden="true" />
-            </>
-          ) : null}
 
           <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Filter orders by payment state">
             {PAYMENT_STATE_FILTER_OPTIONS.map((option) => {

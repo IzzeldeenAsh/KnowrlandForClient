@@ -13,8 +13,14 @@ import {
   readStoredProjectRequestUuid,
 } from '@/components/project/projectRequestUuid'
 import { clearStoredProposalMatchUuid } from '@/components/project/projectProposalMatchUuid'
+import {
+  clearStoredProjectServiceUuid,
+  ensureProjectServiceUuid,
+  pickProjectServiceFromProject,
+} from '@/components/project/projectServiceUuid'
 import { useProjectStepErrorToast } from '@/components/project/useProjectStepErrorToast'
 import { useProjectWizardNavigation } from '@/components/project/useProjectWizardNavigation'
+import { isServiceFlowActive } from '@/components/project/projectWizardFlow'
 import { getApiUrl } from '@/app/config'
 import { getAuthToken } from '@/lib/authToken'
 import { projectWizardStorage, type WizardLocale } from '@/components/project/wizardStorage'
@@ -575,6 +581,8 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
             if (cancelled) return
           }
 
+          const projectServiceUuid = await ensureProjectServiceUuid(locale)
+
           for (let attempt = 1; attempt <= AI_POLL_ATTEMPTS; attempt += 1) {
             if (cancelled) return
             activeController?.abort()
@@ -582,7 +590,7 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
 
             try {
               const url = getApiUrl(
-                `/api/account/project/definition/ai-intake/check-clarification/${projectUuid}`
+                `/api/account/project/definition/ai-intake/check-clarification/${projectUuid}/${projectServiceUuid}`
               )
               const res = await fetch(url, {
                 method: 'GET',
@@ -646,7 +654,9 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
                   )
 
                   const showJson = (await showRes.json()) as unknown
-                  showList = extractSuggestedScopesFromProjectRequest(showJson)
+                  showList = extractSuggestedScopesFromProjectRequest(
+                    pickProjectServiceFromProject(showJson, projectServiceUuid) ?? {}
+                  )
                 }
 
                 if (!cancelled) {
@@ -953,6 +963,12 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
   }
 
   const returnToDefinedServices = () => {
+    // While adding a service from the review, keep the project; the service can be removed there.
+    if (isServiceFlowActive(locale)) {
+      nav.goBack()
+      return
+    }
+
     try {
       window.sessionStorage.removeItem(projectWizardStorage.serviceIdsKey(locale))
       window.sessionStorage.removeItem(projectWizardStorage.serviceIsOtherKey(locale))
@@ -973,6 +989,10 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
         JSON.stringify([])
       )
       window.sessionStorage.setItem(
+        projectWizardStorage.projectComponentSlugsKey(locale),
+        JSON.stringify([])
+      )
+      window.sessionStorage.setItem(
         projectWizardStorage.serviceComponentsPayloadKey(locale),
         JSON.stringify({ components: {} })
       )
@@ -981,6 +1001,7 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
     }
 
     clearStoredProjectRequestUuid(locale)
+    clearStoredProjectServiceUuid(locale)
     clearStoredProposalMatchUuid(locale)
     nav.goBack()
   }
@@ -1008,8 +1029,11 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
     setError(null)
 
     try {
+      const projectServiceUuid = await ensureProjectServiceUuid(locale)
       const res = await fetch(
-        getApiUrl(`/api/account/project/definition/ai-intake/answers/${projectUuid}`),
+        getApiUrl(
+          `/api/account/project/definition/ai-intake/answers/${projectUuid}/${projectServiceUuid}`
+        ),
         {
           method: 'POST',
           headers: {

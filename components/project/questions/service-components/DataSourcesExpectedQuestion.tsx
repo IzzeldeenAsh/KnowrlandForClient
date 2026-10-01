@@ -1,5 +1,7 @@
 'use client'
 
+import { isLeavingComponentSteps } from '@/components/project/projectWizardFlow'
+import { syncProjectProperties } from '@/components/project/projectPropertiesSync'
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { getProjectApiErrorMessage } from '@/components/project/projectApiError'
@@ -90,7 +92,7 @@ export default function DataSourcesExpectedQuestion({ locale }: { locale: Wizard
 
     updateServiceComponentPayload(locale, 'data-sources-expected', payload)
 
-    const leavingComponents = nav.nextStepId === 'project-status' || nav.isReviewEditMode
+    const leavingComponents = isLeavingComponentSteps(locale, nav.nextStepId, nav.isReviewEditMode)
     if (!leavingComponents) {
       nav.goNext()
       return
@@ -99,6 +101,8 @@ export default function DataSourcesExpectedQuestion({ locale }: { locale: Wizard
     setSubmitting(true)
     try {
       await syncServiceComponents(locale)
+      // Project-level component: in review edit mode the description step won't run again.
+      if (nav.isReviewEditMode) await syncProjectProperties(locale)
       nav.goNext()
     } catch (err) {
       setError(

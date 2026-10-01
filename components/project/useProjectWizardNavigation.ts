@@ -8,6 +8,7 @@ import {
 } from './wizardStorage'
 import {
   getProjectWizardStepOrder,
+  isServiceFlowActive,
   normalizeProjectWizardStepId,
   projectWizardStepIds,
 } from './projectWizardFlow'
@@ -58,11 +59,14 @@ export function useProjectWizardNavigation(locale: WizardLocale) {
 
   const editHrefFor = (stepId: string) => withReviewReturn(baseHrefFor(stepId))
 
+  const inServiceFlow = isServiceFlowActive(locale)
   const backHref = isReviewEditMode
     ? reviewHref
     : prevStepId
       ? hrefFor(prevStepId)
-      : `/${locale}/project`
+      : inServiceFlow
+        ? reviewHref
+        : `/${locale}/project`
   const nextHref = isReviewEditMode
     ? reviewHref
     : nextStepId

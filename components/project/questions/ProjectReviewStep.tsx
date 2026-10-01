@@ -22,8 +22,17 @@ import { readStoredProjectRequestUuid } from '@/components/project/projectReques
 import {
   isSpecifiedInsighterProject,
   readStoredSpecifiedInsighterDisplay,
+  readStoredSpecifiedInsighterUuid,
 } from '@/components/project/specifiedInsighterProject'
+import { finishServiceFlow, readServiceFlow } from '@/components/project/projectServiceSessions'
+import ProjectServicesPanel from './ProjectServicesPanel'
 import { readProjectAddonsState, readProjectScopeSnapshot } from '../projectAddonsState'
+import { dayLabel, durationLabel } from '../projectDeliverables'
+import { addDaysToIsoDate, formatIsoDate, readProjectSchedule } from '../projectSchedule'
+import {
+  pickProjectServiceFromProject,
+  readStoredProjectServiceUuid,
+} from '../projectServiceUuid'
 import { projectTypeLabel } from '../projectLabels'
 import { readProjectDescriptionState } from '../projectDescriptionState'
 import {
@@ -92,6 +101,12 @@ type ProjectRequestData = {
   company_max_team_size?: number | string | null
   description?: string | null
   components?: ProjectRequestComponent[] | null
+  project_services?: Array<{
+    uuid?: string
+    components?: ProjectRequestComponent[] | null
+  }> | null
+  planned_start_date?: string | null
+  duration_days?: number | null
 }
 
 type ReviewRow = {
@@ -122,7 +137,8 @@ type ReviewData = {
   experienceRange: string
   teamSizeRange: string
   targetMarket: string[]
-  deadline: string
+  plannedStartDate: string
+  durationDays: number | null
   servicePrompt: string
   description: string
   descriptionFiles: Array<{ name: string; size: number; type: string }>
@@ -551,8 +567,9 @@ function buildServiceComponentSections(params: {
   locale: WizardLocale
   slugs: string[]
   payload: ServiceComponentsPayload
+  plannedStartDate?: string
 }): ReviewSection[] {
-  const { locale, slugs, payload } = params
+  const { locale, slugs, payload, plannedStartDate } = params
 
   return slugs
     .filter((slug) => slug !== 'target-market')
@@ -564,67 +581,35 @@ function buildServiceComponentSections(params: {
           payloadValue && typeof payloadValue === 'object'
             ? (payloadValue as Record<string, unknown>)
             : {}
-        const firstDraft =
-          raw.first_draft && typeof raw.first_draft === 'object'
-            ? (raw.first_draft as Record<string, unknown>)
-            : {}
-        const finalVersion =
-          raw.final_version && typeof raw.final_version === 'object'
-            ? (raw.final_version as Record<string, unknown>)
-            : {}
-
-        const firstDraftWay = resolveDeliverableWay(firstDraft)
-        const finalVersionWay = resolveDeliverableWay(finalVersion)
-        const firstDraftReportTypes = getReportTypes(firstDraft.report_type)
-        const finalVersionReportTypes = getReportTypes(finalVersion.report_type)
+        const deliverables = Array.isArray(raw.deliverables)
+          ? (raw.deliverables as Array<Record<string, unknown>>)
+          : []
         const notSpecified = locale === 'ar' ? 'غير محدد' : 'Not specified'
+
+        if (deliverables.length === 0) return null
 
         return {
           title: getComponentTitle(locale, slug),
-          rows: [
-            {
-              label: locale === 'ar' ? 'تاريخ المسودة الأولى' : 'First draft date',
-              value: [String(firstDraft.date || '').trim() || notSpecified],
-              editStepId: 'deliverable-first-draft-date',
-            },
-            {
-              label: locale === 'ar' ? 'طريقة تسليم المسودة الأولى' : 'First draft delivery mode',
+          rows: deliverables.map((deliverable) => {
+            const way = resolveDeliverableWay(deliverable)
+            const reportTypes = getReportTypes(deliverable.report_type)
+            const periodDays = Math.max(0, Math.round(Number(deliverable.period_days) || 0))
+            const when = plannedStartDate
+              ? `${dayLabel(locale, periodDays)} · ${formatIsoDate(addDaysToIsoDate(plannedStartDate, periodDays), locale)}`
+              : dayLabel(locale, periodDays)
+
+            return {
+              label: `${String(deliverable.title || '').trim() || notSpecified} — ${when}`,
               value: [
-                getDeliverableWayLabel(locale, firstDraftWay.key),
-                ...(firstDraftWay.address
-                  ? [`${locale === 'ar' ? 'العنوان' : 'Address'}: ${firstDraftWay.address}`]
+                getDeliverableWayLabel(locale, way.key),
+                ...(way.address
+                  ? [`${locale === 'ar' ? 'العنوان' : 'Address'}: ${way.address}`]
                   : []),
               ],
-              editStepId: 'deliverable-first-draft-way',
-            },
-            {
-              label: locale === 'ar' ? 'صيغ المسودة الأولى' : 'First draft formats',
-              value: firstDraftReportTypes.length === 0 ? [notSpecified] : [],
-              fileTypes: firstDraftReportTypes,
-              editStepId: 'deliverable-first-draft-type',
-            },
-            {
-              label: locale === 'ar' ? 'تاريخ النسخة النهائية' : 'Final version date',
-              value: [String(finalVersion.date || '').trim() || notSpecified],
-              editStepId: 'deliverable-final-version-date',
-            },
-            {
-              label: locale === 'ar' ? 'طريقة تسليم النسخة النهائية' : 'Final version delivery mode',
-              value: [
-                getDeliverableWayLabel(locale, finalVersionWay.key),
-                ...(finalVersionWay.address
-                  ? [`${locale === 'ar' ? 'العنوان' : 'Address'}: ${finalVersionWay.address}`]
-                  : []),
-              ],
-              editStepId: 'deliverable-final-version-way',
-            },
-            {
-              label: locale === 'ar' ? 'صيغ النسخة النهائية' : 'Final version formats',
-              value: finalVersionReportTypes.length === 0 ? [notSpecified] : [],
-              fileTypes: finalVersionReportTypes,
-              editStepId: 'deliverable-final-version-type',
-            },
-          ],
+              fileTypes: reportTypes,
+              editStepId: 'deliverables-plan',
+            }
+          }),
         }
       }
 
@@ -859,6 +844,7 @@ export default function ProjectReviewStep({
   const [submitting, setSubmitting] = useState(false)
   const [isSpecifiedInsighter, setIsSpecifiedInsighter] = useState(false)
   const [specifiedInsighterDisplayName, setSpecifiedInsighterDisplayName] = useState('')
+  const [servicesPanelIds, setServicesPanelIds] = useState<{ projectUuid: string; insighterUuid: string } | null>(null)
 
   useProjectStepErrorToast(error, locale)
 
@@ -867,6 +853,9 @@ export default function ProjectReviewStep({
 
     const load = async () => {
       setError(null)
+      // Back from adding/editing an additional service: restore the main service's answers.
+      if (readServiceFlow(locale)) finishServiceFlow(locale)
+
       const specificProject = isSpecifiedInsighterProject(locale)
       setIsSpecifiedInsighter(specificProject)
       setSpecifiedInsighterDisplayName(
@@ -874,6 +863,12 @@ export default function ProjectReviewStep({
       )
 
       const projectUuid = readStoredProjectRequestUuid(locale)
+      const specifiedInsighterUuid = readStoredSpecifiedInsighterUuid(locale)
+      setServicesPanelIds(
+        specificProject && projectUuid && specifiedInsighterUuid
+          ? { projectUuid, insighterUuid: specifiedInsighterUuid }
+          : null
+      )
 
       const rawProjectType = readStorageValue(
         locale,
@@ -919,10 +914,7 @@ export default function ProjectReviewStep({
         locale,
         projectWizardStorage.targetMarketModeKey(locale)
       )
-      const projectDeadline = readStorageValue(
-        locale,
-        projectWizardStorage.deadlineKey(locale)
-      )
+      const storedSchedule = readProjectSchedule(locale)
       const countryIds = safeParseNumberArray(
         readStorageValue(locale, projectWizardStorage.targetMarketCountryIdsKey(locale))
       )
@@ -1049,7 +1041,20 @@ export default function ProjectReviewStep({
       const addonsState = readProjectAddonsState(locale)
       const scopeSnapshot = readProjectScopeSnapshot(locale)
       const storedServiceComponentsPayload = readServiceComponentsPayload(locale)
-      const apiServiceComponentsPayload = normalizeProjectComponents(requestData?.components)
+      const activeProjectService = requestData
+        ? pickProjectServiceFromProject(requestData, readStoredProjectServiceUuid(locale))
+        : null
+      const apiServiceComponentsPayload = normalizeProjectComponents([
+        ...(requestData?.components || []),
+        ...((activeProjectService?.components as ProjectRequestComponent[] | undefined) || []),
+      ])
+      const plannedStartDate =
+        storedSchedule?.plannedStartDate || stringifyValue(requestData?.planned_start_date).slice(0, 10)
+      const durationDays =
+        storedSchedule?.durationDays ??
+        (requestData?.duration_days === null || requestData?.duration_days === undefined
+          ? null
+          : Number(requestData.duration_days))
       const serviceComponentsPayload: ServiceComponentsPayload = {
         components: {
           ...(apiServiceComponentsPayload.components || {}),
@@ -1070,6 +1075,7 @@ export default function ProjectReviewStep({
         locale,
         slugs: serviceComponentSlugs,
         payload: serviceComponentsPayload,
+        plannedStartDate,
       })
 
       const projectTypeValue = projectTypeLabel(
@@ -1130,7 +1136,8 @@ export default function ProjectReviewStep({
             : apiTargetMarket.length > 0
               ? apiTargetMarket
               : [isRTL ? 'غير محدد' : 'Not specified'],
-        deadline: projectDeadline,
+        plannedStartDate,
+        durationDays,
         servicePrompt: servicePrompt.trim() || stringifyValue(requestData?.service_prompt),
         description: descriptionState.description || stringifyValue(requestData?.description),
         descriptionFiles: descriptionState.files,
@@ -1199,9 +1206,27 @@ export default function ProjectReviewStep({
         editStepId: projectWizardStepIds.whoAreYou,
       },
       {
-        label: isRTL ? 'موعد التسليم' : 'Delivery deadline',
-        value: review.deadline ? [review.deadline] : [],
-        editStepId: projectWizardStepIds.projectDeadline,
+        label: isRTL ? 'البدء المخطط' : 'Planned start',
+        value: review.plannedStartDate ? [formatIsoDate(review.plannedStartDate, locale)] : [],
+        editStepId: projectWizardStepIds.projectSchedule,
+      },
+      {
+        label: isRTL ? 'المدة' : 'Duration',
+        value:
+          review.durationDays === null
+            ? []
+            : [
+                durationLabel(locale, review.durationDays),
+                ...(review.plannedStartDate
+                  ? [
+                      `${isRTL ? 'الإغلاق المخطط' : 'Planned close'}: ${formatIsoDate(
+                        addDaysToIsoDate(review.plannedStartDate, review.durationDays),
+                        locale
+                      )}`,
+                    ]
+                  : []),
+              ],
+        editStepId: projectWizardStepIds.projectSchedule,
       },
     ]
   }, [isRTL, isSpecifiedInsighter, locale, review, specifiedInsighterDisplayName])
@@ -1410,6 +1435,14 @@ export default function ProjectReviewStep({
                 editLabel={editLabel}
                 editHrefFor={nav.editHrefFor}
               />
+
+              {servicesPanelIds ? (
+                <ProjectServicesPanel
+                  locale={locale}
+                  projectUuid={servicesPanelIds.projectUuid}
+                  insighterUuid={servicesPanelIds.insighterUuid}
+                />
+              ) : null}
 
               <SectionBlock
                 title={

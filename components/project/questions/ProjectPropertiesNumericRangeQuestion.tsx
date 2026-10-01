@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { Slider } from '@mantine/core'
 import { useRouter } from 'next/navigation'
 import { getProjectApiErrorMessage } from '@/components/project/projectApiError'
-import { syncProjectProperties } from '@/components/project/projectPropertiesSync'
+import { syncProjectPropertiesIfReady } from '@/components/project/projectPropertiesSync'
 import { useProjectStepErrorToast } from '@/components/project/useProjectStepErrorToast'
 import ProjectSelectedTypeHeader from '../ProjectSelectedTypeHeader'
 import { useProjectWizardNavigation } from '../useProjectWizardNavigation'
@@ -136,7 +136,7 @@ export default function ProjectPropertiesNumericRangeQuestion({
     setError(null)
 
     try {
-      await syncProjectProperties(locale)
+      await syncProjectPropertiesIfReady(locale)
       if (nav.nextHref) {
         nav.goNext()
         return
