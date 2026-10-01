@@ -1,5 +1,7 @@
 'use client'
 
+import { isLeavingComponentSteps } from '@/components/project/projectWizardFlow'
+import { syncProjectProperties } from '@/components/project/projectPropertiesSync'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import {
@@ -11,7 +13,7 @@ import { useProjectStepErrorToast } from '../useProjectStepErrorToast'
 import { projectWizardStorage, type WizardLocale } from '../wizardStorage'
 import { useProjectWizardNavigation } from '../useProjectWizardNavigation'
 import { updateServiceComponentPayload } from '@/components/project/serviceComponentsPayload'
-import { syncProjectProperties } from '@/components/project/projectPropertiesSync'
+import { syncServiceComponents } from '@/components/project/serviceComponentsSync'
 
 type Mode = 'worldwide' | 'country' | 'regions' | 'economic'
 
@@ -380,7 +382,7 @@ export default function TargetMarketQuestion({ locale }: { locale: WizardLocale 
 
     updateServiceComponentPayload(locale, 'target-market', payload)
 
-    const leavingComponents = nav.isReviewEditMode
+    const leavingComponents = isLeavingComponentSteps(locale, nav.nextStepId, nav.isReviewEditMode)
     if (!leavingComponents) {
       nav.goNext()
       return
@@ -388,7 +390,9 @@ export default function TargetMarketQuestion({ locale }: { locale: WizardLocale 
 
     setSubmitting(true)
     try {
-      await syncProjectProperties(locale)
+      await syncServiceComponents(locale)
+      // Project-level component: in review edit mode the description step won't run again.
+      if (nav.isReviewEditMode) await syncProjectProperties(locale)
       nav.goNext()
     } catch (err) {
       setError(

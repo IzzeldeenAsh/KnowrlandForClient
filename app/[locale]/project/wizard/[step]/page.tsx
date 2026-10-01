@@ -1,8 +1,3 @@
-import DeliverablesQuestion from '@/components/project/questions/service-components/DeliverablesQuestion'
-import ProjectContextStep from '@/components/project/questions/ProjectContextStep'
-import PlannedStartDateQuestion from '@/components/project/questions/PlannedStartDateQuestion'
-import ServicesSummaryStep from '@/components/project/questions/ServicesSummaryStep'
-import ServiceAddonsStep from '@/components/project/questions/ServiceAddonsStep'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import ProjectWizardShell from '@/components/project/ProjectWizardShell'
@@ -15,7 +10,7 @@ import InsighterExperienceQuestion from '@/components/project/questions/Insighte
 import CompanyTeamSizeQuestion from '@/components/project/questions/CompanyTeamSizeQuestion'
 import ProjectDescriptionQuestion from '@/components/project/questions/ProjectDescriptionQuestion'
 import DeadlineOfferQuestion from '@/components/project/questions/DeadlineOfferQuestion'
-import ProjectDeadlineQuestion from '@/components/project/questions/ProjectDeadlineQuestion'
+import ProjectScheduleQuestion from '@/components/project/questions/ProjectScheduleQuestion'
 import ProjectAddonsIntroStep from '@/components/project/questions/ProjectAddonsIntroStep'
 import KickoffMeetingQuestion from '@/components/project/questions/KickoffMeetingQuestion'
 import ProjectReviewStep from '@/components/project/questions/ProjectReviewStep'
@@ -28,6 +23,8 @@ import TargetMarketQuestion from '@/components/project/questions/TargetMarketQue
 import ServiceQuestion from '@/components/project/questions/ServiceQuestion'
 import ProjectScopeQuestion from '@/components/project/questions/ProjectScopeQuestion'
 import ProjectSubscopesQuestion from '@/components/project/questions/ProjectSubscopesQuestion'
+import DeliverablesPlanQuestion from '@/components/project/questions/service-components/DeliverablesPlanQuestion'
+import DeliverablesFormatQuestion from '@/components/project/questions/service-components/DeliverablesFormatQuestion'
 import DataSourcesExpectedQuestion from '@/components/project/questions/service-components/DataSourcesExpectedQuestion'
 
 type PageProps = {
@@ -38,38 +35,28 @@ export default async function ProjectWizardStepPage({ params }: PageProps) {
   const { locale, step } = await params
 
   const legacyRedirects: Record<string, string> = {
-    'deliverable-first-draft-date': 'deliverables',
-    'deliverable-first-draft-type': 'deliverables',
-    'deliverable-first-draft-way': 'deliverables',
-    'deliverable-final-version-date': 'deliverables',
-    'deliverable-final-version-type': 'deliverables',
-    'deliverable-final-version-way': 'deliverables',
     '1': 'project-type',
     '2': 'deliverables-language',
     '3': 'service',
     '5': 'project-status',
     '6': 'target-market',
     '7': 'service',
-    'deliverable-stage': 'deliverables',
-    'deliverable-type-first-draft': 'deliverables',
-    'deliverable-type-final-version': 'deliverables',
+    'deliverable-stage': 'deliverables-plan',
+    'deliverable-type-first-draft': 'deliverables-format',
+    'deliverable-type-final-version': 'deliverables-format',
+    'deliverable-first-draft-date': 'deliverables-plan',
+    'deliverable-final-version-date': 'deliverables-plan',
+    'deliverable-first-draft-type': 'deliverables-format',
+    'deliverable-first-draft-way': 'deliverables-format',
+    'deliverable-final-version-type': 'deliverables-format',
+    'deliverable-final-version-way': 'deliverables-format',
+    'project-deadline': 'project-schedule',
   }
 
   const legacyTarget = legacyRedirects[step]
   if (legacyTarget) {
     redirect(`/${locale}/project/wizard/${legacyTarget}`)
   }
-
-  const newSteps: Record<string, React.ComponentType<{locale: string}>> = {
-    'deliverables': DeliverablesQuestion,
-    'project-context': ProjectContextStep,
-    'planned-start-date': PlannedStartDateQuestion,
-    'services-summary': ServicesSummaryStep,
-    'service-addons': ServiceAddonsStep,
-  }
-  const NewStep = newSteps[step]
-  if (NewStep) return <ProjectWizardShell align="top"><NewStep locale={locale} /></ProjectWizardShell>
-  if (step === 'service-intake') return <ProjectWizardShell align="top"><ProjectScopeQuestion locale={locale} intakeOnly /></ProjectWizardShell>
 
   if (step === 'project-type') {
     return (
@@ -136,6 +123,26 @@ export default async function ProjectWizardStepPage({ params }: PageProps) {
       <ProjectWizardShell align="top">
         <div className="w-full pt-2 sm:pt-4">
           <ProjectSubscopesQuestion locale={locale} />
+        </div>
+      </ProjectWizardShell>
+    )
+  }
+
+  if (step === 'deliverables-plan') {
+    return (
+      <ProjectWizardShell align="top">
+        <div className="w-full pt-2 sm:pt-4">
+          <DeliverablesPlanQuestion locale={locale} />
+        </div>
+      </ProjectWizardShell>
+    )
+  }
+
+  if (step === 'deliverables-format') {
+    return (
+      <ProjectWizardShell align="top">
+        <div className="w-full pt-2 sm:pt-4">
+          <DeliverablesFormatQuestion locale={locale} />
         </div>
       </ProjectWizardShell>
     )
@@ -241,11 +248,11 @@ export default async function ProjectWizardStepPage({ params }: PageProps) {
     )
   }
 
-  if (step === 'project-deadline') {
+  if (step === 'project-schedule') {
     return (
       <ProjectWizardShell align="top">
         <div className="w-full pt-2 sm:pt-4">
-          <ProjectDeadlineQuestion locale={locale} />
+          <ProjectScheduleQuestion locale={locale} />
         </div>
       </ProjectWizardShell>
     )
@@ -273,7 +280,7 @@ export default async function ProjectWizardStepPage({ params }: PageProps) {
 
   if (step === 'project-review') {
     return (
-      <ProjectWizardShell align="top" bleed>
+      <ProjectWizardShell align="top">
         <div className="w-full pt-2 sm:pt-4">
           <ProjectReviewStep locale={locale} />
         </div>

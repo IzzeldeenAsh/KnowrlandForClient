@@ -3,6 +3,7 @@
 import { IconLoader2, IconPhoto } from '@tabler/icons-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { FeedCard, FeedSkeleton } from '@/components/feed/MyFeedsTimeline'
+import { useFeedItemMediaUpdates } from '@/components/feed/feedImageProcessing'
 import {
   getInsighterProfileFeed,
   getCompanyProfileFeed,
@@ -63,6 +64,7 @@ export default function PostsTab({ uuid, locale, kind = 'insighter' }: PostsTabP
   const copy = copyByLocale[locale === 'ar' ? 'ar' : 'en'][kind]
   const fetchFeed = kind === 'company' ? getCompanyProfileFeed : getInsighterProfileFeed
   const [items, setItems] = useState<FeedItem[]>([])
+  useFeedItemMediaUpdates(setItems)
   const [meta, setMeta] = useState<InsighterProfileFeedMeta | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isLoadingMore, setIsLoadingMore] = useState(false)

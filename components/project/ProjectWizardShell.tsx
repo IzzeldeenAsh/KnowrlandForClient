@@ -1,4 +1,3 @@
-import ProjectWizardReady from './ProjectWizardReady'
 import type { ReactNode } from 'react'
 import AnimatedWizardBackground from './AnimatedWizardBackground'
 import ProjectViewportLock from './ProjectViewportLock'
@@ -32,7 +31,7 @@ export default function ProjectWizardShell({
         }`}
         style={{ top: 'var(--app-header-height, 0px)' }}
       >
-        <div className={containerClassName}><ProjectWizardReady>{children}</ProjectWizardReady></div>
+        <div className={containerClassName}>{children}</div>
       </div>
     </section>
   )

@@ -26,16 +26,7 @@ function listProjectWizardStorageKeys(locale: WizardLocale): string[] {
   return keys
 }
 
-export function activeServiceStorageKey(locale: WizardLocale, name: string): string {
-  const uuid = typeof window === 'undefined' ? 'pending' : window.sessionStorage.getItem(`project:wizard:${locale}:activeService`) || 'pending'
-  return `project:wizard:${locale}:services:${uuid}:${name}`
-}
-
 export const projectWizardStorage = {
-  plannedStartDateKey(locale: WizardLocale) { return `project:wizard:${locale}:plannedStartDate` },
-  projectComponentsKey(locale: WizardLocale) { return `project:wizard:${locale}:projectComponents` },
-  projectComponentSlugsKey(locale: WizardLocale) { return `project:wizard:${locale}:projectComponentSlugs` },
-  serviceAddonsKey(locale: WizardLocale) { return activeServiceStorageKey(locale, 'addons') },
   projectTypeKey(locale: WizardLocale) {
     return `project:wizard:${locale}:projectType`
   },
@@ -91,7 +82,7 @@ export const projectWizardStorage = {
     return `project:wizard:${locale}:companyMaxTeamSize`
   },
   projectScopeSnapshotKey(locale: WizardLocale) {
-    return activeServiceStorageKey(locale, 'projectScopeSnapshot')
+    return `project:wizard:${locale}:projectScopeSnapshot`
   },
   projectAddonsKey(locale: WizardLocale) {
     return `project:wizard:${locale}:projectAddons`
@@ -115,43 +106,43 @@ export const projectWizardStorage = {
     return `project:wizard:${locale}:targetMarketEconomicBlocIds`
   },
   serviceIdsKey(locale: WizardLocale) {
-    return activeServiceStorageKey(locale, 'serviceIds')
+    return `project:wizard:${locale}:serviceIds`
   },
   serviceLabelKey(locale: WizardLocale) {
-    return activeServiceStorageKey(locale, 'serviceLabel')
+    return `project:wizard:${locale}:serviceLabel`
   },
   servicePromptKey(locale: WizardLocale) {
-    return activeServiceStorageKey(locale, 'servicePrompt')
+    return `project:wizard:${locale}:servicePrompt`
   },
   serviceIsOtherKey(locale: WizardLocale) {
-    return activeServiceStorageKey(locale, 'serviceIsOther')
+    return `project:wizard:${locale}:serviceIsOther`
   },
   serviceScopeParentIdsKey(locale: WizardLocale) {
-    return activeServiceStorageKey(locale, 'serviceScopeParentIds')
+    return `project:wizard:${locale}:serviceScopeParentIds`
   },
   serviceScopeChildIdsByParentKey(locale: WizardLocale) {
-    return activeServiceStorageKey(locale, 'serviceScopeChildIdsByParent')
+    return `project:wizard:${locale}:serviceScopeChildIdsByParent`
   },
   serviceScopeHasChildrenKey(locale: WizardLocale) {
-    return activeServiceStorageKey(locale, 'serviceScopeHasChildren')
+    return `project:wizard:${locale}:serviceScopeHasChildren`
   },
   serviceManualScopesKey(locale: WizardLocale) {
-    return activeServiceStorageKey(locale, 'serviceManualScopes')
+    return `project:wizard:${locale}:serviceManualScopes`
   },
   serviceManualSubscopesByScopeKey(locale: WizardLocale) {
-    return activeServiceStorageKey(locale, 'serviceManualSubscopesByScope')
+    return `project:wizard:${locale}:serviceManualSubscopesByScope`
   },
   serviceAiSuggestedScopesKey(locale: WizardLocale) {
-    return activeServiceStorageKey(locale, 'serviceAiSuggestedScopes')
+    return `project:wizard:${locale}:serviceAiSuggestedScopes`
   },
   serviceComponentsPayloadKey(locale: WizardLocale) {
-    return activeServiceStorageKey(locale, 'serviceComponentsPayload')
+    return `project:wizard:${locale}:serviceComponentsPayload`
   },
   serviceComponentSlugsKey(locale: WizardLocale) {
-    return activeServiceStorageKey(locale, 'serviceComponentSlugs')
+    return `project:wizard:${locale}:serviceComponentSlugs`
   },
   serviceComponentAnswerKey(locale: WizardLocale, slug: string) {
-    return activeServiceStorageKey(locale, `serviceComponent:${slug}`)
+    return `project:wizard:${locale}:serviceComponent:${slug}`
   },
   deadlineOfferKey(locale: WizardLocale) {
     return `project:wizard:${locale}:deadlineOffer`
@@ -174,8 +165,29 @@ export const projectWizardStorage = {
   specifiedInsighterDisplayKey(locale: WizardLocale) {
     return `project:wizard:${locale}:specifiedInsighterDisplay`
   },
-  deadlineKey(locale: WizardLocale) {
-    return `project:wizard:${locale}:deadline`
+  projectServiceUuidKey(locale: WizardLocale) {
+    return `project:wizard:${locale}:projectServiceUuid`
+  },
+  /** The project's first service — the one the main wizard flow edits. */
+  primaryProjectServiceUuidKey(locale: WizardLocale) {
+    return `project:wizard:${locale}:primaryProjectServiceUuid`
+  },
+  /** Set while the client adds or edits an additional service from the review step. */
+  serviceFlowKey(locale: WizardLocale) {
+    return `project:wizard:${locale}:serviceFlow`
+  },
+  /** Saved wizard answers of one project service. */
+  serviceSessionKey(locale: WizardLocale, projectServiceUuid: string) {
+    return `project:wizard:${locale}:serviceSession:${projectServiceUuid}`
+  },
+  projectComponentSlugsKey(locale: WizardLocale) {
+    return `project:wizard:${locale}:projectComponentSlugs`
+  },
+  plannedStartDateKey(locale: WizardLocale) {
+    return `project:wizard:${locale}:plannedStartDate`
+  },
+  durationDaysKey(locale: WizardLocale) {
+    return `project:wizard:${locale}:durationDays`
   },
 } as const
 

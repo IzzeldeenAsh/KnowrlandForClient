@@ -1,7 +1,5 @@
 'use client'
 
-import { requireProjectServiceUuid, activeServiceResponse, markServiceComplete } from '../projectServicesState'
-
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { IconArrowUp, IconCheck, IconPlusFilled, IconSparklesFilled, IconXboxXFilled } from '@tabler/icons-react'
@@ -11,11 +9,18 @@ import {
   getProjectApiErrorMessage,
 } from '@/components/project/projectApiError'
 import {
+  clearStoredProjectRequestUuid,
   readStoredProjectRequestUuid,
 } from '@/components/project/projectRequestUuid'
+import { clearStoredProposalMatchUuid } from '@/components/project/projectProposalMatchUuid'
+import {
+  clearStoredProjectServiceUuid,
+  ensureProjectServiceUuid,
+  pickProjectServiceFromProject,
+} from '@/components/project/projectServiceUuid'
 import { useProjectStepErrorToast } from '@/components/project/useProjectStepErrorToast'
 import { useProjectWizardNavigation } from '@/components/project/useProjectWizardNavigation'
-import { projectWizardStepIds } from '@/components/project/projectWizardFlow'
+import { isServiceFlowActive, projectWizardStepIds } from '@/components/project/projectWizardFlow'
 import { BACKEND_STRING_MAX } from '@/components/project/backendLimits'
 import { getApiUrl } from '@/app/config'
 import { getAuthToken } from '@/lib/authToken'
@@ -480,15 +485,12 @@ function persistAiSuggestedScopes(locale: WizardLocale, scopes: ScopeParent[]) {
 
 // components are fetched after scope sync (next step)
 
-export default function ProjectScopeQuestion({ locale, intakeOnly = false }: { locale: WizardLocale; intakeOnly?: boolean }) {
+export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale }) {
   const nav = useProjectWizardNavigation(locale)
   const isRTL = locale === 'ar'
   const isEnglish =
     typeof locale === 'string' && locale.toLowerCase().startsWith('en')
 
-  useEffect(() => {
-    if (!intakeOnly && !nav.isReviewEditMode) { try { markServiceComplete(locale, false) } catch {} }
-  }, [locale, intakeOnly, nav.isReviewEditMode])
   const [entered, setEntered] = useState(false)
   const [projectType, setProjectType] = useState<string | null>(null)
   const [serviceId, setServiceId] = useState<number | null>(null)
@@ -594,6 +596,8 @@ export default function ProjectScopeQuestion({ locale, intakeOnly = false }: { l
             if (cancelled) return
           }
 
+          const projectServiceUuid = await ensureProjectServiceUuid(locale)
+
           for (let attempt = 1; attempt <= AI_POLL_ATTEMPTS; attempt += 1) {
             if (cancelled) return
             activeController?.abort()
@@ -601,7 +605,7 @@ export default function ProjectScopeQuestion({ locale, intakeOnly = false }: { l
 
             try {
               const url = getApiUrl(
-                `/api/account/project/definition/ai-intake/check-clarification/${projectUuid}/${requireProjectServiceUuid(locale)}`
+                `/api/account/project/definition/ai-intake/check-clarification/${projectUuid}/${projectServiceUuid}`
               )
               const res = await fetch(url, {
                 method: 'GET',
@@ -665,14 +669,15 @@ export default function ProjectScopeQuestion({ locale, intakeOnly = false }: { l
                   )
 
                   const showJson = (await showRes.json()) as unknown
-                  showList = extractSuggestedScopesFromProjectRequest(activeServiceResponse(showJson, locale))
+                  showList = extractSuggestedScopesFromProjectRequest(
+                    pickProjectServiceFromProject(showJson, projectServiceUuid) ?? {}
+                  )
                 }
 
                 if (!cancelled) {
                   setScopes(showList)
                   persistAiSuggestedScopes(locale, showList)
                   setAiMode('idle')
-                  if (intakeOnly) nav.goNext()
                 }
                 return
               }
@@ -984,7 +989,47 @@ export default function ProjectScopeQuestion({ locale, intakeOnly = false }: { l
   }
 
   const returnToDefinedServices = () => {
-    window.location.assign(`/${locale}/project/wizard/services-summary`)
+    // While adding a service from the review, keep the project; the service can be removed there.
+    if (isServiceFlowActive(locale)) {
+      nav.goBack()
+      return
+    }
+
+    try {
+      window.sessionStorage.removeItem(projectWizardStorage.serviceIdsKey(locale))
+      window.sessionStorage.removeItem(projectWizardStorage.serviceIsOtherKey(locale))
+      window.sessionStorage.removeItem(projectWizardStorage.serviceLabelKey(locale))
+      window.sessionStorage.removeItem(projectWizardStorage.servicePromptKey(locale))
+      window.sessionStorage.removeItem(projectWizardStorage.projectScopeSnapshotKey(locale))
+      window.sessionStorage.removeItem(projectWizardStorage.serviceManualScopesKey(locale))
+      window.sessionStorage.removeItem(projectWizardStorage.serviceAiSuggestedScopesKey(locale))
+      window.sessionStorage.removeItem(
+        projectWizardStorage.serviceManualSubscopesByScopeKey(locale)
+      )
+      window.sessionStorage.setItem(
+        projectWizardStorage.serviceScopeParentIdsKey(locale),
+        JSON.stringify([])
+      )
+      window.sessionStorage.setItem(
+        projectWizardStorage.serviceComponentSlugsKey(locale),
+        JSON.stringify([])
+      )
+      window.sessionStorage.setItem(
+        projectWizardStorage.projectComponentSlugsKey(locale),
+        JSON.stringify([])
+      )
+      window.sessionStorage.setItem(
+        projectWizardStorage.serviceComponentsPayloadKey(locale),
+        JSON.stringify({ components: {} })
+      )
+    } catch {
+      // ignore
+    }
+
+    clearStoredProjectRequestUuid(locale)
+    clearStoredProjectServiceUuid(locale)
+    clearStoredProposalMatchUuid(locale)
+    nav.goBack()
   }
 
   const submitAiClarificationAnswers = async () => {
@@ -1010,8 +1055,11 @@ export default function ProjectScopeQuestion({ locale, intakeOnly = false }: { l
     setError(null)
 
     try {
+      const projectServiceUuid = await ensureProjectServiceUuid(locale)
       const res = await fetch(
-        getApiUrl(`/api/account/project/definition/ai-intake/answers/${projectUuid}/${requireProjectServiceUuid(locale)}`),
+        getApiUrl(
+          `/api/account/project/definition/ai-intake/answers/${projectUuid}/${projectServiceUuid}`
+        ),
         {
           method: 'POST',
           headers: {

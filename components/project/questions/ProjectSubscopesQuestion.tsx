@@ -1,7 +1,5 @@
 'use client'
 
-import { requireProjectServiceUuid, activeServiceResponse } from '../projectServicesState'
-
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { IconCheck, IconPaperclip, IconPlusFilled, IconXboxXFilled } from '@tabler/icons-react'
@@ -14,7 +12,15 @@ import { readStoredProjectRequestUuid } from '@/components/project/projectReques
 import { getApiUrl } from '@/app/config'
 import { getAuthToken } from '@/lib/authToken'
 import { writeProjectScopeSnapshot } from '@/components/project/projectAddonsState'
-import { expandServiceComponentSlugs } from '@/components/project/projectWizardFlow'
+import {
+  fetchProjectLevelComponentSlugs,
+  fetchProjectServiceComponentSlugs,
+  storeComponentSlugs,
+} from '@/components/project/projectComponentsCatalog'
+import {
+  ensureProjectServiceUuid,
+  pickProjectServiceFromProject,
+} from '@/components/project/projectServiceUuid'
 import { useProjectStepErrorToast } from '@/components/project/useProjectStepErrorToast'
 import { useProjectWizardNavigation } from '@/components/project/useProjectWizardNavigation'
 import { BACKEND_STRING_MAX } from '@/components/project/backendLimits'
@@ -252,46 +258,11 @@ function persistAiSuggestedScopes(locale: WizardLocale, scopes: ScopeParent[]) {
   }
 }
 
-async function fetchServiceComponents(params: {
-  locale: WizardLocale
-  token: string
-  serviceId: number
-  isOther: boolean
-  projectUuid: string
-}): Promise<string[]> {
-  const url =
-    params.isOther && params.projectUuid
-      ? getApiUrl(
-          `/api/account/project/definition/service-prompt/component/${params.projectUuid}/${requireProjectServiceUuid(params.locale)}`
-        )
-      : getApiUrl(`/api/common/setting/service/component/${params.serviceId}`)
-
-  const res = await fetch(
-    url,
-    {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${params.token}`,
-        Accept: 'application/json',
-        'Accept-Language': params.locale === 'ar' ? 'ar' : 'en',
-        'X-Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
-      },
-      cache: 'no-store',
-    }
-  )
-  await assertProjectApiResponse(res, 'Failed to load service components.')
-  const json = (await res.json()) as {
-    data?: Array<{ id?: number; name?: string; slug?: string }>
-  }
-  return (json.data || [])
-    .map((item) => item.slug || item.name)
-    .filter((slug): slug is string => Boolean(slug && slug.trim()))
-}
-
 async function syncScopes(params: {
   locale: WizardLocale
   token: string
   projectUuid: string
+  projectServiceUuid: string
   scopes: Array<{ name: string; subscopes: Array<{ name: string; files?: File[] }> }>
 }) {
   const formData = new FormData()
@@ -307,7 +278,9 @@ async function syncScopes(params: {
   })
 
   const res = await fetch(
-    getApiUrl(`/api/account/project/definition/scope/sync/${params.projectUuid}/${requireProjectServiceUuid(params.locale)}`),
+    getApiUrl(
+      `/api/account/project/definition/scope/sync/${params.projectUuid}/${params.projectServiceUuid}`
+    ),
     {
       method: 'POST',
       headers: {
@@ -605,10 +578,12 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
           }
         }
 
+        const projectServiceUuid =
+          isOther && projectUuid ? await ensureProjectServiceUuid(locale) : ''
         const url = isOther
           ? projectUuid
             ? getApiUrl(
-                `/api/account/project/definition/ai-intake/check-clarification/${projectUuid}/${requireProjectServiceUuid(locale)}`
+                `/api/account/project/definition/ai-intake/check-clarification/${projectUuid}/${projectServiceUuid}`
               )
             : null
           : getApiUrl(`/api/common/setting/service/scope/${serviceId}`)
@@ -654,7 +629,9 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
           )
 
           const showJson = (await showRes.json()) as unknown
-          list = extractSuggestedScopesFromProjectRequest(activeServiceResponse(showJson, locale))
+          list = extractSuggestedScopesFromProjectRequest(
+            pickProjectServiceFromProject(showJson, projectServiceUuid) ?? {}
+          )
         }
 
         if (!cancelled) {
@@ -1056,7 +1033,8 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
 
     setSubmitting(true)
     try {
-      await syncScopes({ locale, token, projectUuid, scopes: scopePayload })
+      const projectServiceUuid = await ensureProjectServiceUuid(locale)
+      await syncScopes({ locale, token, projectUuid, projectServiceUuid, scopes: scopePayload })
 
       writeProjectScopeSnapshot(
         locale,
@@ -1066,23 +1044,18 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
         }))
       )
 
-      const slugs = expandServiceComponentSlugs(
-        await fetchServiceComponents({
+      const [projectServiceSlugs, projectSlugs] = await Promise.all([
+        fetchProjectServiceComponentSlugs({
           locale,
           token,
           serviceId,
           isOther: readServiceIsOther(locale),
           projectUuid,
-        })
-      )
-      try {
-        window.sessionStorage.setItem(
-          projectWizardStorage.serviceComponentSlugsKey(locale),
-          JSON.stringify(slugs)
-        )
-      } catch {
-        // ignore
-      }
+          projectServiceUuid,
+        }),
+        fetchProjectLevelComponentSlugs({ locale, token, projectUuid }),
+      ])
+      storeComponentSlugs(locale, { projectServiceSlugs, projectSlugs })
 
       nav.goNext()
     } catch (err) {

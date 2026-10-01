@@ -15,6 +15,7 @@ import InlineDateCalendar from './InlineDateCalendar'
 import ProjectSelectedTypeHeader from '../ProjectSelectedTypeHeader'
 import { useProjectWizardNavigation } from '../useProjectWizardNavigation'
 import { projectWizardStorage, type WizardLocale } from '../wizardStorage'
+import { addDaysToIsoDate, readProjectSchedule } from '../projectSchedule'
 
 function todayString(): string {
   const d = new Date()
@@ -114,10 +115,9 @@ export default function DeadlineOfferQuestion({
         projectWizardStorage.projectTypeKey(locale)
       )
       setProjectType(storedProjectType)
-      const start =
-        window.sessionStorage.getItem(projectWizardStorage.plannedStartDateKey(locale)) || ''
-      const end =
-        window.sessionStorage.getItem(projectWizardStorage.deadlineKey(locale)) || ''
+      const schedule = readProjectSchedule(locale)
+      const start = schedule?.plannedStartDate || ''
+      const end = schedule ? addDaysToIsoDate(schedule.plannedStartDate, schedule.durationDays) : ''
       setProjectStart(start)
       setProjectEnd(end)
 

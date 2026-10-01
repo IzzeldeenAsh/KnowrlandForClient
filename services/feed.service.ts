@@ -27,6 +27,17 @@ export interface FeedTag {
   name: string
 }
 
+// Optimized WebP renditions the backend generates from an uploaded image.
+// Keys are usually small/medium/large, but smaller originals get fewer
+// variants and the names do not imply fixed widths — use `width`.
+export interface FeedImageVariant {
+  url: string
+  width: number
+  height: number
+  size: number
+  mime_type: string
+}
+
 export interface FeedItemMedia {
   id: number
   provider: string | null
@@ -48,6 +59,9 @@ export interface FeedItemMedia {
   thumbnail_path: string | null
   thumbnail_url: string | null
   metadata: Record<string, unknown> | unknown[] | null
+  // Images: absent while provider_processing_status is pending/processing;
+  // `url` always remains the original and is the fallback.
+  variants?: Record<string, FeedImageVariant> | null
   sort_order: number
 }
 

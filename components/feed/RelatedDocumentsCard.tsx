@@ -2,6 +2,7 @@
 
 import DocumentsListCard from './DocumentsListCard'
 import { useFeedSearchInsights } from './FeedSearchInsightsContext'
+import { getInsightsSearchHref } from './FeedSearchScopeToggle'
 
 const VISIBLE_DOCUMENTS = 3
 
@@ -11,7 +12,7 @@ type RelatedDocumentsCardProps = {
   className?: string
 }
 
-export default function RelatedDocumentsCard({ locale, className }: RelatedDocumentsCardProps) {
+export default function RelatedDocumentsCard({ locale, keyword, className }: RelatedDocumentsCardProps) {
   const isRTL = locale === 'ar'
   const { insights, isLoading } = useFeedSearchInsights()
   const copy = isRTL
@@ -40,7 +41,8 @@ export default function RelatedDocumentsCard({ locale, className }: RelatedDocum
         viewAllDescription: 'Advanced documents search',
       }
 
-  const viewAllHref = `/${locale}/home`
+  // Continue the same keyword in the advanced documents search.
+  const viewAllHref = getInsightsSearchHref(locale, keyword)
   const documents = insights.slice(0, VISIBLE_DOCUMENTS).map((insight) => ({
     id: `${insight.type}-${insight.searchable_id}`,
     href: insight.url.startsWith('/') ? `/${locale}${insight.url}` : insight.url,

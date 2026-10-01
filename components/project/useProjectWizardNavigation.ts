@@ -1,6 +1,4 @@
 'use client'
-import { readProjectServices } from './projectServicesState'
-import { isSpecifiedInsighterProject } from './specifiedInsighterProject'
 
 import { useEffect, useMemo, useState } from 'react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
@@ -9,10 +7,9 @@ import {
   type WizardLocale,
 } from './wizardStorage'
 import {
-  getNextProjectWizardStepId,
   getProjectWizardStepOrder,
+  isServiceFlowActive,
   normalizeProjectWizardStepId,
-  passThroughStepIds,
   projectWizardStepIds,
 } from './projectWizardFlow'
 
@@ -41,13 +38,7 @@ export function useProjectWizardNavigation(locale: WizardLocale) {
 
   const index = useMemo(() => stepOrder.indexOf(currentStep), [currentStep, stepOrder])
 
-  const prevStepId =
-    index > 0
-      ? stepOrder
-          .slice(0, index)
-          .reverse()
-          .find((step) => !passThroughStepIds.has(step)) || null
-      : null
+  const prevStepId = index > 0 ? stepOrder[index - 1] : null
   const nextStepId =
     index >= 0 && index < stepOrder.length - 1 ? stepOrder[index + 1] : null
 
@@ -68,13 +59,14 @@ export function useProjectWizardNavigation(locale: WizardLocale) {
 
   const editHrefFor = (stepId: string) => withReviewReturn(baseHrefFor(stepId))
 
-  const backHref = currentStep === 'service' && isSpecifiedInsighterProject(locale) && readProjectServices(locale).length > 0
-    ? baseHrefFor('services-summary')
-    : isReviewEditMode
+  const inServiceFlow = isServiceFlowActive(locale)
+  const backHref = isReviewEditMode
     ? reviewHref
     : prevStepId
       ? hrefFor(prevStepId)
-      : `/${locale}/project`
+      : inServiceFlow
+        ? reviewHref
+        : `/${locale}/project`
   const nextHref = isReviewEditMode
     ? reviewHref
     : nextStepId
@@ -94,10 +86,15 @@ export function useProjectWizardNavigation(locale: WizardLocale) {
       return
     }
 
-    const freshNextStepId = getNextProjectWizardStepId(locale, currentStep)
+    const freshStepOrder = getProjectWizardStepOrder(locale)
+    const freshIndex = freshStepOrder.indexOf(currentStep)
+    const freshNextStepId =
+      freshIndex >= 0 && freshIndex < freshStepOrder.length - 1
+        ? freshStepOrder[freshIndex + 1]
+        : null
 
     if (!freshNextStepId) return
-    setStepOrder(getProjectWizardStepOrder(locale))
+    setStepOrder(freshStepOrder)
     router.push(hrefFor(freshNextStepId))
   }
 

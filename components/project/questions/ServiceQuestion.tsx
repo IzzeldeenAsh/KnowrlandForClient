@@ -1,12 +1,7 @@
 'use client'
-import { activeProjectServiceUuid, beginProjectService, forgetProjectService, readProjectServices, registerProjectService, selectProjectService } from '../projectServicesState'
-import { clearStoredProjectRequestUuid, readStoredProjectRequestUuid } from '../projectRequestUuid'
-import { definitionRequest } from '../projectDefinitionApi'
-
 
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { serviceMetaForSlug, type ServiceMeta } from '../serviceMeta'
 import {
   IconArrowUp,
   IconCheck,
@@ -14,6 +9,7 @@ import {
 } from '@tabler/icons-react'
 import ProjectSelectedTypeHeader from '../ProjectSelectedTypeHeader'
 import {
+  clearStoredProjectRequestUuid,
   extractProjectRequestUuid,
   writeStoredProjectRequestUuid,
 } from '../projectRequestUuid'
@@ -22,7 +18,14 @@ import {
   extractProjectProposalMatchUuid,
   writeStoredProposalMatchUuid,
 } from '../projectProposalMatchUuid'
+import {
+  clearStoredProjectServiceUuid,
+  extractProjectServiceUuid,
+  writeStoredProjectServiceUuid,
+} from '../projectServiceUuid'
+import { writePrimaryProjectServiceUuid } from '../projectServiceSessions'
 import { readStoredSpecifiedInsighterUuid } from '../specifiedInsighterProject'
+import { serviceMetaForSlug, type ServiceMeta } from '../serviceMeta'
 import { projectWizardStorage, type WizardLocale } from '../wizardStorage'
 import { getApiUrl } from '@/app/config'
 import { getAuthToken } from '@/lib/authToken'
@@ -247,13 +250,7 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
             // The Insighter's eligible services remain usable without the optional "Other" choice.
           }
         }
-        if (!cancelled) {
-          const active = activeProjectServiceUuid(locale)
-          const selected = readProjectServices(locale)
-          // DEBUG: temporarily keep "Other" selectable even if already used, so the
-          // backend's unique(project_id, service_id) rejection surfaces in the UI.
-          setServices(availableServices.filter(service => isOtherService(service) || !selected.some(s => s.serviceId === service.id && s.uuid !== active)))
-        }
+        if (!cancelled) setServices(availableServices)
       } catch (err) {
         if (!cancelled) {
           setError(
@@ -295,7 +292,7 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
 
   const isOtherSelected = isOtherService(selectedService)
 
-  const canContinue = selectedService != null
+  const canContinue = selectedId != null && services != null
 
   const toApiLanguage = (value: string | null) => {
     const v = (value || '').toLowerCase()
@@ -346,7 +343,9 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
 
   const resetDownstreamWizardState = (preservePrompt: boolean) => {
     try {
-      // Service selection must not discard the existing project.
+      clearStoredProjectRequestUuid(locale)
+      clearStoredProjectServiceUuid(locale)
+      clearStoredProposalMatchUuid(locale)
       window.sessionStorage.removeItem(projectWizardStorage.projectScopeSnapshotKey(locale))
       window.sessionStorage.removeItem(projectWizardStorage.selectedMatchIdsKey(locale))
 
@@ -360,6 +359,10 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
       )
       window.sessionStorage.setItem(
         projectWizardStorage.serviceComponentSlugsKey(locale),
+        JSON.stringify([])
+      )
+      window.sessionStorage.setItem(
+        projectWizardStorage.projectComponentSlugsKey(locale),
         JSON.stringify([])
       )
       window.sessionStorage.setItem(
@@ -384,57 +387,13 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
     }
   }
 
-  const activeService = () =>
-    readProjectServices(locale).find((s) => s.uuid === activeProjectServiceUuid(locale))
-
-  const readActivePrompt = () => {
-    try {
-      return (window.sessionStorage.getItem(projectWizardStorage.servicePromptKey(locale)) || '').trim()
-    } catch {
-      return ''
-    }
-  }
-
   const submitSelection = async (payload: {
     serviceId: number
     isOtherSelected: boolean
     servicePrompt: string
     serviceLabel: string | null
-    serviceSlug?: string
   }) => {
     setError(null)
-    const existing = activeService()
-    // Service being swapped out on the server once its replacement exists (specified projects only).
-    let replacedServiceUuid = ''
-    if (existing) {
-      const unchanged =
-        existing.serviceId === payload.serviceId &&
-        (!payload.isOtherSelected || readActivePrompt() === payload.servicePrompt.trim())
-      if (unchanged) {
-        nav.goNext()
-        return
-      }
-
-      if (readStoredSpecifiedInsighterUuid(locale)) {
-        // The backend rejects a second copy of the same service, so an "Other" prompt cannot be swapped in place.
-        if (existing.serviceId === payload.serviceId) {
-          setError(
-            isRTL
-              ? 'لا يمكن تعديل وصف الخدمة المخصصة بعد إنشائها. تابع بها أو اختر خدمة أخرى.'
-              : "A custom service's description can't be changed once it's created. Continue with it or pick a different service."
-          )
-          return
-        }
-        replacedServiceUuid = existing.uuid
-      } else {
-        // A general project holds one service and the backend cannot swap it,
-        // so changing the service starts a fresh draft project.
-        forgetProjectService(locale, existing.uuid)
-        clearStoredProjectRequestUuid(locale)
-        clearStoredProposalMatchUuid(locale)
-      }
-      beginProjectService(locale)
-    }
 
     persistSelection(
       payload.serviceId,
@@ -467,10 +426,7 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
         )
       )
       const specifiedInsighterUuid = readStoredSpecifiedInsighterUuid(locale)
-      const existingProjectUuid = readStoredProjectRequestUuid(locale)
-      const initiatePath = existingProjectUuid
-        ? `/api/account/project/definition/service/${existingProjectUuid}`
-        : specifiedInsighterUuid
+      const initiatePath = specifiedInsighterUuid
         ? `/api/account/project/definition/initiate-specific/${encodeURIComponent(
             specifiedInsighterUuid
           )}`
@@ -494,24 +450,20 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
       await assertProjectApiResponse(initRes, 'Failed to create the project.')
 
       const initJson = (await initRes.json()) as unknown
-      const projectUuid = existingProjectUuid || extractProjectRequestUuid(initJson)
+      const projectUuid = extractProjectRequestUuid(initJson)
       if (!projectUuid) throw new Error('init_bad_response')
 
+      const projectServiceUuid = extractProjectServiceUuid(initJson)
+      if (!projectServiceUuid) throw new Error('init_bad_response')
+
       writeStoredProjectRequestUuid(locale, projectUuid)
-      const data = (initJson as {data: {uuid?: string; project_services?: Array<{uuid: string; service: {id: number}}>}}).data
-      const serviceUuid = existingProjectUuid ? data.uuid : data.project_services?.find(s => s.service.id === payload.serviceId)?.uuid
-      if (!serviceUuid) throw new Error('The server did not return a project service identifier.')
-      registerProjectService(locale, { uuid: serviceUuid, serviceId: payload.serviceId, label: payload.serviceLabel || (isRTL ? 'خدمة مخصصة' : 'Custom service'), slug: payload.serviceSlug, isOther: payload.isOtherSelected, complete: false })
-      if (replacedServiceUuid) {
-        await definitionRequest(locale, `service/${projectUuid}/${replacedServiceUuid}`, 'DELETE')
-        forgetProjectService(locale, replacedServiceUuid)
-        replacedServiceUuid = ''
-      }
-      if (specifiedInsighterUuid && !existingProjectUuid) {
+      writeStoredProjectServiceUuid(locale, projectServiceUuid)
+      writePrimaryProjectServiceUuid(locale, projectServiceUuid)
+      if (specifiedInsighterUuid) {
         const proposalMatchUuid = extractProjectProposalMatchUuid(initJson)
         if (!proposalMatchUuid) throw new Error('init_bad_response')
         writeStoredProposalMatchUuid(locale, proposalMatchUuid)
-      } else if (!specifiedInsighterUuid) {
+      } else {
         clearStoredProposalMatchUuid(locale)
       }
       try {
@@ -526,6 +478,10 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
       try {
         window.sessionStorage.setItem(
           projectWizardStorage.serviceComponentSlugsKey(locale),
+          JSON.stringify([])
+        )
+        window.sessionStorage.setItem(
+          projectWizardStorage.projectComponentSlugsKey(locale),
           JSON.stringify([])
         )
         window.sessionStorage.setItem(
@@ -553,9 +509,6 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
 
       nav.goNext()
     } catch (err) {
-      // The replacement was never created, so the previous service stays active.
-      if (replacedServiceUuid && !activeProjectServiceUuid(locale))
-        selectProjectService(locale, replacedServiceUuid)
       setError(
         getProjectApiErrorMessage(
           err,
@@ -571,7 +524,7 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
     if (!canContinue || selectedId == null || submitting) return
 
     if (isOtherSelected) {
-      await onSendAiPrompt()
+      nav.goNext()
       return
     }
 
@@ -580,18 +533,12 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
       isOtherSelected,
       servicePrompt,
       serviceLabel: selectedService?.name || null,
-      serviceSlug: selectedService?.slug,
     })
   }
 
   const onSelect = (service: Service) => {
     if (submitting) return
-    const existing = activeService()
-    if (existing && service.id === existing.serviceId && !existing.isOther) {
-      nav.goNext()
-      return
-    }
-    if (service.id === selectedId && !existing) return
+    if (service.id === selectedId) return
 
     setError(null)
     setSelectedId(service.id)
@@ -599,23 +546,24 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
     const nextIsOtherSelected = isOtherService(service)
     const nextPrompt = nextIsOtherSelected ? servicePrompt : ''
     if (!nextIsOtherSelected) setServicePrompt('')
-    // Keep an existing service's stored answers intact until the replacement is saved.
-    if (!existing)
-      persistSelection(
-        service.id,
-        nextIsOtherSelected,
-        nextPrompt,
-        nextIsOtherSelected ? null : service.name
-      )
+    persistSelection(
+      service.id,
+      nextIsOtherSelected,
+      nextPrompt,
+      nextIsOtherSelected ? null : service.name
+    )
 
-    if (nextIsOtherSelected) return
+    if (nextIsOtherSelected) {
+      resetDownstreamWizardState(true)
+      nav.goNext()
+      return
+    }
 
     void submitSelection({
       serviceId: service.id,
       isOtherSelected: false,
       servicePrompt: '',
       serviceLabel: service.name,
-      serviceSlug: service.slug,
     })
   }
 
@@ -644,19 +592,13 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
     const otherServiceId = otherService.id
     setSelectedId(otherServiceId)
     setError(null)
-    const existing = activeService()
-    if (existing?.isOther && readActivePrompt() === prompt) {
-      nav.goNext()
-      return
-    }
-    if (!existing) resetDownstreamWizardState(true)
+    resetDownstreamWizardState(true)
 
     await submitSelection({
       serviceId: otherServiceId,
       isOtherSelected: true,
       servicePrompt: prompt,
       serviceLabel: null,
-      serviceSlug: otherService.slug,
     })
   }
 
@@ -768,7 +710,7 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
               </div>
             ) : null}
 
-            {otherService && !activeProjectServiceUuid(locale) && <div className="mt-6">
+            <div className="mt-6">
               <AiScopePromptComposer
                 isRTL={isRTL}
                 value={servicePrompt}
@@ -779,7 +721,7 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
                 }}
                 onSend={onSendAiPrompt}
               />
-            </div>}
+            </div>
           </>
         )}
       </div>
