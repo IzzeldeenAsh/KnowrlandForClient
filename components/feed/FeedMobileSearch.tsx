@@ -47,14 +47,12 @@ export default function FeedMobileSearch({ locale }: { locale: string }) {
     router.push(keyword ? `/${locale}?keyword=${encodeURIComponent(keyword)}` : `/${locale}`)
   }
 
-  // With a query typed, "By Insights" searches Insights right away; on an empty
-  // field it only switches where the next search goes.
+  // Enabling with a query opens Insights; disabling returns to feed search.
   const handleSearchInsightsChange = (active: boolean) => {
-    if (query.trim()) {
-      router.push(getInsightsSearchHref(locale, query))
-      return
-    }
     setSearchInsights(active)
+    if (active && query.trim()) {
+      router.push(getInsightsSearchHref(locale, query))
+    }
   }
 
   const clearSearch = () => {

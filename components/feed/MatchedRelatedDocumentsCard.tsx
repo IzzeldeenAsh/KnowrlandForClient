@@ -2,6 +2,7 @@
 
 import type { FeedItemRelatedInsight } from '@/services/feed.service'
 import DocumentsListCard from './DocumentsListCard'
+import { getInsightsSearchHref } from './FeedSearchScopeToggle'
 
 type MatchedRelatedDocumentsCardProps = {
   locale: string
@@ -49,7 +50,7 @@ export default function MatchedRelatedDocumentsCard({
       isLoading={false}
       emptyText={copy.empty}
       openInNewTabLabel={copy.openInNewTab}
-      viewAllHref={`/${locale}/home`}
+      viewAllHref={getInsightsSearchHref(locale, '')}
       viewAllLabel={copy.viewAll}
       viewAllDescription={copy.viewAllDescription}
       className={className}
