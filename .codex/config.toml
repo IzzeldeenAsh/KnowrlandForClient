@@ -1,0 +1,6 @@
+[mcp_servers.e2e]
+command = "npm"
+args = ["run", "--silent", "test:e2e:mcp"]
+env = { E2E_TELEMETRY_DISABLED = "1" }
+startup_timeout_sec = 30
+tool_timeout_sec = 240

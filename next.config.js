@@ -4,6 +4,8 @@ const withNextIntl = createNextIntlPlugin();
 
 const nextConfig = {
   distDir: process.env.NEXT_DIST_DIR || '.next',
+  // The development badge otherwise covers the wizard's Back button on phones.
+  ...(process.env.NEXT_DIST_DIR === '.next-e2e' ? { devIndicators: false } : {}),
   eslint: {
     // Local env has an old ESLint install; don't block production builds on it.
     // Run `npm run lint` separately once ESLint is upgraded.
