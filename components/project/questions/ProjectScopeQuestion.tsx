@@ -24,6 +24,7 @@ import { isServiceFlowActive, projectWizardStepIds } from '@/components/project/
 import { BACKEND_STRING_MAX } from '@/components/project/backendLimits'
 import { getApiUrl } from '@/app/config'
 import { getAuthToken } from '@/lib/authToken'
+import { resetServiceComponentsPayload } from '@/components/project/serviceComponentsPayload'
 import { projectWizardStorage, type WizardLocale } from '@/components/project/wizardStorage'
 
 type ScopeChild = { id: number; name: string }
@@ -989,7 +990,7 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
   }
 
   const returnToDefinedServices = () => {
-    // While adding a service from the review, keep the project; the service can be removed there.
+    // While adding a service, keep the project; the service can be removed from the services list.
     if (isServiceFlowActive(locale)) {
       nav.goBack()
       return
@@ -1018,10 +1019,7 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
         projectWizardStorage.projectComponentSlugsKey(locale),
         JSON.stringify([])
       )
-      window.sessionStorage.setItem(
-        projectWizardStorage.serviceComponentsPayloadKey(locale),
-        JSON.stringify({ components: {} })
-      )
+      resetServiceComponentsPayload(locale)
     } catch {
       // ignore
     }

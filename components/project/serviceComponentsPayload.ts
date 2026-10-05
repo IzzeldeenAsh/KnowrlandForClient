@@ -1,3 +1,4 @@
+import { isPreServiceProjectComponentSlug } from './projectWizardFlow'
 import { projectWizardStorage, type WizardLocale } from './wizardStorage'
 
 export type ServiceComponentsPayload = {
@@ -35,6 +36,16 @@ export function writeServiceComponentsPayload(
   } catch {
     // ignore
   }
+}
+
+/** Clears the service's component answers, keeping the ones asked before the service step. */
+export function resetServiceComponentsPayload(locale: WizardLocale) {
+  const { components } = readServiceComponentsPayload(locale)
+  writeServiceComponentsPayload(locale, {
+    components: Object.fromEntries(
+      Object.entries(components || {}).filter(([slug]) => isPreServiceProjectComponentSlug(slug))
+    ),
+  })
 }
 
 export function updateServiceComponentPayload(

@@ -9,8 +9,6 @@ import {
   updateServiceComponentPayload,
 } from '@/components/project/serviceComponentsPayload'
 import { syncProjectProperties } from '@/components/project/projectPropertiesSync'
-import { isLeavingComponentSteps } from '@/components/project/projectWizardFlow'
-import { syncServiceComponents } from '@/components/project/serviceComponentsSync'
 import { useProjectStepErrorToast } from '@/components/project/useProjectStepErrorToast'
 import { useProjectWizardNavigation } from '@/components/project/useProjectWizardNavigation'
 import { projectWizardStorage, type WizardLocale } from '@/components/project/wizardStorage'
@@ -99,11 +97,9 @@ export default function DataSourcesExpectedQuestion({
     setError(null)
     try {
       updateServiceComponentPayload(locale, 'data-sources-expected', value)
-      if (isLeavingComponentSteps(locale, nav.nextStepId, nav.isReviewEditMode)) {
-        await syncServiceComponents(locale)
-        // Project-level component: in review edit mode the description step won't run again.
-        if (nav.isReviewEditMode) await syncProjectProperties(locale)
-      }
+      // Project-level component, asked before the project exists: the description
+      // step's properties sync sends it. In review edit mode that step won't run again.
+      if (nav.isReviewEditMode) await syncProjectProperties(locale)
       nav.goNext()
     } catch (err) {
       setError(

@@ -2,6 +2,7 @@ import { getApiUrl } from '@/app/config'
 import { getAuthToken } from '@/lib/authToken'
 import { assertProjectApiResponse } from './projectApiError'
 import { readProjectComponentSlugs } from './projectComponentsCatalog'
+import { isPreServiceProjectComponentSlug } from './projectWizardFlow'
 import { readStoredProjectRequestUuid } from './projectRequestUuid'
 import { ensureProjectServiceUuid } from './projectServiceUuid'
 import { type WizardLocale } from './wizardStorage'
@@ -22,7 +23,9 @@ function readProjectServiceComponents(locale: WizardLocale): Record<string, unkn
   const { components } = readServiceComponentsPayload(locale)
 
   return Object.fromEntries(
-    Object.entries(components || {}).filter(([slug]) => !projectSlugs.has(slug))
+    Object.entries(components || {}).filter(
+      ([slug]) => !projectSlugs.has(slug) && !isPreServiceProjectComponentSlug(slug)
+    )
   )
 }
 

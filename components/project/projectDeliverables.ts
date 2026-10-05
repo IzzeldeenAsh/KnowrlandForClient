@@ -53,13 +53,14 @@ export function defaultDeliverableTitle(locale: WizardLocale, index: number): st
   return `Deliverable ${index + 1}`
 }
 
+/** New deliverables start unnamed — the client names each one. */
 export function createDeliverable(
-  locale: WizardLocale,
-  index: number,
+  _locale: WizardLocale,
+  _index: number,
   periodDays: number
 ): ProjectDeliverable {
   return {
-    title: defaultDeliverableTitle(locale, index),
+    title: '',
     period_days: periodDays,
     report_type: ['pdf'],
     way: { selected: 'on_platform', address: null },
@@ -70,11 +71,7 @@ export function defaultDeliverables(
   locale: WizardLocale,
   projectType: string | null
 ): ProjectDeliverable[] {
-  if (isUrgentProjectType(projectType)) {
-    return [createDeliverable(locale, 1, 1)]
-  }
-
-  return [createDeliverable(locale, 0, 14), createDeliverable(locale, 1, 30)]
+  return [createDeliverable(locale, 0, isUrgentProjectType(projectType) ? 1 : 30)]
 }
 
 function normalizeDeliverable(value: unknown, locale: WizardLocale, index: number) {
@@ -159,8 +156,8 @@ export function latestDeliverableDay(deliverables: ProjectDeliverable[]): number
 export function deliverableWayLabel(locale: WizardLocale, way: string): string {
   const labels: Record<string, { en: string; ar: string }> = {
     on_platform: { en: 'On platform', ar: 'على المنصة' },
-    session: { en: 'Session', ar: 'جلسة' },
-    physical_workshop: { en: 'Physical workshop', ar: 'ورشة حضورية' },
+    session: { en: 'Online session', ar: 'جلسة أونلاين' },
+    physical_workshop: { en: 'In-person workshop', ar: 'ورشة حضورية' },
   }
   const label = labels[way]
   if (!label) return way
@@ -176,7 +173,7 @@ export function dayLabel(locale: WizardLocale, days: number): string {
   }
 
   if (days === 0) return 'Start day'
-  return `Day ${days}`
+  return days === 1 ? '1 Day' : `${days} Days`
 }
 
 export function durationLabel(locale: WizardLocale, days: number): string {
@@ -187,5 +184,5 @@ export function durationLabel(locale: WizardLocale, days: number): string {
     return days <= 10 ? `${days} أيام` : `${days} يومًا`
   }
 
-  return days === 1 ? '1 day' : `${days} days`
+  return days === 1 ? '1 Day' : `${days} Days`
 }

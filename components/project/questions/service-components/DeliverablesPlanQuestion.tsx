@@ -1,18 +1,37 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { IconMinus, IconPlus, IconTrash } from "@tabler/icons-react";
+import {
+  Listbox,
+  ListboxButton,
+  ListboxOption,
+  ListboxOptions,
+  Popover,
+  PopoverButton,
+  PopoverPanel,
+} from "@headlessui/react";
+import {
+  IconCalendarEvent,
+  IconCheck,
+  IconChevronDown,
+  IconCloudUpload,
+  IconDeviceDesktopUp,
+  IconMapPin,
+  IconMinus,
+  IconPlus,
+  IconTrash,
+} from "@tabler/icons-react";
 import ProjectSelectedTypeHeader from "@/components/project/ProjectSelectedTypeHeader";
 import { getProjectApiErrorMessage } from "@/components/project/projectApiError";
 import {
   MAX_DELIVERABLES,
   createDeliverable,
   dayLabel,
-  durationLabel,
   latestDeliverableDay,
   readDeliverables,
   writeDeliverables,
+  type DeliverableWay,
   type ProjectDeliverable,
 } from "@/components/project/projectDeliverables";
 import {
@@ -31,15 +50,77 @@ import {
   projectWizardStorage,
   type WizardLocale,
 } from "@/components/project/wizardStorage";
-import TimelineSlider from "../TimelineSlider";
+import {
+  getReportTypeOptions,
+  type ReportTypeOption,
+} from "./deliverableReportTypes";
 
-const MIN_RANGE_DAYS = 60;
-const RANGE_HEADROOM_DAYS = 14;
+const DEFAULT_DAY = 30;
 
-function rangeFor(deliverables: ProjectDeliverable[], urgent: boolean) {
-  if (urgent) return URGENT_MAX_DURATION_DAYS;
-  const needed = latestDeliverableDay(deliverables) + RANGE_HEADROOM_DAYS;
-  return Math.max(MIN_RANGE_DAYS, Math.ceil(needed / 15) * 15);
+const WAY_OPTIONS: Array<{
+  value: DeliverableWay;
+  Icon: typeof IconCloudUpload;
+  iconClass: string;
+  label: { en: string; ar: string };
+}> = [
+  {
+    value: "on_platform",
+    Icon: IconCloudUpload,
+    iconClass: "text-sky-600",
+    label: { en: "On platform", ar: "على المنصة" },
+  },
+  {
+    value: "session",
+    Icon: IconDeviceDesktopUp,
+    iconClass: "text-violet-600",
+    label: { en: "Online session", ar: "جلسة أونلاين" },
+  },
+  {
+    value: "physical_workshop",
+    Icon: IconMapPin,
+    iconClass: "text-amber-600",
+    label: { en: "In-person workshop", ar: "ورشة حضورية" },
+  },
+];
+
+const PILL_CLASS =
+  "inline-flex h-9 items-center gap-2 rounded-full border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-800 transition-colors hover:border-slate-300 hover:bg-slate-50 focus:outline-none data-[focus]:ring-2 data-[focus]:ring-blue-200 data-[open]:border-blue-300 data-[open]:bg-blue-50/60";
+
+const PANEL_CLASS =
+  "z-50 rounded-[12px] border border-slate-200 bg-white p-2 shadow-lg [--anchor-gap:6px] focus:outline-none";
+
+function isDeliverableComplete(item: ProjectDeliverable) {
+  if (!item.title.trim()) return false;
+  if (item.report_type.length === 0) return false;
+  if (item.way.selected === "physical_workshop")
+    return Boolean(item.way.address?.trim());
+  return true;
+}
+
+function FormatIcons({
+  types,
+  options,
+}: {
+  types: string[];
+  options: ReportTypeOption[];
+}) {
+  const icons = types
+    .map((type) => options.find((option) => option.value === type)?.iconSrc)
+    .filter((src): src is string => Boolean(src))
+    .slice(0, 3);
+
+  return (
+    <span className="flex items-center -space-x-1.5 rtl:space-x-reverse">
+      {icons.map((src) => (
+        <img
+          key={src}
+          src={src}
+          alt=""
+          className="h-5 w-5 rounded-[4px] bg-white object-contain ring-2 ring-white"
+        />
+      ))}
+    </span>
+  );
 }
 
 export default function DeliverablesPlanQuestion({
@@ -51,13 +132,19 @@ export default function DeliverablesPlanQuestion({
   const isEnglish =
     typeof locale === "string" && locale.toLowerCase().startsWith("en");
   const nav = useProjectWizardNavigation(locale);
+  const reportTypeOptions = useMemo(
+    () => getReportTypeOptions(locale),
+    [locale],
+  );
 
   const [entered, setEntered] = useState(false);
   const [projectType, setProjectType] = useState<string | null>(null);
   const [deliverables, setDeliverables] = useState<ProjectDeliverable[]>([]);
-  const [rangeMax, setRangeMax] = useState(MIN_RANGE_DAYS);
+  // Only a freshly added deliverable grabs focus.
+  const [focusIndex, setFocusIndex] = useState<number | null>(null);
   // The schedule step comes first, so deliverables fit inside the planned duration.
   const [schedule, setSchedule] = useState<ProjectSchedule | null>(null);
+  const [attempted, setAttempted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -79,7 +166,11 @@ export default function DeliverablesPlanQuestion({
     }
     const urgent = isUrgentProjectType(storedProjectType);
     const storedSchedule = urgent ? null : readProjectSchedule(locale);
-    const limit = storedSchedule ? storedSchedule.durationDays : null;
+    const limit = urgent
+      ? URGENT_MAX_DURATION_DAYS
+      : storedSchedule
+        ? storedSchedule.durationDays
+        : null;
     const initial = readDeliverables(locale, storedProjectType).map((item) =>
       limit === null
         ? item
@@ -88,7 +179,6 @@ export default function DeliverablesPlanQuestion({
     setProjectType(storedProjectType);
     setSchedule(storedSchedule);
     setDeliverables(initial);
-    setRangeMax(limit !== null ? limit : rangeFor(initial, urgent));
   }, [locale]);
 
   const isUrgent = isUrgentProjectType(projectType);
@@ -105,12 +195,29 @@ export default function DeliverablesPlanQuestion({
       ? formatIsoDate(
           addDaysToIsoDate(schedule.plannedStartDate, days),
           locale,
-          {
-            month: "short",
-            day: "numeric",
-          },
+          { month: "short", day: "numeric" },
         )
       : "";
+
+  const quickDays = useMemo(() => {
+    if (isUrgent) return [0, 1];
+    const presets = [7, 14, 30, 60].filter((day) => day < maxDay);
+    return schedule ? [...presets, schedule.durationDays] : presets;
+  }, [isUrgent, maxDay, schedule]);
+
+  const quickDayLabel = (day: number) => {
+    if (schedule && day === schedule.durationDays) {
+      return isRTL ? "نهاية المشروع" : "At the end";
+    }
+    if (isUrgent) return dayLabel(locale, day);
+    const labels: Record<number, { en: string; ar: string }> = {
+      7: { en: "1 week", ar: "أسبوع" },
+      14: { en: "2 weeks", ar: "أسبوعان" },
+      30: { en: "1 month", ar: "شهر" },
+      60: { en: "2 months", ar: "شهران" },
+    };
+    return isRTL ? labels[day].ar : labels[day].en;
+  };
 
   const update = (index: number, patch: Partial<ProjectDeliverable>) => {
     setDeliverables((prev) =>
@@ -118,50 +225,54 @@ export default function DeliverablesPlanQuestion({
     );
   };
 
-  // The range only grows outside a drag, so the handle never jumps under the pointer.
-  const setDay = (index: number, value: number, growRange = true) => {
-    const next = Math.min(maxDay, Math.max(0, Math.round(value) || 0));
-    update(index, { period_days: next });
-    if (
-      growRange &&
-      !isUrgent &&
-      !schedule &&
-      next + RANGE_HEADROOM_DAYS > rangeMax
-    ) {
-      setRangeMax(Math.ceil((next + RANGE_HEADROOM_DAYS) / 15) * 15);
-    }
-  };
-
-  const addDeliverable = () => {
-    setDeliverables((prev) => {
-      if (prev.length >= MAX_DELIVERABLES) return prev;
-      const day = Math.min(
-        maxDay,
-        isUrgent
-          ? URGENT_MAX_DURATION_DAYS
-          : latestDeliverableDay(prev) + (prev.length > 0 ? 7 : 14),
-      );
-      const next = [...prev, createDeliverable(locale, prev.length, day)];
-      if (!schedule) {
-        setRangeMax((current) => Math.max(current, rangeFor(next, isUrgent)));
-      }
-      return next;
+  const setDay = (index: number, value: number) => {
+    update(index, {
+      period_days: Math.min(maxDay, Math.max(0, Math.round(value) || 0)),
     });
   };
 
-  const removeDeliverable = (index: number) => {
-    setDeliverables((prev) =>
-      prev.length <= 1 ? prev : prev.filter((_, i) => i !== index),
-    );
+  const setWay = (index: number, selected: DeliverableWay) => {
+    const item = deliverables[index];
+    update(index, {
+      way: {
+        selected,
+        address:
+          selected === "physical_workshop" ? item.way.address || "" : null,
+      },
+    });
   };
 
-  const titlesValid = deliverables.every(
-    (item) => item.title.trim().length > 0,
-  );
-  const canContinue = deliverables.length > 0 && titlesValid && !submitting;
+  const addDeliverable = () => {
+    if (deliverables.length >= MAX_DELIVERABLES) return;
+    const day = Math.min(
+      maxDay,
+      isUrgent
+        ? URGENT_MAX_DURATION_DAYS
+        : Math.max(DEFAULT_DAY, latestDeliverableDay(deliverables)),
+    );
+    setDeliverables((prev) => [
+      ...prev,
+      createDeliverable(locale, prev.length, day),
+    ]);
+    setFocusIndex(deliverables.length);
+    setAttempted(false);
+  };
+
+  const removeDeliverable = (index: number) => {
+    if (deliverables.length <= 1) return;
+    setDeliverables((prev) => prev.filter((_, i) => i !== index));
+    setFocusIndex(null);
+  };
+
+  const allComplete =
+    deliverables.length > 0 && deliverables.every(isDeliverableComplete);
 
   const onContinue = async () => {
-    if (!canContinue) return;
+    if (submitting) return;
+    if (!allComplete) {
+      setAttempted(true);
+      return;
+    }
     setError(null);
 
     // Keep deliverables in timeline order so positions match their dates.
@@ -170,7 +281,14 @@ export default function DeliverablesPlanQuestion({
       .sort(
         (a, b) => a.item.period_days - b.item.period_days || a.index - b.index,
       )
-      .map(({ item }) => ({ ...item, title: item.title.trim() }));
+      .map(({ item }) => ({
+        ...item,
+        title: item.title.trim(),
+        way: {
+          ...item.way,
+          address: item.way.address ? item.way.address.trim() : item.way.address,
+        },
+      }));
     writeDeliverables(locale, ordered);
 
     const leavingComponents = isLeavingComponentSteps(
@@ -199,13 +317,284 @@ export default function DeliverablesPlanQuestion({
     }
   };
 
-  const shortTitle = (title: string, index: number) => {
-    const text = title.trim() || `#${index + 1}`;
-    return text.length > 18 ? `${text.slice(0, 17)}…` : text;
+  const formatSummary = (types: string[]) => {
+    const first = reportTypeOptions.find((option) => option.value === types[0]);
+    if (!first) return isRTL ? "اختر الصيغة" : "Choose format";
+    return types.length > 1 ? `${first.label} +${types.length - 1}` : first.label;
+  };
+
+  const renderDeliverable = (item: ProjectDeliverable, index: number) => {
+    const way =
+      WAY_OPTIONS.find((option) => option.value === item.way.selected) ??
+      WAY_OPTIONS[0];
+    const missingTitle = attempted && !item.title.trim();
+    const missingTypes = attempted && item.report_type.length === 0;
+    const missingAddress =
+      attempted &&
+      item.way.selected === "physical_workshop" &&
+      !item.way.address?.trim();
+
+    return (
+      <li
+        key={index}
+        className="rounded-[12px] border border-slate-200 bg-white/90 p-4"
+      >
+        <div className="flex items-center justify-between gap-2">
+          <label
+            htmlFor={`deliverable-title-${index}`}
+            className="text-xs font-bold text-slate-500"
+          >
+            {deliverables.length > 1
+              ? isRTL
+                ? `اسم المخرج ${index + 1}`
+                : `Deliverable ${index + 1} name`
+              : isRTL
+                ? "اسم المخرج"
+                : "Deliverable name"}
+          </label>
+          {deliverables.length > 1 ? (
+            <button
+              type="button"
+              onClick={() => removeDeliverable(index)}
+              aria-label={isRTL ? "حذف المخرج" : "Remove deliverable"}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:bg-rose-50 hover:text-rose-600"
+            >
+              <IconTrash size={16} />
+            </button>
+          ) : null}
+        </div>
+        <input
+          id={`deliverable-title-${index}`}
+          value={item.title}
+          onChange={(event) => update(index, { title: event.target.value })}
+          maxLength={120}
+          autoFocus={index === focusIndex}
+          placeholder={
+            isRTL ? "مثال: تقرير تحليل السوق" : "e.g. Market analysis report"
+          }
+          className={`mt-1.5 w-full rounded-[10px] border bg-white px-3 py-2.5 text-sm font-semibold text-slate-900 placeholder:font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-200 ${
+            missingTitle ? "border-rose-300" : "border-slate-200"
+          }`}
+        />
+
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <Popover>
+            <PopoverButton
+              className={PILL_CLASS}
+              aria-label={isRTL ? "موعد التسليم" : "Due date"}
+            >
+              <IconCalendarEvent size={16} className="text-slate-500" />
+              <span>{dayLabel(locale, item.period_days)}</span>
+              {schedule ? (
+                <span className="font-medium text-slate-400">
+                  · {dateFor(item.period_days)}
+                </span>
+              ) : null}
+              <IconChevronDown size={14} className="text-slate-400" />
+            </PopoverButton>
+            <PopoverPanel
+              anchor="bottom start"
+              className={`${PANEL_CLASS} w-72 p-3`}
+            >
+              <p className="text-xs font-bold text-slate-500">
+                {isRTL ? "موعد التسليم" : "Due"}
+              </p>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {quickDays.map((day) => {
+                  const selected = item.period_days === day;
+                  return (
+                    <button
+                      key={day}
+                      type="button"
+                      onClick={() => setDay(index, day)}
+                      className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${
+                        selected
+                          ? "border-blue-300 bg-blue-50 text-blue-800"
+                          : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                      }`}
+                    >
+                      {quickDayLabel(day)}
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="mt-3 flex items-center gap-2">
+                <div className="flex items-center rounded-full border border-slate-200 bg-white">
+                  <button
+                    type="button"
+                    onClick={() => setDay(index, item.period_days - 1)}
+                    disabled={item.period_days <= 0}
+                    aria-label={isRTL ? "يوم أبكر" : "One day earlier"}
+                    className="inline-flex h-8 w-8 items-center justify-center text-slate-600 hover:text-slate-900 disabled:text-slate-300"
+                  >
+                    <IconMinus size={14} />
+                  </button>
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    min={0}
+                    max={maxDay === Number.MAX_SAFE_INTEGER ? undefined : maxDay}
+                    value={item.period_days}
+                    onChange={(event) =>
+                      setDay(index, Number(event.target.value))
+                    }
+                    aria-label={
+                      isRTL
+                        ? "عدد الأيام من بدء المشروع"
+                        : "Days from project start"
+                    }
+                    className="w-12 appearance-none border-0 bg-transparent p-0 text-center text-sm font-bold tabular-nums text-slate-900 focus:outline-none [-moz-appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setDay(index, item.period_days + 1)}
+                    disabled={item.period_days >= maxDay}
+                    aria-label={isRTL ? "يوم لاحق" : "One day later"}
+                    className="inline-flex h-8 w-8 items-center justify-center text-slate-600 hover:text-slate-900 disabled:text-slate-300"
+                  >
+                    <IconPlus size={14} />
+                  </button>
+                </div>
+                <span className="text-xs font-semibold text-slate-500">
+                  {isRTL ? "يوم بعد البدء" : "days after start"}
+                </span>
+              </div>
+              {schedule ? (
+                <p className="mt-2 text-[11px] font-semibold text-slate-400">
+                  {isRTL
+                    ? `ينتهي المشروع في ${formatIsoDate(plannedCloseDate, locale)}`
+                    : `Project ends ${formatIsoDate(plannedCloseDate, locale)}`}
+                </p>
+              ) : null}
+              {isUrgent ? (
+                <p className="mt-2 text-[11px] font-semibold text-amber-700">
+                  {isRTL
+                    ? "الطلبات العاجلة تُسلَّم خلال 24 ساعة."
+                    : "Urgent requests are delivered within 24 hours."}
+                </p>
+              ) : null}
+            </PopoverPanel>
+          </Popover>
+
+          <Listbox
+            multiple
+            value={item.report_type}
+            onChange={(next: string[]) => update(index, { report_type: next })}
+          >
+            <ListboxButton
+              className={`${PILL_CLASS} ${missingTypes ? "border-rose-300" : ""}`}
+              aria-label={isRTL ? "صيغة الملف" : "File format"}
+            >
+              <FormatIcons types={item.report_type} options={reportTypeOptions} />
+              <span>{formatSummary(item.report_type)}</span>
+              <IconChevronDown size={14} className="text-slate-400" />
+            </ListboxButton>
+            <ListboxOptions anchor="bottom start" className={`${PANEL_CLASS} w-60`}>
+              <p className="px-2 pb-1 pt-1 text-xs font-bold text-slate-500">
+                {isRTL ? "صيغة الملف (يمكن اختيار أكثر من صيغة)" : "File format (pick any)"}
+              </p>
+              {reportTypeOptions.map((option) => (
+                <ListboxOption
+                  key={option.value}
+                  value={option.value}
+                  className="group flex cursor-pointer items-center gap-2.5 rounded-[8px] px-2 py-2 text-sm font-semibold text-slate-700 data-[focus]:bg-slate-50 data-[selected]:text-blue-800"
+                >
+                  {option.iconSrc ? (
+                    <img src={option.iconSrc} alt="" className="h-5 w-5 object-contain" />
+                  ) : null}
+                  <span className="flex-1">{option.label}</span>
+                  <IconCheck
+                    size={16}
+                    className="invisible text-blue-600 group-data-[selected]:visible"
+                  />
+                </ListboxOption>
+              ))}
+            </ListboxOptions>
+          </Listbox>
+
+          <Listbox
+            value={item.way.selected}
+            onChange={(next: DeliverableWay) => setWay(index, next)}
+          >
+            <ListboxButton
+              className={PILL_CLASS}
+              aria-label={isRTL ? "طريقة التسليم" : "Delivery method"}
+            >
+              <way.Icon size={16} className={way.iconClass} />
+              <span>{isRTL ? way.label.ar : way.label.en}</span>
+              <IconChevronDown size={14} className="text-slate-400" />
+            </ListboxButton>
+            <ListboxOptions anchor="bottom start" className={`${PANEL_CLASS} w-60`}>
+              <p className="px-2 pb-1 pt-1 text-xs font-bold text-slate-500">
+                {isRTL ? "طريقة التسليم" : "Delivered by"}
+              </p>
+              {WAY_OPTIONS.map((option) => (
+                <ListboxOption
+                  key={option.value}
+                  value={option.value}
+                  className="group flex cursor-pointer items-center gap-2.5 rounded-[8px] px-2 py-2 text-sm font-semibold text-slate-700 data-[focus]:bg-slate-50 data-[selected]:text-blue-800"
+                >
+                  <option.Icon size={18} className={option.iconClass} />
+                  <span className="flex-1">
+                    {isRTL ? option.label.ar : option.label.en}
+                  </span>
+                  <IconCheck
+                    size={16}
+                    className="invisible text-blue-600 group-data-[selected]:visible"
+                  />
+                </ListboxOption>
+              ))}
+            </ListboxOptions>
+          </Listbox>
+        </div>
+
+        {item.way.selected === "physical_workshop" ? (
+          <label className="mt-3 flex items-center gap-2">
+            <IconMapPin size={16} className="shrink-0 text-slate-400" />
+            <span className="sr-only">
+              {isRTL ? "عنوان الورشة" : "Workshop address"}
+            </span>
+            <input
+              value={item.way.address || ""}
+              onChange={(event) =>
+                update(index, {
+                  way: {
+                    selected: "physical_workshop",
+                    address: event.target.value,
+                  },
+                })
+              }
+              placeholder={
+                isRTL ? "عنوان الورشة، مثال: عمّان" : "Workshop address, e.g. Amman"
+              }
+              className={`w-full rounded-[10px] border bg-white px-3 py-2 text-sm font-semibold text-slate-900 placeholder:font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-200 ${
+                missingAddress ? "border-rose-300" : "border-slate-200"
+              }`}
+            />
+          </label>
+        ) : null}
+
+        {missingTitle || missingTypes || missingAddress ? (
+          <p className="mt-2 text-xs font-semibold text-rose-600">
+            {missingTitle
+              ? isRTL
+                ? "أدخل اسم المخرج."
+                : "Enter a name for this deliverable."
+              : missingTypes
+                ? isRTL
+                  ? "اختر صيغة ملف واحدة على الأقل."
+                  : "Pick at least one file format."
+                : isRTL
+                  ? "أدخل عنوان الورشة."
+                  : "Enter the workshop address."}
+          </p>
+        ) : null}
+      </li>
+    );
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto" dir={isRTL ? "rtl" : "ltr"}>
+    <div className="w-full max-w-3xl mx-auto" dir={isRTL ? "rtl" : "ltr"}>
       <ProjectSelectedTypeHeader
         locale={locale}
         entered={entered}
@@ -232,197 +621,29 @@ export default function DeliverablesPlanQuestion({
           id="deliverables-plan-question-title"
           className="text-2xl sm:text-3xl font-medium tracking-tight text-slate-900"
         >
-          {isRTL
-            ? "ما المخرجات التي تتوقعها ومتى؟"
-            : "What will you receive, and when?"}
+          {isRTL ? "ما المخرجات التي ستستلمها؟" : "What will you receive?"}
         </h2>
         <p className="mt-2 text-sm sm:text-base font-semibold text-slate-600">
           {isRTL
-            ? schedule
-              ? "أضف كل مخرج واسحبه على الخط الزمني للمشروع إلى موعده المتوقع."
-              : "أضف كل مخرج واسحبه على الخط الزمني إلى موعده، محسوبًا بالأيام من بدء المشروع."
-            : schedule
-              ? "Add each deliverable and drag it along the project timeline to when you expect it."
-              : "Add each deliverable and drag it along the timeline, counted in days from the project start."}
+            ? "سمِّ المخرج وحدد موعده وصيغته وطريقة تسليمه."
+            : "Name it, set when it's due, its format, and how it reaches you."}
         </p>
       </div>
 
       <div className="mt-6 pb-36 sm:pb-28">
-        <div className="rounded-[10px] border border-slate-200 bg-white/80 px-2 sm:px-4">
-          <TimelineSlider
-            min={0}
-            max={Math.max(rangeMax, 1)}
-            isRTL={isRTL}
-            tickEvery={isUrgent ? undefined : rangeMax > 120 ? 30 : 7}
-            startLabel={
-              schedule
-                ? formatIsoDate(schedule.plannedStartDate, locale)
-                : isRTL
-                  ? "بدء المشروع"
-                  : "Project start"
-            }
-            endLabel={
-              isUrgent
-                ? isRTL
-                  ? "خلال 24 ساعة"
-                  : "Within 24 hours"
-                : plannedCloseDate
-                  ? formatIsoDate(plannedCloseDate, locale)
-                  : durationLabel(locale, rangeMax)
-            }
-            onChange={(id, value) => setDay(Number(id), value, false)}
-            onCommit={(id, value) => setDay(Number(id), value)}
-            points={deliverables.map((item, index) => ({
-              id: String(index),
-              value: item.period_days,
-              label: `${shortTitle(item.title, index)} · ${dayLabel(locale, item.period_days)}`,
-              ariaLabel:
-                item.title ||
-                (isRTL ? `المخرج ${index + 1}` : `Deliverable ${index + 1}`),
-              valueText: dayLabel(locale, item.period_days),
-              tone: index === deliverables.length - 1 ? "primary" : "accent",
-              draggable: true,
-            }))}
-          />
-        </div>
-
-        {schedule ? (
-          <p className="mt-3 text-xs font-semibold text-slate-500">
-            {isRTL
-              ? `يجب أن تقع المخرجات ضمن مدة المشروع (حتى ${formatIsoDate(plannedCloseDate, locale)}). لموعد أبعد، عدّل جدول المشروع.`
-              : `Deliverables have to fall within the project duration (until ${formatIsoDate(plannedCloseDate, locale)}). To plan later, change the project schedule.`}
-          </p>
-        ) : null}
-
-        {isUrgent ? (
-          <p className="mt-3 text-xs font-semibold text-amber-800">
-            {isRTL
-              ? "الطلبات العاجلة تُسلَّم خلال 24 ساعة، لذا تكون المخرجات في يوم البدء أو اليوم التالي."
-              : "Urgent requests are delivered within 24 hours, so deliverables are due on the start day or the day after."}
-          </p>
-        ) : null}
-
-        <ul className="mt-5 space-y-3">
-          {deliverables.map((item, index) => (
-            <li
-              key={index}
-              className="flex flex-col gap-3 rounded-[10px] border border-slate-200 bg-white/85 p-3 sm:flex-row sm:items-center"
-            >
-              <div className="flex min-w-0 flex-1 items-center gap-3">
-                <span
-                  className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-600"
-                  aria-hidden="true"
-                >
-                  {index + 1}
-                </span>
-
-                <label className="min-w-0 flex-1">
-                  <span className="sr-only">
-                    {isRTL
-                      ? `عنوان المخرج ${index + 1}`
-                      : `Deliverable ${index + 1} title`}
-                  </span>
-                  <input
-                    value={item.title}
-                    onChange={(event) =>
-                      update(index, { title: event.target.value })
-                    }
-                    maxLength={120}
-                    placeholder={
-                      isRTL
-                        ? "مثال: تقرير تحليل السوق"
-                        : "e.g. Market analysis report"
-                    }
-                    className={`w-full rounded-[10px] border bg-white px-3 py-2 text-sm font-semibold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-200 ${item.title.trim() ? "border-slate-200" : "border-rose-300"}`}
-                  />
-                </label>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <div className="flex items-center rounded-[10px] border border-slate-200 bg-white">
-                  <button
-                    type="button"
-                    onClick={() => setDay(index, item.period_days - 1)}
-                    disabled={item.period_days <= 0}
-                    aria-label={isRTL ? "يوم أبكر" : "One day earlier"}
-                    className="inline-flex h-9 w-9 items-center justify-center text-slate-600 hover:text-slate-900 disabled:text-slate-300"
-                  >
-                    <IconMinus size={16} />
-                  </button>
-                  <label className="flex items-center gap-1 px-1">
-                    <span className="sr-only">
-                      {isRTL
-                        ? "عدد الأيام من بدء المشروع"
-                        : "Days from project start"}
-                    </span>
-                    <input
-                      type="number"
-                      inputMode="numeric"
-                      min={0}
-                      max={isUrgent ? URGENT_MAX_DURATION_DAYS : undefined}
-                      value={item.period_days}
-                      onChange={(event) =>
-                        setDay(index, Number(event.target.value))
-                      }
-                      className="w-14 bg-transparent text-center text-sm font-bold tabular-nums text-slate-900 focus:outline-none"
-                    />
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => setDay(index, item.period_days + 1)}
-                    disabled={item.period_days >= maxDay}
-                    aria-label={isRTL ? "يوم لاحق" : "One day later"}
-                    className="inline-flex h-9 w-9 items-center justify-center text-slate-600 hover:text-slate-900 disabled:text-slate-300"
-                  >
-                    <IconPlus size={16} />
-                  </button>
-                </div>
-                <span className="w-28 text-xs font-semibold text-slate-500">
-                  {item.period_days === 0
-                    ? isRTL
-                      ? "في يوم البدء"
-                      : "on the start day"
-                    : isRTL
-                      ? "يوم بعد البدء"
-                      : "days after start"}
-                  {schedule ? (
-                    <span className="block font-bold text-slate-700">
-                      {dateFor(item.period_days)}
-                    </span>
-                  ) : null}
-                </span>
-
-                <button
-                  type="button"
-                  onClick={() => removeDeliverable(index)}
-                  disabled={deliverables.length <= 1}
-                  aria-label={isRTL ? "حذف المخرج" : "Remove deliverable"}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full text-slate-400 hover:bg-rose-50 hover:text-rose-600 disabled:invisible"
-                >
-                  <IconTrash size={16} />
-                </button>
-              </div>
-            </li>
-          ))}
+        <ul className="space-y-2.5">
+          {deliverables.map((item, index) => renderDeliverable(item, index))}
         </ul>
 
         {deliverables.length < MAX_DELIVERABLES ? (
           <button
             type="button"
             onClick={addDeliverable}
-            className="mt-3 inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-[10px] border border-dashed border-blue-300/80 px-3 py-2 text-sm font-bold text-blue-600 hover:border-blue-400 hover:bg-blue-50/40"
+            className="mt-3 inline-flex items-center gap-1.5 rounded-full px-2 py-1.5 text-sm font-bold text-blue-600 hover:bg-blue-50/60"
           >
             <IconPlus size={16} />
-            {isRTL ? "إضافة مخرج" : "Add deliverable"}
+            {isRTL ? "إضافة مخرج آخر" : "Add another deliverable"}
           </button>
-        ) : null}
-
-        {!titlesValid ? (
-          <p className="mt-3 text-xs font-semibold text-rose-600">
-            {isRTL
-              ? "أعطِ كل مخرج عنوانًا."
-              : "Give every deliverable a title."}
-          </p>
         ) : null}
       </div>
 
@@ -438,11 +659,11 @@ export default function DeliverablesPlanQuestion({
             <button
               type="button"
               onClick={() => void onContinue()}
-              disabled={!canContinue}
+              disabled={submitting}
               className={`btn-sm px-6 py-2 rounded-full ${
-                canContinue
+                allComplete && !submitting
                   ? "text-white bg-[#1C7CBB] hover:bg-opacity-90"
-                  : "text-slate-500 bg-slate-200 cursor-not-allowed"
+                  : "text-slate-500 bg-slate-200"
               }`}
             >
               {submitting

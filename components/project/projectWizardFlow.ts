@@ -16,6 +16,7 @@ export const projectWizardStepIds = {
   insighterOrigin: 'insighter-origin',
   insighterExperience: 'insighter-experience',
   companyTeamSize: 'company-team-size',
+  servicesSummary: 'services-summary',
   projectDescription: 'project-description',
   deadlineOffer: 'deadline-offer',
   projectSchedule: 'project-schedule',
@@ -28,10 +29,22 @@ export const projectWizardStepIds = {
 
 export type ProjectWizardStepId = string
 
-export const deliverableStageStepSlugs = ['deliverables-plan', 'deliverables-format'] as const
+export const deliverableStageStepSlugs = ['deliverables-plan'] as const
 
-/** Retired deliverable step slugs (pre-phase-2), redirected to the plan step. */
+/**
+ * Project-level components asked before the service is chosen (the project
+ * does not exist yet, so the API cannot list them). Their answers ride along
+ * in the properties sync once the API confirms they apply to the project.
+ */
+export const preServiceProjectComponentSlugs = ['target-market', 'data-sources-expected'] as const
+
+export function isPreServiceProjectComponentSlug(slug: string): boolean {
+  return (preServiceProjectComponentSlugs as readonly string[]).includes(slug)
+}
+
+/** Retired deliverable step slugs, redirected to the plan step. */
 export const legacyDeliverableStepSlugs = [
+  'deliverables-format',
   'deliverable-first-draft-date',
   'deliverable-first-draft-type',
   'deliverable-first-draft-way',
@@ -180,6 +193,32 @@ export function isServiceFlowActive(locale: WizardLocale): boolean {
   }
 }
 
+/** True while the client is choosing another service to add (it has no project service yet). */
+export function isServiceAddPending(locale: WizardLocale): boolean {
+  if (typeof window === 'undefined') return false
+  try {
+    const raw = window.sessionStorage.getItem(projectWizardStorage.serviceFlowKey(locale))
+    const flow = raw ? (JSON.parse(raw) as { projectServiceUuid?: unknown }) : null
+    return Boolean(flow) && !flow?.projectServiceUuid
+  } catch {
+    return false
+  }
+}
+
+/** Step the add/edit-service sub-flow returns to: the services step, or the review it was started from. */
+export function readServiceFlowReturnStepId(locale: WizardLocale): string {
+  if (typeof window === 'undefined') return projectWizardStepIds.servicesSummary
+  try {
+    const raw = window.sessionStorage.getItem(projectWizardStorage.serviceFlowKey(locale))
+    const flow = raw ? (JSON.parse(raw) as { returnStepId?: unknown }) : null
+    return flow?.returnStepId === projectWizardStepIds.projectReview
+      ? projectWizardStepIds.projectReview
+      : projectWizardStepIds.servicesSummary
+  } catch {
+    return projectWizardStepIds.servicesSummary
+  }
+}
+
 function readPreferredInsighterType(
   locale: WizardLocale
 ): 'Individual' | 'Company' | 'Either' | null {
@@ -215,17 +254,20 @@ function selectedIndustryParentHasChildren(locale: WizardLocale): boolean {
 }
 
 export function getProjectWizardStepOrder(locale: WizardLocale): string[] {
-  // Adding/editing an additional service from the review: only that service's steps.
+  // Adding/editing an additional service: only that service's steps.
   if (isServiceFlowActive(locale)) {
     return [
+      ...(isServiceAddPending(locale) ? [projectWizardStepIds.service] : []),
       projectWizardStepIds.projectScope,
       projectWizardStepIds.projectSubscopes,
       ...readProjectServiceStepSlugs(locale),
-      projectWizardStepIds.projectReview,
+      readServiceFlowReturnStepId(locale),
     ]
   }
 
-  const serviceComponentSlugs = readServiceComponentSlugs(locale)
+  const serviceComponentSlugs = readServiceComponentSlugs(locale).filter(
+    (slug) => !isPreServiceProjectComponentSlug(slug)
+  )
   const preferredInsighterType = readPreferredInsighterType(locale)
   const skipKickoffMeeting = readProjectAddonsState(locale).kickoffMeeting.skipped
   const specifiedInsighterProject = isSpecifiedInsighterProject(locale)
@@ -244,7 +286,8 @@ export function getProjectWizardStepOrder(locale: WizardLocale): string[] {
     ? []
     : [
         projectWizardStepIds.preferredInsighterType,
-        projectWizardStepIds.insighterOrigin,
+        // "Any" means worldwide, so the origin question is skipped.
+        ...(preferredInsighterType === 'Either' ? [] : [projectWizardStepIds.insighterOrigin]),
         ...postOriginSteps,
       ]
 
@@ -260,11 +303,14 @@ export function getProjectWizardStepOrder(locale: WizardLocale): string[] {
     projectWizardStepIds.whoAreYou,
     ...insighterPreferenceSteps,
     projectWizardStepIds.projectSchedule,
+    ...preServiceProjectComponentSlugs,
     // …then the service and its questions (the project is created at the service step)…
     projectWizardStepIds.service,
     projectWizardStepIds.projectScope,
     projectWizardStepIds.projectSubscopes,
     ...serviceComponentSlugs,
+    // Specific-insighter projects can bundle more services before moving on.
+    ...(specifiedInsighterProject ? [projectWizardStepIds.servicesSummary] : []),
     // …then description and add-ons, the summary, and insighter selection.
     projectWizardStepIds.projectDescription,
     projectWizardStepIds.addonsIntro,

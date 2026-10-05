@@ -10,6 +10,7 @@ import {
   getProjectWizardStepOrder,
   isServiceFlowActive,
   normalizeProjectWizardStepId,
+  readServiceFlowReturnStepId,
   projectWizardStepIds,
 } from './projectWizardFlow'
 
@@ -65,7 +66,7 @@ export function useProjectWizardNavigation(locale: WizardLocale) {
     : prevStepId
       ? hrefFor(prevStepId)
       : inServiceFlow
-        ? reviewHref
+        ? baseHrefFor(readServiceFlowReturnStepId(locale))
         : `/${locale}/project`
   const nextHref = isReviewEditMode
     ? reviewHref

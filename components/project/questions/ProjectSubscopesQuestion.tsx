@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { IconCheck, IconPaperclip, IconPlusFilled, IconXboxXFilled } from '@tabler/icons-react'
+import { IconCheck, IconPaperclip, IconPlus, IconX } from '@tabler/icons-react'
 import ProjectSelectedTypeHeader from '@/components/project/ProjectSelectedTypeHeader'
 import {
   assertProjectApiResponse,
@@ -25,6 +25,11 @@ import { useProjectStepErrorToast } from '@/components/project/useProjectStepErr
 import { useProjectWizardNavigation } from '@/components/project/useProjectWizardNavigation'
 import { BACKEND_STRING_MAX } from '@/components/project/backendLimits'
 import { projectWizardStorage, type WizardLocale } from '@/components/project/wizardStorage'
+import SubscopeAttachmentModal, {
+  FileIcon,
+  formatBytes,
+  type SubscopeAttachmentGroup,
+} from '@/components/project/questions/SubscopeAttachmentModal'
 
 type ScopeChild = { id: number; name: string }
 type ScopeParent = { id: number; name: string; children: ScopeChild[] }
@@ -296,104 +301,6 @@ async function syncScopes(params: {
   await assertProjectApiResponse(res, 'Failed to save project scope.')
 }
 
-function formatBytes(bytes: number): string {
-  if (!Number.isFinite(bytes) || bytes <= 0) return '0 B'
-  const units = ['B', 'KB', 'MB', 'GB']
-  let value = bytes
-  let idx = 0
-  while (value >= 1024 && idx < units.length - 1) {
-    value /= 1024
-    idx += 1
-  }
-  return `${value.toFixed(value >= 10 || idx === 0 ? 0 : 1)} ${units[idx]}`
-}
-
-function getFileExtension(fileName: string): string {
-  return String(fileName || '').split('.').pop()?.toLowerCase() || ''
-}
-
-function getFileIconPath(file: File): string | null {
-  const extension = getFileExtension(file.name)
-  const mimeType = file.type.toLowerCase()
-
-  const normalizedExtension =
-    extension === 'jpeg'
-      ? 'jpg'
-      : extension === 'powerpoint'
-        ? 'ppt'
-        : extension
-
-  const iconByExtension: Record<string, string> = {
-    csv: 'csv',
-    doc: 'doc',
-    docx: 'docx',
-    jpg: 'jpg',
-    mp3: 'mp3',
-    mp4: 'mp4',
-    pdf: 'pdf',
-    ppt: 'ppt',
-    pptx: 'pptx',
-    pub: 'pub',
-    txt: 'txt',
-    xls: 'xls',
-    xlsx: 'xlsx',
-    zip: 'zip',
-  }
-
-  const iconName =
-    iconByExtension[normalizedExtension] ||
-    (mimeType.includes('presentation') ? 'ppt' : '') ||
-    (mimeType.includes('spreadsheet') || mimeType.includes('excel') ? 'xlsx' : '') ||
-    (mimeType.includes('word') ? 'docx' : '') ||
-    (mimeType.includes('pdf') ? 'pdf' : '') ||
-    (mimeType.includes('zip') ? 'zip' : '') ||
-    (mimeType.startsWith('image/') ? 'jpg' : '')
-
-  return iconName ? `/file-icons/${iconName}.svg` : null
-}
-
-function AttachmentTile({
-  file,
-  onRemove,
-  isRTL,
-}: {
-  file: File
-  onRemove: () => void
-  isRTL: boolean
-}) {
-  const iconPath = getFileIconPath(file)
-  const extensionLabel = getFileExtension(file.name).toUpperCase() || 'FILE'
-
-  return (
-    <div className="group relative inline-flex">
-      <div className="h-6 w-5 shrink-0 overflow-hidden">
-        {iconPath ? (
-          <img src={iconPath} alt="" className="h-full w-full object-contain" />
-        ) : (
-          <div className="grid h-full w-full place-items-center rounded border border-slate-200 text-[8px] font-bold text-slate-500">
-            {extensionLabel}
-          </div>
-        )}
-      </div>
-
-      <button
-        type="button"
-        onClick={onRemove}
-        aria-label={isRTL ? 'إزالة المرفق' : 'Remove attachment'}
-        className="absolute -end-1.5 -top-1.5 inline-flex h-3.5 w-3.5 items-center justify-center rounded-full bg-white text-slate-400 shadow ring-1 ring-slate-200 transition-colors hover:text-rose-500"
-      >
-        <IconXboxXFilled size={11} />
-      </button>
-
-      <div
-        className={`pointer-events-none absolute bottom-full z-20 mb-1.5 hidden whitespace-nowrap rounded-md bg-slate-900/90 px-2 py-1 text-[10px] font-semibold text-white shadow-lg group-hover:block ${isRTL ? 'end-0' : 'start-0'}`}
-      >
-        {file.name} · {formatBytes(file.size)}
-      </div>
-    </div>
-  )
-}
-
 const attachmentStore = new Map<string, File[]>()
 
 export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLocale }) {
@@ -408,6 +315,7 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
   const [scopes, setScopes] = useState<ScopeParent[] | null>(null)
   const [loading, setLoading] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [skipping, setSkipping] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   useProjectStepErrorToast(error, locale)
@@ -426,9 +334,9 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
     {}
   )
 
-  const fileInputRef = useRef<HTMLInputElement | null>(null)
-  const [activeChildKey, setActiveChildKey] = useState<string | null>(null)
-  const [inputNonce, setInputNonce] = useState(0)
+  const [attachModalOpen, setAttachModalOpen] = useState(false)
+  const [addingScopeKey, setAddingScopeKey] = useState<string | null>(null)
+  const [draftSubscopeName, setDraftSubscopeName] = useState('')
 
   const serviceId = useMemo(() => {
     if (typeof window === 'undefined') return null
@@ -713,11 +621,8 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
     }, 0)
   }, [confirmedManualSubscopeKeys, manualScopes, manualSubscopesByScope])
 
-  const canContinue =
-    manualTotalSubscopes + totalSelectedSubscopes > 0 &&
-    !loading &&
-    !submitting &&
-    !(selectedParentIds.length > 0 && scopes === null)
+  const canSkip = !loading && !submitting && !(selectedParentIds.length > 0 && scopes === null)
+  const canContinue = manualTotalSubscopes + totalSelectedSubscopes > 0 && canSkip
 
   const isChildSelected = (parentId: number, childId: number) => {
     const list = childIdsByParent[String(parentId)] || []
@@ -782,26 +687,11 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
     }))
   }
 
-  const openFilePickerKey = (key: string) => {
-    setActiveChildKey(key)
-    setInputNonce((n) => n + 1)
-    setTimeout(() => fileInputRef.current?.click(), 0)
-  }
-
-  const openFilePicker = (parentId: number, childId: number) => {
-    openFilePickerKey(`${parentId}:${childId}`)
-  }
-
-  const onFilesPicked = (files: FileList | null) => {
-    if (!activeChildKey || !files || files.length === 0) return
-    const incoming = Array.from(files)
-
-    const current = attachmentStore.get(activeChildKey) || []
-    const next = [...current, ...incoming]
-    attachmentStore.set(activeChildKey, next)
-
-    setAttachmentsByKey((prev) => ({ ...prev, [activeChildKey]: next }))
-    setActiveChildKey(null)
+  const attachFiles = (key: string, incoming: File[]) => {
+    if (incoming.length === 0) return
+    const next = [...(attachmentStore.get(key) || []), ...incoming]
+    attachmentStore.set(key, next)
+    setAttachmentsByKey((prev) => ({ ...prev, [key]: next }))
   }
 
   const removeFile = (key: string, index: number) => {
@@ -830,42 +720,42 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
     }
   }
 
-  const addManualSubscope = (scopeKey: string, initialName = '') => {
-    const existing = manualSubscopesByScope[scopeKey] || []
-    const next: ManualSubscopesByScope = {
-      ...manualSubscopesByScope,
-      [scopeKey]: [
-        ...existing,
-        { id: createClientId('subscope:'), name: String(initialName || '') },
-      ],
+  const addCustomSubscope = (scopeKey: string, rawName: string, parent?: ScopeParent) => {
+    const name = rawName.trim().slice(0, BACKEND_STRING_MAX)
+    if (!name) return
+    const lower = name.toLowerCase()
+
+    const matchingChild = parent?.children.find((c) => c.name.trim().toLowerCase() === lower)
+    if (parent && matchingChild) {
+      if (!isChildSelected(parent.id, matchingChild.id)) toggleChild(parent.id, matchingChild.id)
+      return
     }
-    persistManualSubscopes(next)
+
+    const existing = manualSubscopesByScope[scopeKey] || []
+    const duplicate = existing.find(
+      (s) =>
+        String(s.name || '').trim().toLowerCase() === lower &&
+        isManualSubscopeFinalized(scopeKey, s.id)
+    )
+    const id = duplicate?.id ?? createClientId('subscope:')
+    const key = `${scopeKey}:${id}`
+
+    if (!duplicate) {
+      persistManualSubscopes({ ...manualSubscopesByScope, [scopeKey]: [...existing, { id, name }] })
+      setFinalizedManualSubscopeKeys((prev) => (prev.includes(key) ? prev : [...prev, key]))
+    }
+    setConfirmedManualSubscopeKeys((prev) => (prev.includes(key) ? prev : [...prev, key]))
   }
 
-  const updateManualSubscopeName = (
-    scopeKey: string,
-    subscopeId: string,
-    name: string
-  ) => {
-    const existing = manualSubscopesByScope[scopeKey] || []
-    const nextList = existing.map((s) => (s.id === subscopeId ? { ...s, name } : s))
-    persistManualSubscopes({ ...manualSubscopesByScope, [scopeKey]: nextList })
+  const startAddingSubscope = (scopeKey: string) => {
+    setDraftSubscopeName('')
+    setAddingScopeKey(scopeKey)
   }
 
-  const confirmManualSubscope = (scopeKey: string, subscopeId: string) => {
-    const existing = manualSubscopesByScope[scopeKey] || []
-    const target = existing.find((s) => s.id === subscopeId)
-    const trimmed = String(target?.name || '').trim()
-    if (!trimmed) return
-    setFinalizedManualSubscopeKeys((prev) => {
-      const key = `${scopeKey}:${subscopeId}`
-      return prev.includes(key) ? prev : [...prev, key]
-    })
-    setConfirmedManualSubscopeKeys((prev) => {
-      const key = `${scopeKey}:${subscopeId}`
-      return prev.includes(key) ? prev : [...prev, key]
-    })
-    updateManualSubscopeName(scopeKey, subscopeId, trimmed)
+  const finishAddingSubscope = (scopeKey: string, parent?: ScopeParent) => {
+    addCustomSubscope(scopeKey, draftSubscopeName, parent)
+    setDraftSubscopeName('')
+    setAddingScopeKey(null)
   }
 
   const toggleManualSubscopeConfirmed = (scopeKey: string, subscopeId: string) => {
@@ -882,7 +772,6 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
           delete copy[key]
           return copy
         })
-        if (activeChildKey === key) setActiveChildKey(null)
       }
 
       return next
@@ -907,7 +796,6 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
       delete copy[fileKey]
       return copy
     })
-    if (activeChildKey === fileKey) setActiveChildKey(null)
   }
 
   const uiMode: 'select' | 'manual' | 'combined' =
@@ -942,20 +830,9 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
   const selectedCountLabel = (count: number) =>
     isRTL ? `${count} محدد` : `${count} selected`
 
-  const parentSelectedCount = (parent: ScopeParent, scopeKey: string) => {
-    const customCount = countConfirmedSubscopes(scopeKey)
-    if ((parent.children || []).length === 0) return customCount > 0 ? customCount : 1
-    return (childIdsByParent[String(parent.id)] || []).length + customCount
-  }
-
-  const manualScopeSelectedCount = (scope: ManualScope, scopeKey: string) => {
-    const confirmedCount = countConfirmedSubscopes(scopeKey)
-    if (confirmedCount > 0) return confirmedCount
-    return String(scope.name || '').trim() ? 1 : 0
-  }
-
-  const onContinue = async () => {
-    if (!canContinue || !serviceId || !projectUuid) return
+  const submitScopes = async (skip: boolean) => {
+    if (!serviceId || !projectUuid) return
+    if (skip ? !canSkip : !canContinue) return
     setError(null)
 
     if (selectedParentIds.length > 0 && !scopes) return
@@ -1029,8 +906,15 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
       })
       .filter((x) => x.subscopes.length > 0)
 
-    const scopePayload = [...selectedParentsPayload, ...manualPayload]
+    // Subscopes are optional: skipping still saves the scopes picked in the previous step.
+    const scopePayload = skip
+      ? [...selectedParents, ...manualScopes].map((scope) => ({
+          name: scope.name,
+          subscopes: [] as Array<{ name: string; files?: File[] }>,
+        }))
+      : [...selectedParentsPayload, ...manualPayload]
 
+    setSkipping(skip)
     setSubmitting(true)
     try {
       const projectServiceUuid = await ensureProjectServiceUuid(locale)
@@ -1067,21 +951,151 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
       )
     } finally {
       setSubmitting(false)
+      setSkipping(false)
     }
   }
 
-  const renderAddSubscopeField = (scopeKey: string) => (
-    <div className="flex min-h-[46px] flex-col justify-center border-b border-slate-200/80 py-2.5">
+  const finalizedManualSubscopes = (scopeKey: string) =>
+    (manualSubscopesByScope[scopeKey] || []).filter(
+      (sub) =>
+        Boolean(String(sub.name || '').trim()) && isManualSubscopeFinalized(scopeKey, sub.id)
+    )
+
+  const attachmentGroups: SubscopeAttachmentGroup[] = [
+    ...selectedParents.map((parent) => {
+      const scopeKey = parentScopeKey(parent.id)
+      const selectedChildIds = childIdsByParent[String(parent.id)] || []
+      return {
+        label: parent.name,
+        options: [
+          ...(parent.children || [])
+            .filter((c) => selectedChildIds.includes(c.id))
+            .map((c) => ({ key: `${parent.id}:${c.id}`, name: c.name })),
+          ...finalizedManualSubscopes(scopeKey)
+            .filter((sub) => isManualSubscopeConfirmed(scopeKey, sub.id))
+            .map((sub) => ({ key: `${scopeKey}:${sub.id}`, name: sub.name })),
+        ],
+      }
+    }),
+    ...manualScopes.map((scope) => {
+      const scopeKey = manualScopeKey(scope.id)
+      return {
+        label: scope.name,
+        options: finalizedManualSubscopes(scopeKey)
+          .filter((sub) => isManualSubscopeConfirmed(scopeKey, sub.id))
+          .map((sub) => ({ key: `${scopeKey}:${sub.id}`, name: sub.name })),
+      }
+    }),
+  ].filter((group) => group.options.length > 0)
+
+  const subscopeNameByKey = new Map(
+    attachmentGroups.flatMap((group) => group.options.map((o) => [o.key, o.name] as const))
+  )
+
+  const attachedFiles = Object.entries(attachmentsByKey).flatMap(([key, files]) =>
+    subscopeNameByKey.has(key)
+      ? files.map((file, index) => ({
+          key,
+          index,
+          file,
+          subscopeName: subscopeNameByKey.get(key) as string,
+        }))
+      : []
+  )
+
+  const renderChip = ({
+    key,
+    label,
+    selected,
+    fileCount,
+    onToggle,
+    onRemove,
+  }: {
+    key: string
+    label: string
+    selected: boolean
+    fileCount: number
+    onToggle: () => void
+    onRemove?: () => void
+  }) => (
+    <span
+      key={key}
+      className={`inline-flex items-center rounded-full border text-[12.5px] font-medium transition-colors ${
+        selected
+          ? 'border-[#1C7CBB] bg-[#1C7CBB] text-white'
+          : 'border-slate-200 bg-white text-slate-700 hover:border-[#1C7CBB]/50'
+      }`}
+    >
       <button
         type="button"
-        onClick={() => addManualSubscope(scopeKey)}
-        className={`inline-flex min-h-9 w-full items-center justify-center gap-2 rounded-md border border-dashed border-blue-300/80 bg-transparent px-3 py-2 text-[13px] font-bold text-blue-600 transition-colors hover:border-blue-400 hover:bg-blue-50/40 ${isRTL ? 'flex-row-reverse' : ''}`}
+        onClick={onToggle}
+        aria-pressed={selected}
+        className={`inline-flex items-center gap-1.5 py-1.5 ${onRemove ? 'ps-3.5 pe-1.5' : 'px-3.5'}`}
       >
-        <IconPlusFilled size={14} />
-        {isRTL ? 'إضافة نطاق فرعي' : 'Add Subscope'}
+        {selected ? <IconCheck size={14} stroke={2.5} /> : null}
+        {label}
+        {fileCount > 0 ? (
+          <span className="inline-flex items-center gap-0.5 text-xs font-medium opacity-80">
+            <IconPaperclip size={12} stroke={2} />
+            {fileCount}
+          </span>
+        ) : null}
       </button>
-    </div>
+      {onRemove ? (
+        <button
+          type="button"
+          onClick={onRemove}
+          aria-label={isRTL ? 'إزالة النطاق الفرعي' : 'Remove subscope'}
+          className={`me-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full ${
+            selected ? 'hover:bg-white/20' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-500'
+          }`}
+        >
+          <IconX size={12} stroke={2.5} />
+        </button>
+      ) : null}
+    </span>
   )
+
+  const renderCustomChips = (scopeKey: string) =>
+    finalizedManualSubscopes(scopeKey).map((sub) =>
+      renderChip({
+        key: sub.id,
+        label: sub.name,
+        selected: isManualSubscopeConfirmed(scopeKey, sub.id),
+        fileCount: (attachmentsByKey[`${scopeKey}:${sub.id}`] || []).length,
+        onToggle: () => toggleManualSubscopeConfirmed(scopeKey, sub.id),
+        onRemove: () => removeManualSubscope(scopeKey, sub.id),
+      })
+    )
+
+  const renderAddChip = (scopeKey: string, parent?: ScopeParent) =>
+    addingScopeKey === scopeKey ? (
+      <input
+        autoFocus
+        value={draftSubscopeName}
+        maxLength={BACKEND_STRING_MAX}
+        onChange={(e) => setDraftSubscopeName(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault()
+            finishAddingSubscope(scopeKey, parent)
+          }
+          if (e.key === 'Escape') setAddingScopeKey(null)
+        }}
+        onBlur={() => finishAddingSubscope(scopeKey, parent)}
+        placeholder={isRTL ? 'اكتب الاسم ثم اضغط Enter' : 'Type a name, then press Enter'}
+        className="min-w-[220px] rounded-full border border-[#1C7CBB] bg-white px-3.5 py-1.5 text-[12.5px] font-medium text-slate-900 placeholder:font-normal placeholder:text-slate-400 focus:outline-none"
+      />
+    ) : (
+      <button
+        type="button"
+        onClick={() => startAddingSubscope(scopeKey)}
+        className="inline-flex items-center gap-1 rounded-full border border-dashed border-slate-300 px-3.5 py-1.5 text-[12.5px] font-medium text-slate-500 transition-colors hover:border-[#1C7CBB] hover:text-[#1C7CBB]"
+      >
+        <IconPlus size={14} stroke={2.2} />
+        {isRTL ? 'أضف نطاقًا خاصًا' : 'Add your own'}
+      </button>
+    )
 
   return (
     <div className="mx-auto w-full max-w-7xl" dir={isRTL ? 'rtl' : 'ltr'}>
@@ -1126,409 +1140,150 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
         <div className="mt-4 text-sm font-semibold text-rose-700">{error}</div>
       ) : null}
 
-      <div className="mt-4 space-y-4 pb-[130px] lg:pb-0">
+      <div className="mt-6 space-y-4 pb-[130px] lg:pb-24">
         {loading ? (
           <div className="text-sm font-semibold text-slate-600">
             {isRTL ? 'جاري التحميل…' : 'Loading…'}
           </div>
         ) : (
-          <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
+          <>
             {selectedParents.map((parent) => {
               const scopeKey = parentScopeKey(parent.id)
               const children = parent.children || []
-              const customSubscopes = manualSubscopesByScope[scopeKey] || []
-              const otherOpen = customSubscopes.length > 0
-              const selectedCount = parentSelectedCount(parent, scopeKey)
-
+              const allSelected = areAllChildrenSelected(parent.id, children)
               return (
-                <div
-                  key={parent.id}
-                  className="h-full rounded-lg border border-slate-200/80 bg-white/45 shadow-sm backdrop-blur-md"
-                >
-                  <div className="flex h-full flex-col gap-2 p-4">
-                    <div className={`flex flex-wrap items-start justify-between gap-2 ${isRTL ? 'text-right' : 'text-left'}`}>
-                      <div className="min-w-0 text-base font-bold leading-tight text-slate-900">
-                        {parent.name}
-                      </div>
-                      <div className="flex shrink-0 items-center gap-2">
-                        {children.length > 0 ? (
-                          <button
-                            type="button"
-                            onClick={() => toggleSelectAllChildren(parent.id, children)}
-                            className="text-xs font-bold text-blue-600 transition-colors hover:text-blue-700"
-                          >
-                            {areAllChildrenSelected(parent.id, children)
-                              ? isRTL
-                                ? 'إلغاء تحديد الكل'
-                                : 'Deselect all'
-                              : isRTL
-                                ? 'تحديد الكل'
-                                : 'Select all'}
-                          </button>
-                        ) : null}
-                        <span className="rounded-full bg-blue-100 px-2.5 py-1 text-xs font-bold text-blue-600">
-                          {selectedCountLabel(selectedCount)}
-                        </span>
-                      </div>
-                    </div>
-
-                    {children.length === 0 ? (
-                      !otherOpen ? (
-                        <div className="grid grid-cols-1 gap-x-8 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-                          {renderAddSubscopeField(scopeKey)}
-                        </div>
-                      ) : null
-                    ) : (
-                      <div className="grid grid-cols-1 gap-x-8 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-                        {children.map((child) => {
-                          const checked = isChildSelected(parent.id, child.id)
-                          const key = `${parent.id}:${child.id}`
-                          const attachments = attachmentsByKey[key] || []
-                          return (
-                            <div
-                              key={child.id}
-                              className="flex min-h-[46px] flex-col justify-center border-b border-slate-200/80 py-2.5"
-                            >
-                              <div className="flex items-start justify-between gap-2">
-                                <button
-                                  type="button"
-                                  onClick={() => toggleChild(parent.id, child.id)}
-                                  className={`flex min-w-0 flex-1 items-start gap-2.5 ${isRTL ? 'text-right' : 'text-left'
-                                    }`}
-                                >
-                                  <span
-                                    className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border ${checked
-                                        ? 'border-blue-500 bg-blue-500'
-                                        : 'border-slate-300 bg-white/80'
-                                      }`}
-                                    aria-hidden="true"
-                                  >
-                                    {checked ? (
-                                      <IconCheck size={13} stroke={3} className="text-white" />
-                                    ) : null}
-                                  </span>
-                                  <span
-                                    className={`min-w-0 text-[13px] font-semibold leading-snug text-slate-700 ${checked ? 'text-blue-900' : ''} ${isRTL ? 'text-right' : 'text-left'
-                                      }`}
-                                  >
-                                    {child.name}
-                                  </span>
-                                </button>
-                                {checked ? (
-                                  <button
-                                    type="button"
-                                    onClick={() => openFilePicker(parent.id, child.id)}
-                                    aria-label={isRTL ? 'إضافة مرفقات داعمة' : 'Add supporting attachments'}
-                                    title={isRTL ? 'إضافة مرفقات داعمة' : 'Add supporting attachments'}
-                                    className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-slate-200 bg-white/75 text-blue-600 transition-colors hover:border-blue-300 hover:bg-blue-50"
-                                  >
-                                    <IconPaperclip size={14} stroke={1.8} />
-                                  </button>
-                                ) : null}
-                              </div>
-
-                              {checked && attachments.length > 0 ? (
-                                <div className="mt-2 flex flex-wrap gap-3">
-                                  {attachments.map((file, idx) => (
-                                    <AttachmentTile
-                                      key={`${file.name}-${file.size}-${idx}`}
-                                      file={file}
-                                      onRemove={() => removeFile(key, idx)}
-                                      isRTL={isRTL}
-                                    />
-                                  ))}
-                                </div>
-                              ) : null}
-                            </div>
-                          )
-                        })}
-                        {!otherOpen ? renderAddSubscopeField(scopeKey) : null}
-                      </div>
-                    )}
-
-                    {otherOpen ? (
-                      <div >
-
-                        <div className="grid grid-cols-1 gap-x-8 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-                          {customSubscopes.map((sub) => {
-                            const key = `${scopeKey}:${sub.id}`
-                            const attachments = attachmentsByKey[key] || []
-                            const hasName = Boolean(String(sub.name || '').trim())
-                            const isConfirmed = isManualSubscopeConfirmed(scopeKey, sub.id)
-                            const isFinalized = isManualSubscopeFinalized(scopeKey, sub.id)
-                            return (
-                              <div
-                                key={sub.id}
-                                className="flex min-h-[46px] flex-col justify-center border-b border-slate-200/80 py-2.5"
-                              >
-                                {isFinalized ? (
-                                  <div className="space-y-2">
-                                    <div className="flex items-start justify-between gap-2">
-                                      <button
-                                        type="button"
-                                        onClick={() => toggleManualSubscopeConfirmed(scopeKey, sub.id)}
-                                        className={`flex min-w-0 flex-1 items-start gap-2.5 ${isRTL ? 'text-right' : 'text-left'}`}
-                                      >
-                                        <span
-                                          className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border ${
-                                            isConfirmed
-                                              ? 'border-blue-500 bg-blue-500'
-                                              : 'border-slate-300 bg-white/80'
-                                          }`}
-                                          aria-hidden="true"
-                                        >
-                                          {isConfirmed ? (
-                                            <IconCheck size={13} stroke={3} className="text-white" />
-                                          ) : null}
-                                        </span>
-                                        <span className={`min-w-0 text-[13px] font-semibold leading-snug text-slate-700 ${isConfirmed ? 'text-blue-900' : ''} ${isRTL ? 'text-right' : 'text-left'}`}>
-                                          {sub.name}
-                                        </span>
-                                      </button>
-
-                                      {isConfirmed ? (
-                                        <button
-                                          type="button"
-                                          onClick={() => openFilePickerKey(key)}
-                                          aria-label={isRTL ? 'إضافة مرفقات داعمة' : 'Add supporting attachments'}
-                                          title={isRTL ? 'إضافة مرفقات داعمة' : 'Add supporting attachments'}
-                                          className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-slate-200 bg-white/75 text-blue-600 transition-colors hover:border-blue-300 hover:bg-blue-50"
-                                        >
-                                          <IconPaperclip size={14} stroke={1.8} />
-                                        </button>
-                                      ) : null}
-
-                                      <button
-                                        type="button"
-                                        onClick={() => removeManualSubscope(scopeKey, sub.id)}
-                                        aria-label={isRTL ? 'إزالة النطاق الفرعي' : 'Remove subscope'}
-                                        title={isRTL ? 'إزالة' : 'Remove'}
-                                        className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-rose-50 text-rose-500 hover:bg-rose-100"
-                                      >
-                                        <IconXboxXFilled size={14} />
-                                      </button>
-                                    </div>
-                                  </div>
-                                ) : (
-                                  <div className="flex items-start justify-between gap-3">
-                                    <input
-                                      value={sub.name}
-                                      maxLength={BACKEND_STRING_MAX}
-                                      onChange={(e) =>
-                                        updateManualSubscopeName(scopeKey, sub.id, e.target.value)
-                                      }
-                                      onKeyDown={(e) => {
-                                        if (e.key === 'Enter') confirmManualSubscope(scopeKey, sub.id)
-                                        if (e.key === 'Escape') removeManualSubscope(scopeKey, sub.id)
-                                      }}
-                                      placeholder={isRTL ? 'اسم النطاق الفرعي…' : 'Subscope name…'}
-                                      className={`w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-[13px] font-semibold text-slate-900 placeholder:text-slate-400 focus:border-slate-300 focus:outline-none focus:ring-0 ${isRTL ? 'text-right' : 'text-left'
-                                        }`}
-                                    />
-
-                                    <div className="flex shrink-0 items-center gap-2">
-                                      <button
-                                        type="button"
-                                        onClick={() => confirmManualSubscope(scopeKey, sub.id)}
-                                        disabled={!hasName}
-                                        aria-label={isRTL ? 'تأكيد النطاق الفرعي' : 'Confirm subscope'}
-                                        title={isRTL ? 'تأكيد' : 'Confirm'}
-                                        className={`inline-flex h-7 w-7 items-center justify-center rounded-md bg-emerald-500 text-white shadow-sm hover:bg-emerald-600 active:bg-emerald-700 ${hasName ? '' : 'cursor-not-allowed opacity-45'}`}
-                                      >
-                                        <IconCheck size={14} stroke={2} />
-                                      </button>
-
-                                      <button
-                                        type="button"
-                                        onClick={() => removeManualSubscope(scopeKey, sub.id)}
-                                        aria-label={isRTL ? 'إزالة النطاق الفرعي' : 'Remove subscope'}
-                                        title={isRTL ? 'إزالة' : 'Remove'}
-                                        className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-rose-50 text-rose-500 hover:bg-rose-100"
-                                      >
-                                        <IconXboxXFilled size={14} />
-                                      </button>
-                                    </div>
-                                  </div>
-                                )}
-
-                                {attachments.length > 0 ? (
-                                  <div className="flex flex-wrap gap-3 pt-1">
-                                    {attachments.map((file, idx) => (
-                                      <AttachmentTile
-                                        key={`${file.name}-${file.size}-${idx}`}
-                                        file={file}
-                                        onRemove={() => removeFile(key, idx)}
-                                        isRTL={isRTL}
-                                      />
-                                    ))}
-                                  </div>
-                                ) : null}
-                              </div>
-                            )
-                          })}
-                          {renderAddSubscopeField(scopeKey)}
-                        </div>
-                      </div>
+                <section key={parent.id} className="space-y-3 rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
+                  <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+                    <h3 className="text-[15px] font-bold text-slate-900">{parent.name}</h3>
+                    {children.length > 0 ? (
+                      <button
+                        type="button"
+                        onClick={() => toggleSelectAllChildren(parent.id, children)}
+                        className="text-[13px] font-semibold text-[#1C7CBB] hover:underline"
+                      >
+                        {allSelected
+                          ? isRTL
+                            ? 'إلغاء تحديد الكل'
+                            : 'Clear'
+                          : isRTL
+                            ? 'تحديد الكل'
+                            : 'Select all'}
+                      </button>
                     ) : null}
                   </div>
-                </div>
+                  {children.length === 0 && finalizedManualSubscopes(scopeKey).length === 0 ? (
+                    <p className="text-[13px] font-medium text-slate-500">
+                      {isRTL
+                        ? 'سيتم تضمين هذا النطاق بالكامل. أضف نطاقات فرعية إذا أردت تفاصيل أكثر.'
+                        : 'This whole scope will be included. Add subscopes if you want to be more specific.'}
+                    </p>
+                  ) : null}
+                  <div className="flex flex-wrap gap-2">
+                    {children.map((child) =>
+                      renderChip({
+                        label: child.name,
+                        selected: isChildSelected(parent.id, child.id),
+                        fileCount: (attachmentsByKey[`${parent.id}:${child.id}`] || []).length,
+                        onToggle: () => toggleChild(parent.id, child.id),
+                        key: String(child.id),
+                      })
+                    )}
+                    {renderCustomChips(scopeKey)}
+                    {renderAddChip(scopeKey, parent)}
+                  </div>
+                </section>
               )
             })}
 
             {manualScopes.map((scope) => {
               const scopeKey = manualScopeKey(scope.id)
-              const subscopes = manualSubscopesByScope[scopeKey] || []
-              const selectedCount = manualScopeSelectedCount(scope, scopeKey)
               return (
-                <div
-                  key={scope.id}
-                  className="h-full rounded-lg border border-slate-200/80 bg-white/45 shadow-sm backdrop-blur-md"
-                >
-                  <div className="flex h-full flex-col gap-2 p-4">
-                    <div className={`flex flex-wrap items-start justify-between gap-2 ${isRTL ? 'text-right' : 'text-left'}`}>
-                      <div className="min-w-0 text-base font-bold leading-tight text-slate-900">
-                        {scope.name}
-                      </div>
-                      <span className="shrink-0 rounded-full bg-blue-100 px-2.5 py-1 text-xs font-bold text-blue-600">
-                        {selectedCountLabel(selectedCount)}
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-1 gap-x-8 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-                      {subscopes.map((sub) => {
-                          const key = `${scopeKey}:${sub.id}`
-                          const attachments = attachmentsByKey[key] || []
-                          const hasName = Boolean(String(sub.name || '').trim())
-                          const isConfirmed = isManualSubscopeConfirmed(scopeKey, sub.id)
-                          const isFinalized = isManualSubscopeFinalized(scopeKey, sub.id)
-                          return (
-                            <div
-                              key={sub.id}
-                              className="flex min-h-[46px] flex-col justify-center border-b border-slate-200/80 py-2.5"
-                            >
-                              {isFinalized ? (
-                                <div className="space-y-2">
-                                  <div className="flex items-start justify-between gap-2">
-                                    <button
-                                      type="button"
-                                      onClick={() => toggleManualSubscopeConfirmed(scopeKey, sub.id)}
-                                      className={`flex min-w-0 flex-1 items-start gap-2.5 ${isRTL ? 'text-right' : 'text-left'}`}
-                                    >
-                                      <span
-                                        className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border ${
-                                          isConfirmed
-                                            ? 'border-blue-500 bg-blue-500'
-                                            : 'border-slate-300 bg-white/80'
-                                        }`}
-                                        aria-hidden="true"
-                                      >
-                                        {isConfirmed ? (
-                                          <IconCheck size={13} stroke={3} className="text-white" />
-                                        ) : null}
-                                      </span>
-                                      <span className={`min-w-0 text-[13px] font-semibold leading-snug text-slate-700 ${isConfirmed ? 'text-blue-900' : ''} ${isRTL ? 'text-right' : 'text-left'}`}>
-                                        {sub.name}
-                                      </span>
-                                    </button>
-
-                                    {isConfirmed ? (
-                                      <button
-                                        type="button"
-                                        onClick={() => openFilePickerKey(key)}
-                                        aria-label={isRTL ? 'إضافة مرفقات داعمة' : 'Add supporting attachments'}
-                                        title={isRTL ? 'إضافة مرفقات داعمة' : 'Add supporting attachments'}
-                                        className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-slate-200 bg-white/75 text-blue-600 transition-colors hover:border-blue-300 hover:bg-blue-50"
-                                      >
-                                        <IconPaperclip size={14} stroke={1.8} />
-                                      </button>
-                                    ) : null}
-
-                                    <button
-                                      type="button"
-                                      onClick={() => removeManualSubscope(scopeKey, sub.id)}
-                                      aria-label={isRTL ? 'إزالة النطاق الفرعي' : 'Remove subscope'}
-                                      title={isRTL ? 'إزالة' : 'Remove'}
-                                      className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-rose-50 text-rose-500 hover:bg-rose-100"
-                                    >
-                                      <IconXboxXFilled size={14} />
-                                    </button>
-                                  </div>
-                                </div>
-                              ) : (
-                                <div className="flex items-start justify-between gap-3">
-                                  <input
-                                    value={sub.name}
-                                    maxLength={BACKEND_STRING_MAX}
-                                    onChange={(e) =>
-                                      updateManualSubscopeName(scopeKey, sub.id, e.target.value)
-                                    }
-                                    onKeyDown={(e) => {
-                                      if (e.key === 'Enter') confirmManualSubscope(scopeKey, sub.id)
-                                      if (e.key === 'Escape') removeManualSubscope(scopeKey, sub.id)
-                                    }}
-                                    placeholder={isRTL ? 'اسم النطاق الفرعي…' : 'Subscope name…'}
-                                    className={`w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-[13px] font-semibold text-slate-900 placeholder:text-slate-400 focus:border-slate-300 focus:outline-none focus:ring-0 ${isRTL ? 'text-right' : 'text-left'
-                                      }`}
-                                  />
-
-                                  <div className="flex shrink-0 items-center gap-2">
-                                    <button
-                                      type="button"
-                                      onClick={() => confirmManualSubscope(scopeKey, sub.id)}
-                                      disabled={!hasName}
-                                      aria-label={isRTL ? 'تأكيد النطاق الفرعي' : 'Confirm subscope'}
-                                      title={isRTL ? 'تأكيد' : 'Confirm'}
-                                      className={`inline-flex h-7 w-7 items-center justify-center rounded-md bg-emerald-500 text-white shadow-sm hover:bg-emerald-600 active:bg-emerald-700 ${hasName ? '' : 'cursor-not-allowed opacity-45'}`}
-                                    >
-                                      <IconCheck size={14} stroke={2} />
-                                    </button>
-
-                                    <button
-                                      type="button"
-                                      onClick={() => removeManualSubscope(scopeKey, sub.id)}
-                                      aria-label={isRTL ? 'إزالة النطاق الفرعي' : 'Remove subscope'}
-                                      title={isRTL ? 'إزالة' : 'Remove'}
-                                      className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-rose-50 text-rose-500 hover:bg-rose-100"
-                                    >
-                                      <IconXboxXFilled size={14} />
-                                    </button>
-                                  </div>
-                                </div>
-                              )}
-
-                              {attachments.length > 0 ? (
-                                <div className="flex flex-wrap gap-3">
-                                  {attachments.map((file, idx) => (
-                                    <AttachmentTile
-                                      key={`${file.name}-${file.size}-${idx}`}
-                                      file={file}
-                                      onRemove={() => removeFile(key, idx)}
-                                      isRTL={isRTL}
-                                    />
-                                  ))}
-                                </div>
-                              ) : null}
-                            </div>
-                          )
-                        })}
-                      {renderAddSubscopeField(scopeKey)}
-                    </div>
+                <section key={scope.id} className="space-y-3 rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
+                  <h3 className="text-[15px] font-bold text-slate-900">{scope.name}</h3>
+                  {finalizedManualSubscopes(scopeKey).length === 0 ? (
+                    <p className="text-[13px] font-medium text-slate-500">
+                      {isRTL
+                        ? 'سيتم تضمين هذا النطاق بالكامل. أضف نطاقات فرعية إذا أردت تفاصيل أكثر.'
+                        : 'This whole scope will be included. Add subscopes if you want to be more specific.'}
+                    </p>
+                  ) : null}
+                  <div className="flex flex-wrap gap-2">
+                    {renderCustomChips(scopeKey)}
+                    {renderAddChip(scopeKey)}
                   </div>
-                </div>
+                </section>
               )
             })}
-          </div>
+
+            <section className="rounded-xl border border-dashed border-slate-300 bg-white p-4 sm:p-5">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
+                <IconPaperclip size={18} stroke={1.8} className="shrink-0 text-slate-400" />
+                <div className="min-w-0 flex-1">
+                  <div className="text-sm font-bold text-slate-900">
+                    {isRTL ? 'ملفات داعمة' : 'Supporting files'}{' '}
+                    <span className="font-medium text-slate-400">
+                      {isRTL ? '(اختياري)' : '(optional)'}
+                    </span>
+                  </div>
+                  <p className="text-[13px] font-medium text-slate-500">
+                    {attachmentGroups.length === 0
+                      ? isRTL
+                        ? 'اختر نطاقًا فرعيًا أولًا، ثم أرفق الملفات المتعلقة به.'
+                        : 'Select a subscope first, then attach files related to it.'
+                      : isRTL
+                        ? 'ملخصات أو تقارير سابقة أو بيانات تساعد الإنسايتر.'
+                        : 'Briefs, past reports or data that help the insighter.'}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setAttachModalOpen(true)}
+                  disabled={attachmentGroups.length === 0}
+                  className="btn-sm rounded-full border border-slate-200 bg-white px-4 py-1.5 font-semibold text-[#1C7CBB] hover:border-[#1C7CBB] disabled:cursor-not-allowed disabled:text-slate-400 disabled:hover:border-slate-200"
+                >
+                  {isRTL ? 'إرفاق ملفات' : 'Attach files'}
+                </button>
+              </div>
+
+              {attachedFiles.length > 0 ? (
+                <ul className="mt-4 divide-y divide-slate-100 border-t border-slate-100">
+                  {attachedFiles.map(({ key, index, file, subscopeName }) => (
+                    <li key={`${key}-${index}`} className="flex items-center gap-3 py-2">
+                      <FileIcon file={file} />
+                      <span className="min-w-0 flex-1 truncate text-sm font-medium text-slate-800">
+                        {file.name}
+                        <span className="ms-2 text-xs tabular-nums text-slate-400">
+                          {formatBytes(file.size)}
+                        </span>
+                      </span>
+                      <span className="max-w-[45%] shrink-0 truncate rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-[#1C7CBB]">
+                        {subscopeName}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => removeFile(key, index)}
+                        aria-label={isRTL ? 'إزالة المرفق' : 'Remove attachment'}
+                        className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-slate-400 hover:bg-rose-50 hover:text-rose-500"
+                      >
+                        <IconX size={14} />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </section>
+          </>
         )}
       </div>
 
-      <input
-        key={inputNonce}
-        ref={fileInputRef}
-        type="file"
-        multiple
-        className="hidden"
-        onChange={(e) => onFilesPicked(e.target.files)}
-      />
+      {attachModalOpen ? (
+        <SubscopeAttachmentModal
+          isRTL={isRTL}
+          groups={attachmentGroups}
+          onClose={() => setAttachModalOpen(false)}
+          onAttach={attachFiles}
+        />
+      ) : null}
 
       <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-slate-200/70 bg-white/80 backdrop-blur-md">
         <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
@@ -1540,17 +1295,31 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
               {isRTL ? 'رجوع' : 'Back'}
             </Link>
 
-            <button
-              type="button"
-              onClick={onContinue}
-              disabled={!canContinue}
-              className={`btn-sm px-6 py-2 rounded-full ${canContinue
-                  ? 'text-white bg-[#1C7CBB] hover:bg-opacity-90'
-                  : 'text-slate-500 bg-slate-200 cursor-not-allowed'
-                }`}
-            >
-              {submitting ? (isRTL ? 'جاري المتابعة…' : 'Continuing…') : nav.continueLabel}
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => void submitScopes(true)}
+                disabled={!canSkip}
+                className="btn-sm px-5 py-2 rounded-full text-slate-700 bg-white/80 hover:bg-white border border-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isRTL ? 'تخطي' : 'Skip'}
+              </button>
+              <button
+                type="button"
+                onClick={() => void submitScopes(false)}
+                disabled={!canContinue}
+                className={`btn-sm px-6 py-2 rounded-full ${canContinue
+                    ? 'text-white bg-[#1C7CBB] hover:bg-opacity-90'
+                    : 'text-slate-500 bg-slate-200 cursor-not-allowed'
+                  }`}
+              >
+                {submitting && !skipping
+                  ? isRTL
+                    ? 'جاري المتابعة…'
+                    : 'Continuing…'
+                  : nav.continueLabel}
+              </button>
+            </div>
           </div>
         </div>
       </div>

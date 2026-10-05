@@ -4,6 +4,9 @@ import { useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import Link from 'next/link'
 import { IconBuilding, IconUserFilled, IconUsersGroup } from '@tabler/icons-react'
+import { getProjectApiErrorMessage } from '@/components/project/projectApiError'
+import { syncProjectPropertiesIfReady } from '@/components/project/projectPropertiesSync'
+import { useProjectStepErrorToast } from '@/components/project/useProjectStepErrorToast'
 import ProjectSelectedTypeHeader from '../ProjectSelectedTypeHeader'
 import { useProjectWizardNavigation } from '../useProjectWizardNavigation'
 import { projectWizardStorage, type WizardLocale } from '../wizardStorage'
@@ -48,6 +51,10 @@ export default function PreferredInsighterTypeQuestion({
   const [entered, setEntered] = useState(false)
   const [projectType, setProjectType] = useState<string | null>(null)
   const [selected, setSelected] = useState<PreferredInsighterType | null>(null)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  useProjectStepErrorToast(error, locale)
 
   useEffect(() => {
     const timer = window.setTimeout(() => setEntered(true), 30)
@@ -76,9 +83,11 @@ export default function PreferredInsighterTypeQuestion({
     ? 'ما نوع الخبير الذي تفضله لتنفيذ هذا المشروع؟'
     : 'What type of expert (insighter) do you prefer to conduct this project?'
 
-  const canContinue = selected !== null
+  const canContinue = selected !== null && !submitting
 
-  const persistAndContinue = (value: PreferredInsighterType) => {
+  const persistAndContinue = async (value: PreferredInsighterType) => {
+    if (submitting) return
+
     try {
       window.sessionStorage.setItem(
         projectWizardStorage.preferredInsighterTypeKey(locale),
@@ -93,17 +102,36 @@ export default function PreferredInsighterTypeQuestion({
       // ignore
     }
 
+    // "Any" skips the origin step, which otherwise saves these preferences.
+    if (value === 'Either') {
+      setSubmitting(true)
+      setError(null)
+      try {
+        await syncProjectPropertiesIfReady(locale)
+      } catch (err) {
+        setError(
+          getProjectApiErrorMessage(
+            err,
+            isRTL ? 'تعذر حفظ خصائص المشروع.' : 'Failed to save project properties.'
+          )
+        )
+        return
+      } finally {
+        setSubmitting(false)
+      }
+    }
+
     nav.goNext()
   }
 
   const onContinue = () => {
     if (!selected) return
-    persistAndContinue(selected)
+    void persistAndContinue(selected)
   }
 
   const onSelect = (value: PreferredInsighterType) => {
     setSelected(value)
-    persistAndContinue(value)
+    void persistAndContinue(value)
   }
 
   const iconBadgeBase =

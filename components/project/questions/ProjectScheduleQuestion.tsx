@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { IconInfoCircle } from '@tabler/icons-react'
 import { useRouter } from 'next/navigation'
-import { IconMinus, IconPlus } from '@tabler/icons-react'
 import { getProjectApiErrorMessage } from '@/components/project/projectApiError'
 import {
   dayLabel,
@@ -39,6 +39,11 @@ function rangeFor(durationDays: number) {
   return Math.max(MIN_RANGE_DAYS, Math.ceil((durationDays + 30) / 30) * 30)
 }
 
+function durationUnit(locale: WizardLocale, days: number) {
+  if (locale === 'ar') return days >= 3 && days <= 10 ? 'أيام' : days > 10 ? 'يومًا' : 'يوم'
+  return days === 1 ? 'Day' : 'Days'
+}
+
 export default function ProjectScheduleQuestion({ locale }: { locale: WizardLocale }) {
   const router = useRouter()
   const nav = useProjectWizardNavigation(locale)
@@ -51,6 +56,7 @@ export default function ProjectScheduleQuestion({ locale }: { locale: WizardLoca
   const [deliverables, setDeliverables] = useState<ProjectDeliverable[]>([])
   const [startDate, setStartDate] = useState('')
   const [durationDays, setDurationDays] = useState(30)
+  const [durationDraft, setDurationDraft] = useState<string | null>(null)
   const [rangeMax, setRangeMax] = useState(MIN_RANGE_DAYS)
   const [showUrgentWarning, setShowUrgentWarning] = useState(false)
   const [urgentAcknowledged, setUrgentAcknowledged] = useState(false)
@@ -118,6 +124,13 @@ export default function ProjectScheduleQuestion({ locale }: { locale: WizardLoca
     if (growRange && !isUrgent && next + 14 > rangeMax) setRangeMax(rangeFor(next))
   }
 
+  // Typed values below the minimum stay a draft until blur, so "45" can be typed past a minimum of 10.
+  const commitDurationDraft = () => {
+    if (durationDraft === null) return
+    updateDuration(durationDraft ? Number(durationDraft) : durationDays)
+    setDurationDraft(null)
+  }
+
   // Finishing by tomorrow turns a normal request into an urgent one.
   const becomesUrgent =
     !isUrgent && Boolean(plannedCloseDate) && plannedCloseDate <= addDaysToIsoDate(today, 1)
@@ -182,11 +195,6 @@ export default function ProjectScheduleQuestion({ locale }: { locale: WizardLoca
           >
             {isRTL ? 'متى يبدأ المشروع وكم يستغرق؟' : 'When should the project start, and how long will it take?'}
           </h2>
-          <p className="mt-3 max-w-2xl text-sm text-slate-500">
-            {isRTL
-              ? 'هذا موعد مخطط. إذا وُقّع العقد في يوم آخر، يبدأ المشروع يوم التوقيع وتتحرك مواعيد المخرجات والإغلاق معه.'
-              : 'This is a planned date. If the contract is signed on a different day, the project starts on the signing date and the deliverable and close dates move with it.'}
-          </p>
         </div>
 
         <div
@@ -194,7 +202,11 @@ export default function ProjectScheduleQuestion({ locale }: { locale: WizardLoca
           style={{ transitionDelay: '160ms' }}
         >
           <div>
+            <h3 className="text-sm font-bold text-slate-800">
+              {isRTL ? 'تاريخ البدء المتوقع' : 'Expected start date'}
+            </h3>
             <InlineDateCalendar
+              className="mt-3"
               value={startDate}
               min={today}
               max={isUrgent ? today : undefined}
@@ -204,52 +216,39 @@ export default function ProjectScheduleQuestion({ locale }: { locale: WizardLoca
                 setError(null)
               }}
               locale={locale}
-              label={isRTL ? 'تاريخ البدء المخطط' : 'Planned start date'}
+              label={isRTL ? 'تاريخ البدء المتوقع' : 'Expected start date'}
             />
             {isUrgent ? <UrgentDateNotice locale={locale} /> : null}
           </div>
 
-          <div className="min-w-0">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <h3 className="text-sm font-bold text-slate-800">
-                {isRTL ? 'مدة المشروع' : 'Project duration'}
-              </h3>
-              <div className="flex items-center rounded-[10px] border border-slate-200 bg-white">
-                <button
-                  type="button"
-                  onClick={() => updateDuration(durationDays - 1)}
-                  disabled={durationDays <= minDuration}
-                  aria-label={isRTL ? 'تقليل يوم' : 'One day shorter'}
-                  className="inline-flex h-9 w-9 items-center justify-center text-slate-600 hover:text-slate-900 disabled:text-slate-300"
-                >
-                  <IconMinus size={16} />
-                </button>
-                <label className="flex items-center gap-1 px-1">
-                  <span className="sr-only">{isRTL ? 'المدة بالأيام' : 'Duration in days'}</span>
-                  <input
-                    type="number"
-                    inputMode="numeric"
-                    min={minDuration}
-                    max={isUrgent ? URGENT_MAX_DURATION_DAYS : undefined}
-                    value={durationDays}
-                    onChange={(event) => updateDuration(Number(event.target.value))}
-                    className="w-14 bg-transparent text-center text-sm font-bold tabular-nums text-slate-900 focus:outline-none"
-                  />
-                  <span className="text-xs font-semibold text-slate-500">{isRTL ? 'يوم' : 'days'}</span>
-                </label>
-                <button
-                  type="button"
-                  onClick={() => updateDuration(durationDays + 1)}
-                  disabled={durationDays >= maxDuration}
-                  aria-label={isRTL ? 'زيادة يوم' : 'One day longer'}
-                  className="inline-flex h-9 w-9 items-center justify-center text-slate-600 hover:text-slate-900 disabled:text-slate-300"
-                >
-                  <IconPlus size={16} />
-                </button>
-              </div>
-            </div>
+          <div className="flex min-w-0 flex-col">
+            <h3 className="text-sm font-bold text-slate-800">
+              {isRTL ? 'مدة المشروع' : 'Project duration'}
+            </h3>
+            <label className="mt-1 inline-flex items-baseline gap-2 self-start lg:mb-4">
+              <span className="sr-only">{isRTL ? 'المدة بالأيام' : 'Duration in days'}</span>
+              <input
+                type="text"
+                inputMode="numeric"
+                value={durationDraft ?? String(durationDays)}
+                onChange={(event) => {
+                  const digits = event.target.value.replace(/\D/g, '').slice(0, 4)
+                  setDurationDraft(digits)
+                  const typed = Number(digits)
+                  if (digits && typed >= minDuration && typed <= maxDuration) updateDuration(typed, false)
+                }}
+                onFocus={(event) => event.target.select()}
+                onBlur={commitDurationDraft}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') event.currentTarget.blur()
+                }}
+                style={{ width: `${Math.max(2, (durationDraft ?? String(durationDays)).length) + 0.25}ch` }}
+                className="border-0 border-b-2 border-transparent bg-transparent p-0 text-6xl font-semibold leading-none tracking-tight tabular-nums text-slate-900 transition-colors hover:border-slate-200 focus:border-[#1C7CBB] focus:outline-none focus:ring-0"
+              />
+              <span className="text-2xl font-medium text-slate-500">{durationUnit(locale, durationDays)}</span>
+            </label>
 
-            <div className="mt-3 rounded-[10px] border border-slate-200 bg-white/80 px-2 sm:px-4">
+            <div className="mt-4 rounded-[10px] border border-slate-200 bg-white/80 px-2 sm:px-4 lg:mt-auto">
               <TimelineSlider
                 min={0}
                 max={rangeMax}
@@ -290,15 +289,14 @@ export default function ProjectScheduleQuestion({ locale }: { locale: WizardLoca
               />
             </div>
 
-            <dl className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <dl className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
               {[
                 {
-                  term: isRTL ? 'البدء المخطط' : 'Planned start',
+                  term: isRTL ? 'البدء المتوقع' : 'Expected start',
                   value: startDate ? formatIsoDate(startDate, locale) : '—',
                 },
-                { term: isRTL ? 'المدة' : 'Duration', value: durationLabel(locale, durationDays) },
                 {
-                  term: isRTL ? 'الإغلاق المخطط' : 'Planned close',
+                  term: isRTL ? 'الإغلاق المتوقع' : 'Expected close',
                   value: plannedCloseDate ? formatIsoDate(plannedCloseDate, locale) : '—',
                 },
               ].map((item) => (
@@ -323,6 +321,18 @@ export default function ProjectScheduleQuestion({ locale }: { locale: WizardLoca
             ) : null}
             {error ? <p className="mt-3 text-sm text-rose-700">{error}</p> : null}
           </div>
+        </div>
+
+        <div
+          className={`mt-6 flex items-start gap-3 rounded-[10px] border border-[#1C7CBB]/25 bg-[#1C7CBB]/[0.07] px-4 py-3 text-start transition-all duration-700 ${fadeIn}`}
+          style={{ transitionDelay: '200ms' }}
+        >
+          <IconInfoCircle size={20} className="mt-0.5 shrink-0 text-[#1C7CBB]" aria-hidden="true" />
+          <p className="text-sm font-medium leading-6 text-[#155E8E] sm:text-[15px]">
+            {isRTL
+              ? 'يُرجى العلم أن تاريخي البدء والإغلاق المتوقعين تقديريان. يبدأ المشروع رسميًا في تاريخ توقيع العقد، سواء كان قبل التاريخ المحدد أو بعده، ويُعدَّل تاريخ الإغلاق ومواعيد جميع المخرجات تبعًا لذلك مع الحفاظ على المدة المتفق عليها.'
+              : 'Please note that the expected start and close dates are indicative. The project officially commences on the date the contract is signed, whether earlier or later than the date selected, and the close date and all deliverable dates will be adjusted accordingly, keeping the agreed duration.'}
+          </p>
         </div>
       </div>
 

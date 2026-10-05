@@ -1,4 +1,5 @@
 import { readProjectComponentSlugs } from './projectComponentsCatalog'
+import { isPreServiceProjectComponentSlug } from './projectWizardFlow'
 import {
   readStoredProjectServiceUuid,
   writeStoredProjectServiceUuid,
@@ -22,6 +23,8 @@ type ServiceSession = {
 export type ServiceFlow = {
   mode: 'add' | 'edit'
   projectServiceUuid: string
+  /** Step the sub-flow ends on; defaults to the services step. */
+  returnStepId?: string
 }
 
 function scopedKeys(locale: WizardLocale): string[] {
@@ -57,7 +60,7 @@ function splitComponents(locale: WizardLocale) {
   const serviceLevel: Record<string, unknown> = {}
 
   for (const [slug, value] of Object.entries(components || {})) {
-    if (projectSlugs.has(slug)) projectLevel[slug] = value
+    if (projectSlugs.has(slug) || isPreServiceProjectComponentSlug(slug)) projectLevel[slug] = value
     else serviceLevel[slug] = value
   }
 
@@ -142,7 +145,7 @@ export function readServiceFlow(locale: WizardLocale): ServiceFlow | null {
   return flow?.projectServiceUuid ? flow : null
 }
 
-/** Starts the add/edit sub-flow for an additional service (scopes → components → review). */
+/** Starts the add/edit sub-flow for an additional service (scopes → components → services step or review). */
 export function startServiceFlow(
   locale: WizardLocale,
   flow: ServiceFlow,
@@ -158,6 +161,38 @@ export function startServiceFlow(
     window.sessionStorage.setItem(projectWizardStorage.serviceFlowKey(locale), JSON.stringify(flow))
   } catch {
     // ignore
+  }
+}
+
+/**
+ * Opens the service step to choose another service for the project; picking
+ * one there adds it and starts its sub-flow (`startServiceFlow`).
+ */
+export function beginServiceAdd(locale: WizardLocale, returnStepId: string) {
+  if (typeof window === 'undefined') return
+  if (!readPrimaryProjectServiceUuid(locale)) {
+    writePrimaryProjectServiceUuid(locale, readStoredProjectServiceUuid(locale))
+  }
+  try {
+    window.sessionStorage.setItem(
+      projectWizardStorage.serviceFlowKey(locale),
+      JSON.stringify({ mode: 'add', projectServiceUuid: '', returnStepId })
+    )
+  } catch {
+    // ignore
+  }
+}
+
+/** Storage values a new service session starts with. */
+export function serviceSessionSeed(
+  locale: WizardLocale,
+  service: { serviceId: number | null; name: string; isOther: boolean; prompt?: string }
+): Record<string, string> {
+  return {
+    [projectWizardStorage.serviceIdsKey(locale)]: JSON.stringify(service.serviceId),
+    [projectWizardStorage.serviceIsOtherKey(locale)]: service.isOther ? '1' : '0',
+    ...(service.isOther ? {} : { [projectWizardStorage.serviceLabelKey(locale)]: service.name }),
+    ...(service.prompt ? { [projectWizardStorage.servicePromptKey(locale)]: service.prompt } : {}),
   }
 }
 

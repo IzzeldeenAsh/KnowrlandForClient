@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import {
   IconArrowUp,
   IconCheck,
@@ -11,6 +12,7 @@ import ProjectSelectedTypeHeader from '../ProjectSelectedTypeHeader'
 import {
   clearStoredProjectRequestUuid,
   extractProjectRequestUuid,
+  readStoredProjectRequestUuid,
   writeStoredProjectRequestUuid,
 } from '../projectRequestUuid'
 import {
@@ -23,9 +25,19 @@ import {
   extractProjectServiceUuid,
   writeStoredProjectServiceUuid,
 } from '../projectServiceUuid'
-import { writePrimaryProjectServiceUuid } from '../projectServiceSessions'
+import {
+  serviceSessionSeed,
+  startServiceFlow,
+  writePrimaryProjectServiceUuid,
+} from '../projectServiceSessions'
+import {
+  isServiceAddPending,
+  projectWizardStepIds,
+  readServiceFlowReturnStepId,
+} from '../projectWizardFlow'
 import { readStoredSpecifiedInsighterUuid } from '../specifiedInsighterProject'
 import { serviceMetaForSlug, type ServiceMeta } from '../serviceMeta'
+import { resetServiceComponentsPayload } from '../serviceComponentsPayload'
 import { projectWizardStorage, type WizardLocale } from '../wizardStorage'
 import { getApiUrl } from '@/app/config'
 import { getAuthToken } from '@/lib/authToken'
@@ -163,7 +175,10 @@ function AiScopePromptComposer({
 }
 
 export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
+  const router = useRouter()
   const nav = useProjectWizardNavigation(locale)
+  // Choosing another service for an existing (specific-insighter) project.
+  const [addingService, setAddingService] = useState(false)
   const isRTL = locale === 'ar'
   const isEnglish =
     typeof locale === 'string' && locale.toLowerCase().startsWith('en')
@@ -199,15 +214,20 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
           projectWizardStorage.deliverablesLanguageKey(locale)
         )
       )
-      setSelectedId(
-        safeParseSelectedServiceId(
-          window.sessionStorage.getItem(projectWizardStorage.serviceIdsKey(locale))
+      const adding = isServiceAddPending(locale)
+      setAddingService(adding)
+      // The stored selection belongs to the main service.
+      if (!adding) {
+        setSelectedId(
+          safeParseSelectedServiceId(
+            window.sessionStorage.getItem(projectWizardStorage.serviceIdsKey(locale))
+          )
         )
-      )
-      setServicePrompt(
-        window.sessionStorage.getItem(projectWizardStorage.servicePromptKey(locale)) ||
-        ''
-      )
+        setServicePrompt(
+          window.sessionStorage.getItem(projectWizardStorage.servicePromptKey(locale)) ||
+          ''
+        )
+      }
     } catch {
       // ignore
     }
@@ -271,9 +291,13 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
     }
   }, [isRTL, locale])
 
-  const title = isRTL
-    ? 'ما نوع الخدمات التي تبحث عنها؟'
-    : 'What type of services are you looking for?'
+  const title = addingService
+    ? isRTL
+      ? 'ما الخدمة التي تريد إضافتها؟'
+      : 'Which service do you want to add?'
+    : isRTL
+      ? 'ما نوع الخدمات التي تبحث عنها؟'
+      : 'What type of services are you looking for?'
 
   const selectedService = useMemo(
     () => (services || []).find((service) => service.id === selectedId) || null,
@@ -353,10 +377,7 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
         window.sessionStorage.removeItem(projectWizardStorage.servicePromptKey(locale))
       }
 
-      window.sessionStorage.setItem(
-        projectWizardStorage.serviceComponentsPayloadKey(locale),
-        JSON.stringify({ components: {} })
-      )
+      resetServiceComponentsPayload(locale)
       window.sessionStorage.setItem(
         projectWizardStorage.serviceComponentSlugsKey(locale),
         JSON.stringify([])
@@ -387,12 +408,79 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
     }
   }
 
+  /** Adds the chosen service to the existing project and starts its scopes. */
+  const addServiceToProject = async (payload: {
+    serviceId: number
+    isOtherSelected: boolean
+    servicePrompt: string
+    serviceLabel: string | null
+  }) => {
+    const token = getAuthToken()
+    const projectUuid = readStoredProjectRequestUuid(locale)
+    if (!token || !projectUuid) {
+      setError(isRTL ? 'يرجى تسجيل الدخول للمتابعة.' : 'Please sign in to continue.')
+      return
+    }
+
+    const prompt = payload.isOtherSelected ? payload.servicePrompt.trim() : ''
+    setError(null)
+    setSubmitting(true)
+    try {
+      const res = await fetch(
+        getApiUrl(`/api/account/project/definition/service/${projectUuid}`),
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            'Accept-Language': locale === 'ar' ? 'ar' : 'en',
+            'X-Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
+          },
+          body: JSON.stringify({
+            service_id: payload.serviceId,
+            ...(prompt ? { prompt_ai: prompt } : {}),
+          }),
+        }
+      )
+      await assertProjectApiResponse(res, 'Failed to add the service.')
+      const json = (await res.json()) as { data?: { uuid?: string } }
+      const projectServiceUuid = String(json?.data?.uuid || '')
+      if (!projectServiceUuid) throw new Error('add_service_bad_response')
+
+      startServiceFlow(
+        locale,
+        { mode: 'add', projectServiceUuid, returnStepId: readServiceFlowReturnStepId(locale) },
+        serviceSessionSeed(locale, {
+          serviceId: payload.serviceId,
+          name: payload.serviceLabel || '',
+          isOther: payload.isOtherSelected,
+          prompt,
+        })
+      )
+      router.push(`/${locale}/project/wizard/${projectWizardStepIds.projectScope}`)
+    } catch (err) {
+      setError(
+        getProjectApiErrorMessage(
+          err,
+          isRTL ? 'تعذر إضافة الخدمة.' : 'Failed to add the service.'
+        )
+      )
+      setSubmitting(false)
+    }
+  }
+
   const submitSelection = async (payload: {
     serviceId: number
     isOtherSelected: boolean
     servicePrompt: string
     serviceLabel: string | null
   }) => {
+    if (addingService) {
+      await addServiceToProject(payload)
+      return
+    }
+
     setError(null)
 
     persistSelection(
@@ -467,10 +555,7 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
         clearStoredProposalMatchUuid(locale)
       }
       try {
-        window.sessionStorage.setItem(
-          projectWizardStorage.serviceComponentsPayloadKey(locale),
-          JSON.stringify({ components: {} })
-        )
+        resetServiceComponentsPayload(locale)
       } catch {
         // ignore
       }
@@ -523,7 +608,7 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
   const onContinue = async () => {
     if (!canContinue || selectedId == null || submitting) return
 
-    if (isOtherSelected) {
+    if (isOtherSelected && !addingService) {
       nav.goNext()
       return
     }
@@ -546,6 +631,19 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
     const nextIsOtherSelected = isOtherService(service)
     const nextPrompt = nextIsOtherSelected ? servicePrompt : ''
     if (!nextIsOtherSelected) setServicePrompt('')
+
+    if (addingService) {
+      // "Other" is added once its description is sent.
+      if (nextIsOtherSelected) return
+      void addServiceToProject({
+        serviceId: service.id,
+        isOtherSelected: false,
+        servicePrompt: '',
+        serviceLabel: service.name,
+      })
+      return
+    }
+
     persistSelection(
       service.id,
       nextIsOtherSelected,
@@ -592,7 +690,7 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
     const otherServiceId = otherService.id
     setSelectedId(otherServiceId)
     setError(null)
-    resetDownstreamWizardState(true)
+    if (!addingService) resetDownstreamWizardState(true)
 
     await submitSelection({
       serviceId: otherServiceId,

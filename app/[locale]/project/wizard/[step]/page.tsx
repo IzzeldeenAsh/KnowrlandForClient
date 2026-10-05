@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
+import ProjectServicesRailLayout from '@/components/project/ProjectServicesRail'
 import ProjectWizardShell from '@/components/project/ProjectWizardShell'
 import ProjectTypeQuestion from '@/components/project/questions/ProjectTypeQuestion'
 import ProjectStatusQuestion from '@/components/project/questions/ProjectStatusQuestion'
@@ -14,6 +15,7 @@ import ProjectScheduleQuestion from '@/components/project/questions/ProjectSched
 import ProjectAddonsIntroStep from '@/components/project/questions/ProjectAddonsIntroStep'
 import KickoffMeetingQuestion from '@/components/project/questions/KickoffMeetingQuestion'
 import ProjectReviewStep from '@/components/project/questions/ProjectReviewStep'
+import ServicesSummaryStep from '@/components/project/questions/ServicesSummaryStep'
 import ProjectMatchesStep from '@/components/project/questions/ProjectMatchesStep'
 import ProjectSubmissionSuccessStep from '@/components/project/questions/ProjectSubmissionSuccessStep'
 import DeliverablesLanguageQuestion from '@/components/project/questions/DeliverablesLanguageQuestion'
@@ -24,7 +26,6 @@ import ServiceQuestion from '@/components/project/questions/ServiceQuestion'
 import ProjectScopeQuestion from '@/components/project/questions/ProjectScopeQuestion'
 import ProjectSubscopesQuestion from '@/components/project/questions/ProjectSubscopesQuestion'
 import DeliverablesPlanQuestion from '@/components/project/questions/service-components/DeliverablesPlanQuestion'
-import DeliverablesFormatQuestion from '@/components/project/questions/service-components/DeliverablesFormatQuestion'
 import DataSourcesExpectedQuestion from '@/components/project/questions/service-components/DataSourcesExpectedQuestion'
 
 type PageProps = {
@@ -42,14 +43,15 @@ export default async function ProjectWizardStepPage({ params }: PageProps) {
     '6': 'target-market',
     '7': 'service',
     'deliverable-stage': 'deliverables-plan',
-    'deliverable-type-first-draft': 'deliverables-format',
-    'deliverable-type-final-version': 'deliverables-format',
+    'deliverables-format': 'deliverables-plan',
+    'deliverable-type-first-draft': 'deliverables-plan',
+    'deliverable-type-final-version': 'deliverables-plan',
     'deliverable-first-draft-date': 'deliverables-plan',
     'deliverable-final-version-date': 'deliverables-plan',
-    'deliverable-first-draft-type': 'deliverables-format',
-    'deliverable-first-draft-way': 'deliverables-format',
-    'deliverable-final-version-type': 'deliverables-format',
-    'deliverable-final-version-way': 'deliverables-format',
+    'deliverable-first-draft-type': 'deliverables-plan',
+    'deliverable-first-draft-way': 'deliverables-plan',
+    'deliverable-final-version-type': 'deliverables-plan',
+    'deliverable-final-version-way': 'deliverables-plan',
     'project-deadline': 'project-schedule',
   }
 
@@ -101,9 +103,11 @@ export default async function ProjectWizardStepPage({ params }: PageProps) {
   if (step === 'service') {
     return (
       <ProjectWizardShell align="top">
-        <div className="w-full pt-2 sm:pt-4">
-          <ServiceQuestion locale={locale} />
-        </div>
+        <ProjectServicesRailLayout locale={locale} step={step}>
+          <div className="w-full pt-2 sm:pt-4">
+            <ServiceQuestion locale={locale} />
+          </div>
+        </ProjectServicesRailLayout>
       </ProjectWizardShell>
     )
   }
@@ -111,9 +115,11 @@ export default async function ProjectWizardStepPage({ params }: PageProps) {
   if (step === 'project-scope') {
     return (
       <ProjectWizardShell align="top">
-        <div className="w-full pt-2 sm:pt-4">
-          <ProjectScopeQuestion locale={locale} />
-        </div>
+        <ProjectServicesRailLayout locale={locale} step={step}>
+          <div className="w-full pt-2 sm:pt-4">
+            <ProjectScopeQuestion locale={locale} />
+          </div>
+        </ProjectServicesRailLayout>
       </ProjectWizardShell>
     )
   }
@@ -121,9 +127,11 @@ export default async function ProjectWizardStepPage({ params }: PageProps) {
   if (step === 'project-subscopes') {
     return (
       <ProjectWizardShell align="top">
-        <div className="w-full pt-2 sm:pt-4">
-          <ProjectSubscopesQuestion locale={locale} />
-        </div>
+        <ProjectServicesRailLayout locale={locale} step={step}>
+          <div className="w-full pt-2 sm:pt-4">
+            <ProjectSubscopesQuestion locale={locale} />
+          </div>
+        </ProjectServicesRailLayout>
       </ProjectWizardShell>
     )
   }
@@ -131,22 +139,15 @@ export default async function ProjectWizardStepPage({ params }: PageProps) {
   if (step === 'deliverables-plan') {
     return (
       <ProjectWizardShell align="top">
-        <div className="w-full pt-2 sm:pt-4">
-          <DeliverablesPlanQuestion locale={locale} />
-        </div>
+        <ProjectServicesRailLayout locale={locale} step={step}>
+          <div className="w-full pt-2 sm:pt-4">
+            <DeliverablesPlanQuestion locale={locale} />
+          </div>
+        </ProjectServicesRailLayout>
       </ProjectWizardShell>
     )
   }
 
-  if (step === 'deliverables-format') {
-    return (
-      <ProjectWizardShell align="top">
-        <div className="w-full pt-2 sm:pt-4">
-          <DeliverablesFormatQuestion locale={locale} />
-        </div>
-      </ProjectWizardShell>
-    )
-  }
 
   if (step === 'data-sources-expected') {
     return (
@@ -224,6 +225,18 @@ export default async function ProjectWizardStepPage({ params }: PageProps) {
         <div className="w-full pt-2 sm:pt-4">
           <CompanyTeamSizeQuestion locale={locale} />
         </div>
+      </ProjectWizardShell>
+    )
+  }
+
+  if (step === 'services-summary') {
+    return (
+      <ProjectWizardShell align="top">
+        <ProjectServicesRailLayout locale={locale} step={step}>
+          <div className="w-full pt-2 sm:pt-4">
+            <ServicesSummaryStep locale={locale} />
+          </div>
+        </ProjectServicesRailLayout>
       </ProjectWizardShell>
     )
   }
