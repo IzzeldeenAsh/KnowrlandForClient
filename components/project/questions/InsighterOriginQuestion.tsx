@@ -10,7 +10,7 @@ import {
   assertProjectApiResponse,
   getProjectApiErrorMessage,
 } from '@/components/project/projectApiError'
-import { syncProjectProperties } from '@/components/project/projectPropertiesSync'
+import { syncProjectPropertiesIfReady } from '@/components/project/projectPropertiesSync'
 import { useProjectStepErrorToast } from '@/components/project/useProjectStepErrorToast'
 import ProjectSelectedTypeHeader from '../ProjectSelectedTypeHeader'
 import { projectWizardStepIds } from '../projectWizardFlow'
@@ -163,7 +163,7 @@ export default function InsighterOriginQuestion({
     setError(null)
 
     try {
-      await syncProjectProperties(locale)
+      await syncProjectPropertiesIfReady(locale)
       if (nav.nextHref) {
         nav.goNext()
         return

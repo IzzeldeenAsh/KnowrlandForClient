@@ -1,5 +1,6 @@
 'use client'
 
+import { syncProjectProperties } from '@/components/project/projectPropertiesSync'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import {
@@ -11,7 +12,6 @@ import { useProjectStepErrorToast } from '../useProjectStepErrorToast'
 import { projectWizardStorage, type WizardLocale } from '../wizardStorage'
 import { useProjectWizardNavigation } from '../useProjectWizardNavigation'
 import { updateServiceComponentPayload } from '@/components/project/serviceComponentsPayload'
-import { syncServiceComponents } from '@/components/project/serviceComponentsSync'
 
 type Mode = 'worldwide' | 'country' | 'regions' | 'economic'
 
@@ -380,15 +380,16 @@ export default function TargetMarketQuestion({ locale }: { locale: WizardLocale 
 
     updateServiceComponentPayload(locale, 'target-market', payload)
 
-    const leavingComponents = nav.nextStepId === 'project-status' || nav.isReviewEditMode
-    if (!leavingComponents) {
+    // Project-level component, asked before the project exists: the description
+    // step's properties sync sends it. In review edit mode that step won't run again.
+    if (!nav.isReviewEditMode) {
       nav.goNext()
       return
     }
 
     setSubmitting(true)
     try {
-      await syncServiceComponents(locale)
+      await syncProjectProperties(locale)
       nav.goNext()
     } catch (err) {
       setError(

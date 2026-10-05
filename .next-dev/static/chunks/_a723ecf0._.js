@@ -1286,7 +1286,7 @@ function Callback(param) {
                     }["Callback.useEffect.complete"]);
                     const roles = Array.isArray(user.roles) ? user.roles : [];
                     if (roles.includes('admin') || roles.includes('staff')) {
-                        destination.current = "/".concat(locale, "/dashboard");
+                        destination.current = "/".concat(locale, "/dashboard/users/clients");
                         navigate();
                         return;
                     }

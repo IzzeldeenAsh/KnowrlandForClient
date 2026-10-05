@@ -1,0 +1,58 @@
+{
+  "sorted_middleware": [
+    "/apple-icon/route"
+  ],
+  "middleware": {},
+  "instrumentation": null,
+  "functions": {
+    "/apple-icon/route": {
+      "files": [
+        "server/middleware-build-manifest.js",
+        "server/interception-route-rewrite-manifest.js",
+        "server/server-reference-manifest.js",
+        "server/app/apple-icon/route_client-reference-manifest.js",
+        "server/edge/chunks/_next-internal_server_app_apple-icon_route_actions_24ecdbff.js",
+        "server/edge/chunks/turbopack-_next-internal_server_app_apple-icon_route_actions_f50b4dc5.js",
+        "server/edge/chunks/node_modules_next_dist_esm_e96bb7e3._.js",
+        "server/edge/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_1d71ac1e._.js",
+        "server/edge/chunks/node_modules_next_dist_compiled_@vercel_og_16be1ace._.js",
+        "server/edge/chunks/node_modules_next_dist_compiled_8f4fd302._.js",
+        "server/edge/chunks/node_modules_next_dist_7bea040f._.js",
+        "server/edge/chunks/edge-wrapper_55e48e8b.js",
+        "server/edge/chunks/[root-of-the-server]__bf9d6c61._.js",
+        "server/edge/chunks/turbopack-edge-wrapper_17abf2f1.js"
+      ],
+      "name": "app/apple-icon/route",
+      "page": "/apple-icon/route",
+      "matchers": [
+        {
+          "regexp": "^/apple\\-icon(?:/)?$",
+          "originalSource": "/apple-icon"
+        }
+      ],
+      "wasm": [
+        {
+          "name": "wasm_fdb56e4cc5936d29",
+          "filePath": "server/edge/chunks/node_modules_next_dist_compiled_@vercel_og_resvg_23ace1ce.wasm"
+        },
+        {
+          "name": "wasm_1ccdc983b1fd9f87",
+          "filePath": "server/edge/chunks/node_modules_next_dist_compiled_@vercel_og_yoga_23ace1ce.wasm"
+        }
+      ],
+      "assets": [
+        {
+          "name": "server/edge/assets/noto-sans-v27-latin-regular.bdfa676c.ttf",
+          "filePath": "server/edge/assets/noto-sans-v27-latin-regular.bdfa676c.ttf"
+        }
+      ],
+      "env": {
+        "__NEXT_BUILD_ID": "development",
+        "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "lFIL4e9GyolmTlOgfdzg6VM6ZWCd10wwv5t/Ba/ymOM=",
+        "__NEXT_PREVIEW_MODE_ID": "a54cc08bc55a8067876cfd392e9f81c4",
+        "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "6dab6c5a1a5434a141fd676a3eee3ecac4fd44fcfb7fae8235249214490230b0",
+        "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c4b1c46652e96e2a8c82fcf1bf6c8e348ade2a27428d7c43635f71e336a189fc"
+      }
+    }
+  }
+}

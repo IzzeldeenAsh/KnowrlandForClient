@@ -15,6 +15,7 @@ import InlineDateCalendar from './InlineDateCalendar'
 import ProjectSelectedTypeHeader from '../ProjectSelectedTypeHeader'
 import { useProjectWizardNavigation } from '../useProjectWizardNavigation'
 import { projectWizardStorage, type WizardLocale } from '../wizardStorage'
+import { addDaysToIsoDate, readProjectSchedule } from '../projectSchedule'
 
 function todayString(): string {
   const d = new Date()
@@ -46,6 +47,22 @@ function defaultOfferExpiryDate(projectType: string | null): string {
     : futureDateString(7)
 }
 
+// ISO dates (YYYY-MM-DD) compare correctly as strings.
+function clampIsoDate(value: string, min: string, max: string): string {
+  if (min && value < min) return min
+  if (max && value > max) return max
+  return value
+}
+
+function formatIsoDate(value: string, locale: WizardLocale): string {
+  const [year, month, day] = value.split('-').map(Number)
+  if (!year || !month || !day) return value
+  return new Date(year, month - 1, day).toLocaleDateString(
+    locale === 'ar' ? 'ar-u-nu-latn' : 'en-GB',
+    { day: 'numeric', month: 'short', year: 'numeric' }
+  )
+}
+
 export default function DeadlineOfferQuestion({
   locale,
 }: {
@@ -60,6 +77,8 @@ export default function DeadlineOfferQuestion({
   const [entered, setEntered] = useState(false)
   const [projectType, setProjectType] = useState<string | null>(null)
   const [dateValue, setDateValue] = useState('')
+  const [projectStart, setProjectStart] = useState('')
+  const [projectEnd, setProjectEnd] = useState('')
   const [selectedMatchesCount, setSelectedMatchesCount] = useState(0)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -70,9 +89,20 @@ export default function DeadlineOfferQuestion({
   const today = todayString()
   const tomorrow = futureDateString(1)
   const isUrgentProject = normalizeProjectType(projectType) === 'urgent_request'
+  // The offer must expire within the project window, and never in the past.
+  const minDate = projectStart > today ? projectStart : today
+  const maxDate =
+    [projectEnd, isUrgentProject ? tomorrow : ''].filter(Boolean).sort()[0] || ''
+  const hasSelectableDates = !maxDate || minDate <= maxDate
   const isPastDate = dateValue !== '' && dateValue < today
   const isAfterUrgentMaxDate =
     isUrgentProject && dateValue !== '' && dateValue > tomorrow
+  const isOutsideProjectDates =
+    dateValue !== '' &&
+    ((projectStart !== '' && dateValue < projectStart) ||
+      (projectEnd !== '' && dateValue > projectEnd))
+  const isInvalidDate =
+    !hasSelectableDates || isPastDate || isAfterUrgentMaxDate || isOutsideProjectDates
 
   useEffect(() => {
     const timer = window.setTimeout(() => setEntered(true), 30)
@@ -85,8 +115,24 @@ export default function DeadlineOfferQuestion({
         projectWizardStorage.projectTypeKey(locale)
       )
       setProjectType(storedProjectType)
+      const schedule = readProjectSchedule(locale)
+      const start = schedule?.plannedStartDate || ''
+      const end = schedule ? addDaysToIsoDate(schedule.plannedStartDate, schedule.durationDays) : ''
+      setProjectStart(start)
+      setProjectEnd(end)
+
+      const now = todayString()
+      const urgent = normalizeProjectType(storedProjectType) === 'urgent_request'
+      const min = start > now ? start : now
+      const max =
+        [end, urgent ? futureDateString(1) : ''].filter(Boolean).sort()[0] || ''
+      // A stored or default date outside the project window is moved into it.
       const stored = window.sessionStorage.getItem(storageKey)
-      setDateValue(stored || defaultOfferExpiryDate(storedProjectType))
+      setDateValue(
+        !max || min <= max
+          ? clampIsoDate(stored || defaultOfferExpiryDate(storedProjectType), min, max)
+          : stored || ''
+      )
       setSelectedMatchesCount(
         isSpecifiedInsighterProject(locale) ? 1 : readStoredSelectedMatchIds(locale).length
       )
@@ -129,7 +175,7 @@ export default function DeadlineOfferQuestion({
   }
 
   const onContinue = async () => {
-    if (submitting || isPastDate || isAfterUrgentMaxDate) return
+    if (submitting || isInvalidDate) return
 
     if (!dateValue) {
       setError(
@@ -149,15 +195,23 @@ export default function DeadlineOfferQuestion({
     await submitProposal()
   }
 
-  const validationError = isPastDate
+  const validationError = !hasSelectableDates
     ? isRTL
-      ? 'لا يمكن أن يكون التاريخ في الماضي.'
-      : 'Date cannot be in the past.'
-    : isAfterUrgentMaxDate
+      ? 'لا توجد تواريخ متاحة ضمن مدة المشروع. عدّل تاريخ البدء أو الموعد النهائي.'
+      : 'No dates are available within the project dates. Update the start date or delivery deadline.'
+    : isPastDate
       ? isRTL
-        ? 'يجب أن تنتهي صلاحية عرض الطلب العاجل خلال 24 ساعة.'
-        : 'Urgent request offer must expire within 24 hours.'
-      : null
+        ? 'لا يمكن أن يكون التاريخ في الماضي.'
+        : 'Date cannot be in the past.'
+      : isAfterUrgentMaxDate
+        ? isRTL
+          ? 'يجب أن تنتهي صلاحية عرض الطلب العاجل خلال 24 ساعة.'
+          : 'Urgent request offer must expire within 24 hours.'
+        : isOutsideProjectDates
+          ? isRTL
+            ? 'اختر تاريخًا ضمن مدة المشروع.'
+            : 'Choose a date within the project dates.'
+          : null
   const visibleError = validationError || error
 
   return (
@@ -226,8 +280,8 @@ export default function DeadlineOfferQuestion({
           <div className="max-w-sm">
             <InlineDateCalendar
               value={dateValue}
-              min={today}
-              max={isUrgentProject ? tomorrow : undefined}
+              min={minDate}
+              max={maxDate || undefined}
               onChange={(date) => {
                 setDateValue(date)
                 setError(null)
@@ -235,6 +289,21 @@ export default function DeadlineOfferQuestion({
               locale={locale}
               label={isRTL ? 'تاريخ انتهاء العرض' : 'Offer expiry date'}
             />
+            {projectStart || projectEnd ? (
+              <p className="mt-3 text-xs font-medium text-slate-500">
+                {projectStart && projectEnd
+                  ? isRTL
+                    ? `مدة المشروع: ${formatIsoDate(projectStart, locale)} – ${formatIsoDate(projectEnd, locale)}`
+                    : `Project dates: ${formatIsoDate(projectStart, locale)} – ${formatIsoDate(projectEnd, locale)}`
+                  : projectEnd
+                    ? isRTL
+                      ? `الموعد النهائي للمشروع: ${formatIsoDate(projectEnd, locale)}`
+                      : `Project deadline: ${formatIsoDate(projectEnd, locale)}`
+                    : isRTL
+                      ? `بداية المشروع: ${formatIsoDate(projectStart, locale)}`
+                      : `Project start: ${formatIsoDate(projectStart, locale)}`}
+              </p>
+            ) : null}
             {visibleError ? (
               <div className="mt-3 text-sm text-rose-700">{visibleError}</div>
             ) : null}
@@ -256,8 +325,8 @@ export default function DeadlineOfferQuestion({
               <button
                 type="button"
                 onClick={() => void onContinue()}
-                disabled={submitting || isPastDate || isAfterUrgentMaxDate}
-                className={`btn-sm px-6 py-2 rounded-full ${!submitting && !isPastDate && !isAfterUrgentMaxDate
+                disabled={submitting || isInvalidDate}
+                className={`btn-sm px-6 py-2 rounded-full ${!submitting && !isInvalidDate
                     ? 'text-white bg-[#1C7CBB] hover:bg-opacity-90'
                     : 'text-slate-500 bg-slate-200 cursor-not-allowed'
                   }`}

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
+import ProjectServicesRailLayout from '@/components/project/ProjectServicesRail'
 import ProjectWizardShell from '@/components/project/ProjectWizardShell'
 import ProjectTypeQuestion from '@/components/project/questions/ProjectTypeQuestion'
 import ProjectStatusQuestion from '@/components/project/questions/ProjectStatusQuestion'
@@ -10,10 +11,11 @@ import InsighterExperienceQuestion from '@/components/project/questions/Insighte
 import CompanyTeamSizeQuestion from '@/components/project/questions/CompanyTeamSizeQuestion'
 import ProjectDescriptionQuestion from '@/components/project/questions/ProjectDescriptionQuestion'
 import DeadlineOfferQuestion from '@/components/project/questions/DeadlineOfferQuestion'
-import ProjectDeadlineQuestion from '@/components/project/questions/ProjectDeadlineQuestion'
+import ProjectScheduleQuestion from '@/components/project/questions/ProjectScheduleQuestion'
 import ProjectAddonsIntroStep from '@/components/project/questions/ProjectAddonsIntroStep'
 import KickoffMeetingQuestion from '@/components/project/questions/KickoffMeetingQuestion'
 import ProjectReviewStep from '@/components/project/questions/ProjectReviewStep'
+import ServicesSummaryStep from '@/components/project/questions/ServicesSummaryStep'
 import ProjectMatchesStep from '@/components/project/questions/ProjectMatchesStep'
 import ProjectSubmissionSuccessStep from '@/components/project/questions/ProjectSubmissionSuccessStep'
 import DeliverablesLanguageQuestion from '@/components/project/questions/DeliverablesLanguageQuestion'
@@ -23,12 +25,7 @@ import TargetMarketQuestion from '@/components/project/questions/TargetMarketQue
 import ServiceQuestion from '@/components/project/questions/ServiceQuestion'
 import ProjectScopeQuestion from '@/components/project/questions/ProjectScopeQuestion'
 import ProjectSubscopesQuestion from '@/components/project/questions/ProjectSubscopesQuestion'
-import DeliverableFirstDraftDateQuestion from '@/components/project/questions/service-components/DeliverableFirstDraftDateQuestion'
-import DeliverableFirstDraftTypeQuestion from '@/components/project/questions/service-components/DeliverableFirstDraftTypeQuestion'
-import DeliverableFirstDraftWayQuestion from '@/components/project/questions/service-components/DeliverableFirstDraftWayQuestion'
-import DeliverableFinalVersionDateQuestion from '@/components/project/questions/service-components/DeliverableFinalVersionDateQuestion'
-import DeliverableFinalVersionTypeQuestion from '@/components/project/questions/service-components/DeliverableFinalVersionTypeQuestion'
-import DeliverableFinalVersionWayQuestion from '@/components/project/questions/service-components/DeliverableFinalVersionWayQuestion'
+import DeliverablesPlanQuestion from '@/components/project/questions/service-components/DeliverablesPlanQuestion'
 import DataSourcesExpectedQuestion from '@/components/project/questions/service-components/DataSourcesExpectedQuestion'
 
 type PageProps = {
@@ -45,9 +42,17 @@ export default async function ProjectWizardStepPage({ params }: PageProps) {
     '5': 'project-status',
     '6': 'target-market',
     '7': 'service',
-    'deliverable-stage': 'deliverable-first-draft-date',
-    'deliverable-type-first-draft': 'deliverable-first-draft-type',
-    'deliverable-type-final-version': 'deliverable-final-version-type',
+    'deliverable-stage': 'deliverables-plan',
+    'deliverables-format': 'deliverables-plan',
+    'deliverable-type-first-draft': 'deliverables-plan',
+    'deliverable-type-final-version': 'deliverables-plan',
+    'deliverable-first-draft-date': 'deliverables-plan',
+    'deliverable-final-version-date': 'deliverables-plan',
+    'deliverable-first-draft-type': 'deliverables-plan',
+    'deliverable-first-draft-way': 'deliverables-plan',
+    'deliverable-final-version-type': 'deliverables-plan',
+    'deliverable-final-version-way': 'deliverables-plan',
+    'project-deadline': 'project-schedule',
   }
 
   const legacyTarget = legacyRedirects[step]
@@ -98,9 +103,11 @@ export default async function ProjectWizardStepPage({ params }: PageProps) {
   if (step === 'service') {
     return (
       <ProjectWizardShell align="top">
-        <div className="w-full pt-2 sm:pt-4">
-          <ServiceQuestion locale={locale} />
-        </div>
+        <ProjectServicesRailLayout locale={locale} step={step}>
+          <div className="w-full pt-2 sm:pt-4">
+            <ServiceQuestion locale={locale} />
+          </div>
+        </ProjectServicesRailLayout>
       </ProjectWizardShell>
     )
   }
@@ -108,9 +115,11 @@ export default async function ProjectWizardStepPage({ params }: PageProps) {
   if (step === 'project-scope') {
     return (
       <ProjectWizardShell align="top">
-        <div className="w-full pt-2 sm:pt-4">
-          <ProjectScopeQuestion locale={locale} />
-        </div>
+        <ProjectServicesRailLayout locale={locale} step={step}>
+          <div className="w-full pt-2 sm:pt-4">
+            <ProjectScopeQuestion locale={locale} />
+          </div>
+        </ProjectServicesRailLayout>
       </ProjectWizardShell>
     )
   }
@@ -118,72 +127,27 @@ export default async function ProjectWizardStepPage({ params }: PageProps) {
   if (step === 'project-subscopes') {
     return (
       <ProjectWizardShell align="top">
-        <div className="w-full pt-2 sm:pt-4">
-          <ProjectSubscopesQuestion locale={locale} />
-        </div>
+        <ProjectServicesRailLayout locale={locale} step={step}>
+          <div className="w-full pt-2 sm:pt-4">
+            <ProjectSubscopesQuestion locale={locale} />
+          </div>
+        </ProjectServicesRailLayout>
       </ProjectWizardShell>
     )
   }
 
-  if (step === 'deliverable-first-draft-date') {
+  if (step === 'deliverables-plan') {
     return (
       <ProjectWizardShell align="top">
-        <div className="w-full pt-2 sm:pt-4">
-          <DeliverableFirstDraftDateQuestion locale={locale} />
-        </div>
+        <ProjectServicesRailLayout locale={locale} step={step}>
+          <div className="w-full pt-2 sm:pt-4">
+            <DeliverablesPlanQuestion locale={locale} />
+          </div>
+        </ProjectServicesRailLayout>
       </ProjectWizardShell>
     )
   }
 
-  if (step === 'deliverable-first-draft-type') {
-    return (
-      <ProjectWizardShell align="top">
-        <div className="w-full pt-2 sm:pt-4">
-          <DeliverableFirstDraftTypeQuestion locale={locale} />
-        </div>
-      </ProjectWizardShell>
-    )
-  }
-
-  if (step === 'deliverable-first-draft-way') {
-    return (
-      <ProjectWizardShell align="top">
-        <div className="w-full pt-2 sm:pt-4">
-          <DeliverableFirstDraftWayQuestion locale={locale} />
-        </div>
-      </ProjectWizardShell>
-    )
-  }
-
-  if (step === 'deliverable-final-version-date') {
-    return (
-      <ProjectWizardShell align="top">
-        <div className="w-full pt-2 sm:pt-4">
-          <DeliverableFinalVersionDateQuestion locale={locale} />
-        </div>
-      </ProjectWizardShell>
-    )
-  }
-
-  if (step === 'deliverable-final-version-type') {
-    return (
-      <ProjectWizardShell align="top">
-        <div className="w-full pt-2 sm:pt-4">
-          <DeliverableFinalVersionTypeQuestion locale={locale} />
-        </div>
-      </ProjectWizardShell>
-    )
-  }
-
-  if (step === 'deliverable-final-version-way') {
-    return (
-      <ProjectWizardShell align="top">
-        <div className="w-full pt-2 sm:pt-4">
-          <DeliverableFinalVersionWayQuestion locale={locale} />
-        </div>
-      </ProjectWizardShell>
-    )
-  }
 
   if (step === 'data-sources-expected') {
     return (
@@ -265,6 +229,18 @@ export default async function ProjectWizardStepPage({ params }: PageProps) {
     )
   }
 
+  if (step === 'services-summary') {
+    return (
+      <ProjectWizardShell align="top">
+        <ProjectServicesRailLayout locale={locale} step={step}>
+          <div className="w-full pt-2 sm:pt-4">
+            <ServicesSummaryStep locale={locale} />
+          </div>
+        </ProjectServicesRailLayout>
+      </ProjectWizardShell>
+    )
+  }
+
   if (step === 'project-description') {
     return (
       <ProjectWizardShell align="top">
@@ -285,11 +261,11 @@ export default async function ProjectWizardStepPage({ params }: PageProps) {
     )
   }
 
-  if (step === 'project-deadline') {
+  if (step === 'project-schedule') {
     return (
       <ProjectWizardShell align="top">
         <div className="w-full pt-2 sm:pt-4">
-          <ProjectDeadlineQuestion locale={locale} />
+          <ProjectScheduleQuestion locale={locale} />
         </div>
       </ProjectWizardShell>
     )

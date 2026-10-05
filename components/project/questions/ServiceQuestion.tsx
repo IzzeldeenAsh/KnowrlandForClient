@@ -1,29 +1,18 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import type { ComponentType } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import {
   IconArrowUp,
   IconCheck,
   IconSparklesFilled,
-  IconChartBar,
-  IconChartArrowsVertical,
-  IconClipboardText,
-  IconDeviceDesktopAnalytics,
-  IconBuildingBank,
-  IconTargetArrow,
-  IconCoins,
-  IconShieldCheck,
-  IconReportAnalytics,
-  IconFileSearch,
-  IconBulb,
-  IconFileDollar,
 } from '@tabler/icons-react'
 import ProjectSelectedTypeHeader from '../ProjectSelectedTypeHeader'
 import {
   clearStoredProjectRequestUuid,
   extractProjectRequestUuid,
+  readStoredProjectRequestUuid,
   writeStoredProjectRequestUuid,
 } from '../projectRequestUuid'
 import {
@@ -31,7 +20,24 @@ import {
   extractProjectProposalMatchUuid,
   writeStoredProposalMatchUuid,
 } from '../projectProposalMatchUuid'
+import {
+  clearStoredProjectServiceUuid,
+  extractProjectServiceUuid,
+  writeStoredProjectServiceUuid,
+} from '../projectServiceUuid'
+import {
+  serviceSessionSeed,
+  startServiceFlow,
+  writePrimaryProjectServiceUuid,
+} from '../projectServiceSessions'
+import {
+  isServiceAddPending,
+  projectWizardStepIds,
+  readServiceFlowReturnStepId,
+} from '../projectWizardFlow'
 import { readStoredSpecifiedInsighterUuid } from '../specifiedInsighterProject'
+import { serviceMetaForSlug, type ServiceMeta } from '../serviceMeta'
+import { resetServiceComponentsPayload } from '../serviceComponentsPayload'
 import { projectWizardStorage, type WizardLocale } from '../wizardStorage'
 import { getApiUrl } from '@/app/config'
 import { getAuthToken } from '@/lib/authToken'
@@ -48,126 +54,8 @@ type Service = {
   slug: string
 }
 
-type TablerIcon = ComponentType<{ size?: number; stroke?: number; className?: string }>
-
-type ServiceMeta = {
-  Icon: TablerIcon
-  iconClass: string
-  description: { en: string; ar: string }
-}
-
-// Hardcoded presentation metadata per service slug. Icons are placeholders to be
-// swapped for custom illustrations later.
-const SERVICE_META: Record<string, ServiceMeta> = {
-  'market-research': {
-    Icon: IconChartBar,
-    iconClass: 'bg-blue-50 text-blue-600',
-    description: {
-      en: 'Understand market size, demand, and competition.',
-      ar: 'افهم حجم السوق والطلب والمنافسة.',
-    },
-  },
-  'pre-feasibility-study': {
-    Icon: IconFileSearch,
-    iconClass: 'bg-lime-50 text-lime-600',
-    description: {
-      en: 'Quickly assess whether your idea is worth developing.',
-      ar: 'قيّم بسرعة ما إذا كانت فكرتك جديرة بالتطوير.',
-    },
-  },
-  'feasibility-study': {
-    Icon: IconChartArrowsVertical,
-    iconClass: 'bg-amber-50 text-amber-600',
-    description: {
-      en: 'Assess viability, profitability, and next steps.',
-      ar: 'قيّم الجدوى والربحية والخطوات التالية.',
-    },
-  },
-  'business-plan': {
-    Icon: IconClipboardText,
-    iconClass: 'bg-emerald-50 text-emerald-600',
-    description: {
-      en: 'Build a roadmap for strategy and operations.',
-      ar: 'ابنِ خارطة طريق للاستراتيجية والعمليات.',
-    },
-  },
-  'digital-transformation': {
-    Icon: IconDeviceDesktopAnalytics,
-    iconClass: 'bg-violet-50 text-violet-600',
-    description: {
-      en: 'Modernize processes and technology to scale.',
-      ar: 'حدّث العمليات والتقنيات للتوسع.',
-    },
-  },
-  'company-valuation': {
-    Icon: IconBuildingBank,
-    iconClass: 'bg-cyan-50 text-cyan-600',
-    description: {
-      en: "Determine your company's fair value.",
-      ar: 'حدّد القيمة العادلة لشركتك.',
-    },
-  },
-  'go-to-market-strategy': {
-    Icon: IconTargetArrow,
-    iconClass: 'bg-rose-50 text-rose-600',
-    description: {
-      en: 'Plan launch, positioning, and customer growth.',
-      ar: 'خطّط للإطلاق والتموضع ونمو العملاء.',
-    },
-  },
-  'fundraising-strategy': {
-    Icon: IconCoins,
-    iconClass: 'bg-teal-50 text-teal-600',
-    description: {
-      en: 'Prepare to raise capital and attract investors.',
-      ar: 'استعد لجمع التمويل وجذب المستثمرين.',
-    },
-  },
-  'policies-procedures-governance': {
-    Icon: IconShieldCheck,
-    iconClass: 'bg-indigo-50 text-indigo-600',
-    description: {
-      en: 'Set governance, policies, and compliance.',
-      ar: 'ضع الحوكمة والسياسات والامتثال.',
-    },
-  },
-  'brief-feasibility-study': {
-    Icon: IconFileSearch,
-    iconClass: 'bg-lime-50 text-lime-600',
-    description: {
-      en: 'Quick check on whether your idea holds up.',
-      ar: 'فحص سريع لمدى جدوى فكرتك.',
-    },
-  },
-  'opportunity-evaluation': {
-    Icon: IconBulb,
-    iconClass: 'bg-orange-50 text-orange-600',
-    description: {
-      en: 'Weigh the potential of a business opportunity.',
-      ar: 'قيّم إمكانات الفرصة التجارية.',
-    },
-  },
-  'funding-application': {
-    Icon: IconFileDollar,
-    iconClass: 'bg-fuchsia-50 text-fuchsia-600',
-    description: {
-      en: 'Prepare and package your funding application.',
-      ar: 'جهّز وأعدّ طلب التمويل الخاص بك.',
-    },
-  },
-}
-
-const FALLBACK_SERVICE_META: ServiceMeta = {
-  Icon: IconReportAnalytics,
-  iconClass: 'bg-slate-100 text-slate-600',
-  description: {
-    en: 'Advisory tailored to your business needs.',
-    ar: 'استشارة مصممة لاحتياجات عملك.',
-  },
-}
-
 function getServiceMeta(service: Service): ServiceMeta {
-  return SERVICE_META[(service.slug || '').trim().toLowerCase()] || FALLBACK_SERVICE_META
+  return serviceMetaForSlug(service.slug)
 }
 
 function isOtherService(service: Service | null): boolean {
@@ -287,7 +175,10 @@ function AiScopePromptComposer({
 }
 
 export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
+  const router = useRouter()
   const nav = useProjectWizardNavigation(locale)
+  // Choosing another service for an existing (specific-insighter) project.
+  const [addingService, setAddingService] = useState(false)
   const isRTL = locale === 'ar'
   const isEnglish =
     typeof locale === 'string' && locale.toLowerCase().startsWith('en')
@@ -323,15 +214,20 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
           projectWizardStorage.deliverablesLanguageKey(locale)
         )
       )
-      setSelectedId(
-        safeParseSelectedServiceId(
-          window.sessionStorage.getItem(projectWizardStorage.serviceIdsKey(locale))
+      const adding = isServiceAddPending(locale)
+      setAddingService(adding)
+      // The stored selection belongs to the main service.
+      if (!adding) {
+        setSelectedId(
+          safeParseSelectedServiceId(
+            window.sessionStorage.getItem(projectWizardStorage.serviceIdsKey(locale))
+          )
         )
-      )
-      setServicePrompt(
-        window.sessionStorage.getItem(projectWizardStorage.servicePromptKey(locale)) ||
-        ''
-      )
+        setServicePrompt(
+          window.sessionStorage.getItem(projectWizardStorage.servicePromptKey(locale)) ||
+          ''
+        )
+      }
     } catch {
       // ignore
     }
@@ -342,21 +238,39 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
     const load = async () => {
       setError(null)
       setLoading(true)
+      setServices(null)
       try {
-        const res = await fetch(
-          getApiUrl('/api/common/setting/service'),
-          {
+        const specifiedInsighterUuid = readStoredSpecifiedInsighterUuid(locale)
+        const servicePath = specifiedInsighterUuid
+          ? `/api/common/setting/service/insighter/${encodeURIComponent(specifiedInsighterUuid)}`
+          : '/api/common/setting/service'
+        const fetchServiceList = async (path: string): Promise<Service[]> => {
+          const res = await fetch(getApiUrl(path), {
             method: 'GET',
             headers: {
               Accept: 'application/json',
               'Accept-Language': locale === 'ar' ? 'ar' : 'en',
             },
             cache: 'no-store',
+          })
+          await assertProjectApiResponse(res)
+          const json = (await res.json()) as { data?: Service[] }
+          if (!Array.isArray(json.data)) throw new Error('Invalid service list response.')
+          return json.data
+        }
+
+        const availableServices = await fetchServiceList(servicePath)
+        // The API permits "Other" even when it is not assigned to the Insighter.
+        if (specifiedInsighterUuid && !availableServices.some(isOtherService)) {
+          try {
+            const catalog = await fetchServiceList('/api/common/setting/service')
+            const other = catalog.find(isOtherService)
+            if (other) availableServices.push(other)
+          } catch {
+            // The Insighter's eligible services remain usable without the optional "Other" choice.
           }
-        )
-        await assertProjectApiResponse(res)
-        const json = (await res.json()) as { data?: Service[] }
-        if (!cancelled) setServices(json.data || [])
+        }
+        if (!cancelled) setServices(availableServices)
       } catch (err) {
         if (!cancelled) {
           setError(
@@ -377,9 +291,13 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
     }
   }, [isRTL, locale])
 
-  const title = isRTL
-    ? 'ما نوع الخدمات التي تبحث عنها؟'
-    : 'What type of services are you looking for?'
+  const title = addingService
+    ? isRTL
+      ? 'ما الخدمة التي تريد إضافتها؟'
+      : 'Which service do you want to add?'
+    : isRTL
+      ? 'ما نوع الخدمات التي تبحث عنها؟'
+      : 'What type of services are you looking for?'
 
   const selectedService = useMemo(
     () => (services || []).find((service) => service.id === selectedId) || null,
@@ -450,6 +368,7 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
   const resetDownstreamWizardState = (preservePrompt: boolean) => {
     try {
       clearStoredProjectRequestUuid(locale)
+      clearStoredProjectServiceUuid(locale)
       clearStoredProposalMatchUuid(locale)
       window.sessionStorage.removeItem(projectWizardStorage.projectScopeSnapshotKey(locale))
       window.sessionStorage.removeItem(projectWizardStorage.selectedMatchIdsKey(locale))
@@ -458,12 +377,13 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
         window.sessionStorage.removeItem(projectWizardStorage.servicePromptKey(locale))
       }
 
-      window.sessionStorage.setItem(
-        projectWizardStorage.serviceComponentsPayloadKey(locale),
-        JSON.stringify({ components: {} })
-      )
+      resetServiceComponentsPayload(locale)
       window.sessionStorage.setItem(
         projectWizardStorage.serviceComponentSlugsKey(locale),
+        JSON.stringify([])
+      )
+      window.sessionStorage.setItem(
+        projectWizardStorage.projectComponentSlugsKey(locale),
         JSON.stringify([])
       )
       window.sessionStorage.setItem(
@@ -488,12 +408,79 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
     }
   }
 
+  /** Adds the chosen service to the existing project and starts its scopes. */
+  const addServiceToProject = async (payload: {
+    serviceId: number
+    isOtherSelected: boolean
+    servicePrompt: string
+    serviceLabel: string | null
+  }) => {
+    const token = getAuthToken()
+    const projectUuid = readStoredProjectRequestUuid(locale)
+    if (!token || !projectUuid) {
+      setError(isRTL ? 'يرجى تسجيل الدخول للمتابعة.' : 'Please sign in to continue.')
+      return
+    }
+
+    const prompt = payload.isOtherSelected ? payload.servicePrompt.trim() : ''
+    setError(null)
+    setSubmitting(true)
+    try {
+      const res = await fetch(
+        getApiUrl(`/api/account/project/definition/service/${projectUuid}`),
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            'Accept-Language': locale === 'ar' ? 'ar' : 'en',
+            'X-Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
+          },
+          body: JSON.stringify({
+            service_id: payload.serviceId,
+            ...(prompt ? { prompt_ai: prompt } : {}),
+          }),
+        }
+      )
+      await assertProjectApiResponse(res, 'Failed to add the service.')
+      const json = (await res.json()) as { data?: { uuid?: string } }
+      const projectServiceUuid = String(json?.data?.uuid || '')
+      if (!projectServiceUuid) throw new Error('add_service_bad_response')
+
+      startServiceFlow(
+        locale,
+        { mode: 'add', projectServiceUuid, returnStepId: readServiceFlowReturnStepId(locale) },
+        serviceSessionSeed(locale, {
+          serviceId: payload.serviceId,
+          name: payload.serviceLabel || '',
+          isOther: payload.isOtherSelected,
+          prompt,
+        })
+      )
+      router.push(`/${locale}/project/wizard/${projectWizardStepIds.projectScope}`)
+    } catch (err) {
+      setError(
+        getProjectApiErrorMessage(
+          err,
+          isRTL ? 'تعذر إضافة الخدمة.' : 'Failed to add the service.'
+        )
+      )
+      setSubmitting(false)
+    }
+  }
+
   const submitSelection = async (payload: {
     serviceId: number
     isOtherSelected: boolean
     servicePrompt: string
     serviceLabel: string | null
   }) => {
+    if (addingService) {
+      await addServiceToProject(payload)
+      return
+    }
+
     setError(null)
 
     persistSelection(
@@ -554,7 +541,12 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
       const projectUuid = extractProjectRequestUuid(initJson)
       if (!projectUuid) throw new Error('init_bad_response')
 
+      const projectServiceUuid = extractProjectServiceUuid(initJson)
+      if (!projectServiceUuid) throw new Error('init_bad_response')
+
       writeStoredProjectRequestUuid(locale, projectUuid)
+      writeStoredProjectServiceUuid(locale, projectServiceUuid)
+      writePrimaryProjectServiceUuid(locale, projectServiceUuid)
       if (specifiedInsighterUuid) {
         const proposalMatchUuid = extractProjectProposalMatchUuid(initJson)
         if (!proposalMatchUuid) throw new Error('init_bad_response')
@@ -563,10 +555,7 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
         clearStoredProposalMatchUuid(locale)
       }
       try {
-        window.sessionStorage.setItem(
-          projectWizardStorage.serviceComponentsPayloadKey(locale),
-          JSON.stringify({ components: {} })
-        )
+        resetServiceComponentsPayload(locale)
       } catch {
         // ignore
       }
@@ -574,6 +563,10 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
       try {
         window.sessionStorage.setItem(
           projectWizardStorage.serviceComponentSlugsKey(locale),
+          JSON.stringify([])
+        )
+        window.sessionStorage.setItem(
+          projectWizardStorage.projectComponentSlugsKey(locale),
           JSON.stringify([])
         )
         window.sessionStorage.setItem(
@@ -615,7 +608,7 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
   const onContinue = async () => {
     if (!canContinue || selectedId == null || submitting) return
 
-    if (isOtherSelected) {
+    if (isOtherSelected && !addingService) {
       nav.goNext()
       return
     }
@@ -638,6 +631,19 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
     const nextIsOtherSelected = isOtherService(service)
     const nextPrompt = nextIsOtherSelected ? servicePrompt : ''
     if (!nextIsOtherSelected) setServicePrompt('')
+
+    if (addingService) {
+      // "Other" is added once its description is sent.
+      if (nextIsOtherSelected) return
+      void addServiceToProject({
+        serviceId: service.id,
+        isOtherSelected: false,
+        servicePrompt: '',
+        serviceLabel: service.name,
+      })
+      return
+    }
+
     persistSelection(
       service.id,
       nextIsOtherSelected,
@@ -684,7 +690,7 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
     const otherServiceId = otherService.id
     setSelectedId(otherServiceId)
     setError(null)
-    resetDownstreamWizardState(true)
+    if (!addingService) resetDownstreamWizardState(true)
 
     await submitSelection({
       serviceId: otherServiceId,
@@ -734,6 +740,17 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
           </div>
         ) : (
           <>
+            {!error && services?.length === 0 ? (
+              <div className="text-sm font-semibold text-slate-600">
+                {readStoredSpecifiedInsighterUuid(locale)
+                  ? isRTL
+                    ? 'لا توجد خدمات متاحة من هذا الخبير حاليًا.'
+                    : 'This Insighter has no available services right now.'
+                  : isRTL
+                    ? 'لا توجد خدمات متاحة حاليًا.'
+                    : 'No services are available right now.'}
+              </div>
+            ) : null}
             {predefinedServices.length > 0 ? (
               <div>
                 <div

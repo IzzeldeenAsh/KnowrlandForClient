@@ -183,7 +183,7 @@ export default function OrderDetailsModal({
                 <div className="mt-3 space-y-3">
                   {payments.map((payment, idx) => {
                     const paymentStatus = normalizeText(payment.status) || 'unknown';
-                    const paymentType = normalizeText(payment.type);
+                    const paymentType = normalizeText(payment.order_installment?.title) || normalizeText(payment.type);
                     const paymentConfirmedAt = getPaymentConfirmedAt(payment);
                     const failureLogs = getPaymentFailureLogs(payment);
 

@@ -5951,6 +5951,8 @@ function NotificationBell({ parent = 'client' }) {
 "use strict";
 
 __turbopack_context__.s([
+    "activeServiceStorageKey",
+    ()=>activeServiceStorageKey,
     "clearProjectWizardStorage",
     ()=>clearProjectWizardStorage,
     "clearProjectWizardStorageLocalePair",
@@ -5977,7 +5979,23 @@ function listProjectWizardStorageKeys(locale) {
     const prefix = undefined;
     const keys = undefined;
 }
+function activeServiceStorageKey(locale, name) {
+    const uuid = ("TURBOPACK compile-time truthy", 1) ? 'pending' : "TURBOPACK unreachable";
+    return `project:wizard:${locale}:services:${uuid}:${name}`;
+}
 const projectWizardStorage = {
+    plannedStartDateKey (locale) {
+        return `project:wizard:${locale}:plannedStartDate`;
+    },
+    projectComponentsKey (locale) {
+        return `project:wizard:${locale}:projectComponents`;
+    },
+    projectComponentSlugsKey (locale) {
+        return `project:wizard:${locale}:projectComponentSlugs`;
+    },
+    serviceAddonsKey (locale) {
+        return activeServiceStorageKey(locale, 'addons');
+    },
     projectTypeKey (locale) {
         return `project:wizard:${locale}:projectType`;
     },
@@ -6033,7 +6051,7 @@ const projectWizardStorage = {
         return `project:wizard:${locale}:companyMaxTeamSize`;
     },
     projectScopeSnapshotKey (locale) {
-        return `project:wizard:${locale}:projectScopeSnapshot`;
+        return activeServiceStorageKey(locale, 'projectScopeSnapshot');
     },
     projectAddonsKey (locale) {
         return `project:wizard:${locale}:projectAddons`;
@@ -6057,43 +6075,43 @@ const projectWizardStorage = {
         return `project:wizard:${locale}:targetMarketEconomicBlocIds`;
     },
     serviceIdsKey (locale) {
-        return `project:wizard:${locale}:serviceIds`;
+        return activeServiceStorageKey(locale, 'serviceIds');
     },
     serviceLabelKey (locale) {
-        return `project:wizard:${locale}:serviceLabel`;
+        return activeServiceStorageKey(locale, 'serviceLabel');
     },
     servicePromptKey (locale) {
-        return `project:wizard:${locale}:servicePrompt`;
+        return activeServiceStorageKey(locale, 'servicePrompt');
     },
     serviceIsOtherKey (locale) {
-        return `project:wizard:${locale}:serviceIsOther`;
+        return activeServiceStorageKey(locale, 'serviceIsOther');
     },
     serviceScopeParentIdsKey (locale) {
-        return `project:wizard:${locale}:serviceScopeParentIds`;
+        return activeServiceStorageKey(locale, 'serviceScopeParentIds');
     },
     serviceScopeChildIdsByParentKey (locale) {
-        return `project:wizard:${locale}:serviceScopeChildIdsByParent`;
+        return activeServiceStorageKey(locale, 'serviceScopeChildIdsByParent');
     },
     serviceScopeHasChildrenKey (locale) {
-        return `project:wizard:${locale}:serviceScopeHasChildren`;
+        return activeServiceStorageKey(locale, 'serviceScopeHasChildren');
     },
     serviceManualScopesKey (locale) {
-        return `project:wizard:${locale}:serviceManualScopes`;
+        return activeServiceStorageKey(locale, 'serviceManualScopes');
     },
     serviceManualSubscopesByScopeKey (locale) {
-        return `project:wizard:${locale}:serviceManualSubscopesByScope`;
+        return activeServiceStorageKey(locale, 'serviceManualSubscopesByScope');
     },
     serviceAiSuggestedScopesKey (locale) {
-        return `project:wizard:${locale}:serviceAiSuggestedScopes`;
+        return activeServiceStorageKey(locale, 'serviceAiSuggestedScopes');
     },
     serviceComponentsPayloadKey (locale) {
-        return `project:wizard:${locale}:serviceComponentsPayload`;
+        return activeServiceStorageKey(locale, 'serviceComponentsPayload');
     },
     serviceComponentSlugsKey (locale) {
-        return `project:wizard:${locale}:serviceComponentSlugs`;
+        return activeServiceStorageKey(locale, 'serviceComponentSlugs');
     },
     serviceComponentAnswerKey (locale, slug) {
-        return `project:wizard:${locale}:serviceComponent:${slug}`;
+        return activeServiceStorageKey(locale, `serviceComponent:${slug}`);
     },
     deadlineOfferKey (locale) {
         return `project:wizard:${locale}:deadlineOffer`;

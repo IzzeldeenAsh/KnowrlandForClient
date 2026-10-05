@@ -22,15 +22,24 @@ import { readStoredProjectRequestUuid } from '@/components/project/projectReques
 import {
   isSpecifiedInsighterProject,
   readStoredSpecifiedInsighterDisplay,
+  readStoredSpecifiedInsighterUuid,
 } from '@/components/project/specifiedInsighterProject'
+import { finishServiceFlow, startServiceFlow, serviceSessionSeed } from '@/components/project/projectServiceSessions'
+import { DeliverablesReviewTable, type ReviewProjectService } from './ProjectServicesReview'
 import { readProjectAddonsState, readProjectScopeSnapshot } from '../projectAddonsState'
+import { dayLabel, durationLabel, type ProjectDeliverable } from '../projectDeliverables'
+import { addDaysToIsoDate, formatIsoDate, readProjectSchedule } from '../projectSchedule'
+import {
+  pickProjectServiceFromProject,
+  readStoredProjectServiceUuid,
+} from '../projectServiceUuid'
 import { projectTypeLabel } from '../projectLabels'
 import { readProjectDescriptionState } from '../projectDescriptionState'
 import {
   readServiceComponentsPayload,
   type ServiceComponentsPayload,
 } from '../serviceComponentsPayload'
-import { projectWizardStepIds, readServiceComponentSlugs } from '../projectWizardFlow'
+import { isServiceFlowActive, projectWizardStepIds, readServiceComponentSlugs } from '../projectWizardFlow'
 import { useProjectStepErrorToast } from '../useProjectStepErrorToast'
 import { useProjectWizardNavigation } from '../useProjectWizardNavigation'
 import { projectWizardStorage, type WizardLocale } from '../wizardStorage'
@@ -92,13 +101,19 @@ type ProjectRequestData = {
   company_max_team_size?: number | string | null
   description?: string | null
   components?: ProjectRequestComponent[] | null
+  project_services?: ReviewProjectService[] | null
+  planned_start_date?: string | null
+  duration_days?: number | null
 }
 
 type ReviewRow = {
   label: string
   value: string[]
   fileTypes?: string[]
-  variant?: 'default' | 'chips' | 'scope-table'
+  variant?: 'default' | 'chips' | 'scope-table' | 'deliverables-table'
+  deliverables?: ProjectDeliverable[]
+  full?: boolean
+  onEdit?: () => void
   scopeGroups?: Array<{ name: string; subscopes: string[] }>
   editStepId?: string
   wide?: boolean
@@ -110,6 +125,7 @@ type ReviewSection = {
 }
 
 type ReviewData = {
+  projectServices: ReviewProjectService[]
   title: string
   projectType: string
   deliverablesLanguage: string
@@ -118,11 +134,13 @@ type ReviewData = {
   projectStatus: string
   whoAreYou: string
   preferredInsighterType: string
+  anyInsighterType: boolean
   origin: string
   experienceRange: string
   teamSizeRange: string
   targetMarket: string[]
-  deadline: string
+  plannedStartDate: string
+  durationDays: number | null
   servicePrompt: string
   description: string
   descriptionFiles: Array<{ name: string; size: number; type: string }>
@@ -551,8 +569,9 @@ function buildServiceComponentSections(params: {
   locale: WizardLocale
   slugs: string[]
   payload: ServiceComponentsPayload
+  plannedStartDate?: string
 }): ReviewSection[] {
-  const { locale, slugs, payload } = params
+  const { locale, slugs, payload, plannedStartDate } = params
 
   return slugs
     .filter((slug) => slug !== 'target-market')
@@ -564,67 +583,35 @@ function buildServiceComponentSections(params: {
           payloadValue && typeof payloadValue === 'object'
             ? (payloadValue as Record<string, unknown>)
             : {}
-        const firstDraft =
-          raw.first_draft && typeof raw.first_draft === 'object'
-            ? (raw.first_draft as Record<string, unknown>)
-            : {}
-        const finalVersion =
-          raw.final_version && typeof raw.final_version === 'object'
-            ? (raw.final_version as Record<string, unknown>)
-            : {}
-
-        const firstDraftWay = resolveDeliverableWay(firstDraft)
-        const finalVersionWay = resolveDeliverableWay(finalVersion)
-        const firstDraftReportTypes = getReportTypes(firstDraft.report_type)
-        const finalVersionReportTypes = getReportTypes(finalVersion.report_type)
+        const deliverables = Array.isArray(raw.deliverables)
+          ? (raw.deliverables as Array<Record<string, unknown>>)
+          : []
         const notSpecified = locale === 'ar' ? 'غير محدد' : 'Not specified'
+
+        if (deliverables.length === 0) return null
 
         return {
           title: getComponentTitle(locale, slug),
-          rows: [
-            {
-              label: locale === 'ar' ? 'تاريخ المسودة الأولى' : 'First draft date',
-              value: [String(firstDraft.date || '').trim() || notSpecified],
-              editStepId: 'deliverable-first-draft-date',
-            },
-            {
-              label: locale === 'ar' ? 'طريقة تسليم المسودة الأولى' : 'First draft delivery mode',
+          rows: deliverables.map((deliverable) => {
+            const way = resolveDeliverableWay(deliverable)
+            const reportTypes = getReportTypes(deliverable.report_type)
+            const periodDays = Math.max(0, Math.round(Number(deliverable.period_days) || 0))
+            const when = plannedStartDate
+              ? `${dayLabel(locale, periodDays)} · ${formatIsoDate(addDaysToIsoDate(plannedStartDate, periodDays), locale)}`
+              : dayLabel(locale, periodDays)
+
+            return {
+              label: `${String(deliverable.title || '').trim() || notSpecified} — ${when}`,
               value: [
-                getDeliverableWayLabel(locale, firstDraftWay.key),
-                ...(firstDraftWay.address
-                  ? [`${locale === 'ar' ? 'العنوان' : 'Address'}: ${firstDraftWay.address}`]
+                getDeliverableWayLabel(locale, way.key),
+                ...(way.address
+                  ? [`${locale === 'ar' ? 'العنوان' : 'Address'}: ${way.address}`]
                   : []),
               ],
-              editStepId: 'deliverable-first-draft-way',
-            },
-            {
-              label: locale === 'ar' ? 'صيغ المسودة الأولى' : 'First draft formats',
-              value: firstDraftReportTypes.length === 0 ? [notSpecified] : [],
-              fileTypes: firstDraftReportTypes,
-              editStepId: 'deliverable-first-draft-type',
-            },
-            {
-              label: locale === 'ar' ? 'تاريخ النسخة النهائية' : 'Final version date',
-              value: [String(finalVersion.date || '').trim() || notSpecified],
-              editStepId: 'deliverable-final-version-date',
-            },
-            {
-              label: locale === 'ar' ? 'طريقة تسليم النسخة النهائية' : 'Final version delivery mode',
-              value: [
-                getDeliverableWayLabel(locale, finalVersionWay.key),
-                ...(finalVersionWay.address
-                  ? [`${locale === 'ar' ? 'العنوان' : 'Address'}: ${finalVersionWay.address}`]
-                  : []),
-              ],
-              editStepId: 'deliverable-final-version-way',
-            },
-            {
-              label: locale === 'ar' ? 'صيغ النسخة النهائية' : 'Final version formats',
-              value: finalVersionReportTypes.length === 0 ? [notSpecified] : [],
-              fileTypes: finalVersionReportTypes,
-              editStepId: 'deliverable-final-version-type',
-            },
-          ],
+              fileTypes: reportTypes,
+              editStepId: 'deliverables-plan',
+            }
+          }),
         }
       }
 
@@ -673,6 +660,8 @@ function buildServiceComponentSections(params: {
 }
 
 function SectionBlock({
+  locale,
+  plannedStartDate,
   title,
   rows,
   emptyText,
@@ -681,6 +670,8 @@ function SectionBlock({
   editLabel,
   editHrefFor,
 }: {
+  locale?: WizardLocale
+  plannedStartDate?: string
   title: string
   rows: ReviewRow[]
   emptyText: string
@@ -712,7 +703,7 @@ function SectionBlock({
           <article
             key={row.label}
             className={`min-w-0 ${
-              rows.length === 1
+              rows.length === 1 || row.full
                 ? 'sm:col-span-2 xl:col-span-3'
                 : row.wide
                   ? 'sm:col-span-2 xl:col-span-2'
@@ -724,6 +715,7 @@ function SectionBlock({
               {row.editStepId ? (
                 <Link
                   href={editHrefFor(row.editStepId)}
+                  onClick={row.onEdit}
                   title={`${editLabel}: ${row.label}`}
                   aria-label={`${editLabel}: ${row.label}`}
                   className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition-colors hover:border-sky-200 hover:bg-sky-50 hover:text-sky-700"
@@ -738,7 +730,9 @@ function SectionBlock({
 
             {row.value.length > 0 || (row.fileTypes?.length ?? 0) > 0 ? (
               <div className="space-y-3">
-                {row.variant === 'scope-table' && row.scopeGroups ? (
+                {row.variant === 'deliverables-table' && row.deliverables ? (
+                  <DeliverablesReviewTable locale={locale || 'en'} deliverables={row.deliverables} plannedStartDate={plannedStartDate} />
+                ) : row.variant === 'scope-table' && row.scopeGroups ? (
                   <div className="overflow-hidden rounded-xl border border-slate-200">
                     <table className="w-full border-collapse text-sm">
                       <tbody>
@@ -747,7 +741,7 @@ function SectionBlock({
                             <tr>
                               <th
                                 scope="colgroup"
-                                className={`bg-slate-50 px-4 py-3 font-semibold text-slate-900 ${
+                                className={`bg-white px-4 py-3 font-semibold text-slate-900 ${
                                   isRTL ? 'text-right' : 'text-left'
                                 } ${
                                   groupIndex > 0 ? 'border-t border-slate-200' : ''
@@ -867,6 +861,9 @@ export default function ProjectReviewStep({
 
     const load = async () => {
       setError(null)
+      // Back from adding/editing an additional service: restore the main service's answers.
+      if (isServiceFlowActive(locale)) finishServiceFlow(locale)
+
       const specificProject = isSpecifiedInsighterProject(locale)
       setIsSpecifiedInsighter(specificProject)
       setSpecifiedInsighterDisplayName(
@@ -874,7 +871,6 @@ export default function ProjectReviewStep({
       )
 
       const projectUuid = readStoredProjectRequestUuid(locale)
-
       const rawProjectType = readStorageValue(
         locale,
         projectWizardStorage.projectTypeKey(locale)
@@ -919,10 +915,7 @@ export default function ProjectReviewStep({
         locale,
         projectWizardStorage.targetMarketModeKey(locale)
       )
-      const projectDeadline = readStorageValue(
-        locale,
-        projectWizardStorage.deadlineKey(locale)
-      )
+      const storedSchedule = readProjectSchedule(locale)
       const countryIds = safeParseNumberArray(
         readStorageValue(locale, projectWizardStorage.targetMarketCountryIdsKey(locale))
       )
@@ -1021,8 +1014,8 @@ export default function ProjectReviewStep({
         (requestData?.insighter_origin
           ? getDisplayName(locale, requestData.insighter_origin)
           : isRTL
-            ? 'غير محدد'
-            : 'Not specified')
+            ? 'كل العالم'
+            : 'Worldwide')
 
       const targetMarket =
         targetMode === 'country'
@@ -1049,7 +1042,20 @@ export default function ProjectReviewStep({
       const addonsState = readProjectAddonsState(locale)
       const scopeSnapshot = readProjectScopeSnapshot(locale)
       const storedServiceComponentsPayload = readServiceComponentsPayload(locale)
-      const apiServiceComponentsPayload = normalizeProjectComponents(requestData?.components)
+      const activeProjectService = requestData
+        ? pickProjectServiceFromProject(requestData, readStoredProjectServiceUuid(locale))
+        : null
+      const apiServiceComponentsPayload = normalizeProjectComponents([
+        ...(requestData?.components || []),
+        ...((activeProjectService?.components as ProjectRequestComponent[] | undefined) || []),
+      ])
+      const plannedStartDate =
+        storedSchedule?.plannedStartDate || stringifyValue(requestData?.planned_start_date).slice(0, 10)
+      const durationDays =
+        storedSchedule?.durationDays ??
+        (requestData?.duration_days === null || requestData?.duration_days === undefined
+          ? null
+          : Number(requestData.duration_days))
       const serviceComponentsPayload: ServiceComponentsPayload = {
         components: {
           ...(apiServiceComponentsPayload.components || {}),
@@ -1070,6 +1076,7 @@ export default function ProjectReviewStep({
         locale,
         slugs: serviceComponentSlugs,
         payload: serviceComponentsPayload,
+        plannedStartDate,
       })
 
       const projectTypeValue = projectTypeLabel(
@@ -1113,6 +1120,8 @@ export default function ProjectReviewStep({
         whoAreYou: businessTypeValue || (isRTL ? 'غير محدد' : 'Not specified'),
         preferredInsighterType:
           preferredInsighterTypeValue || (isRTL ? 'غير محدد' : 'Not specified'),
+        anyInsighterType:
+          (preferredInsighterType || stringifyValue(requestData?.insighter_preferred_type)) === 'Either',
         origin: originLabel,
         experienceRange: formatRange(
           insighterMinYearsExperience,
@@ -1130,13 +1139,15 @@ export default function ProjectReviewStep({
             : apiTargetMarket.length > 0
               ? apiTargetMarket
               : [isRTL ? 'غير محدد' : 'Not specified'],
-        deadline: projectDeadline,
+        plannedStartDate,
+        durationDays,
         servicePrompt: servicePrompt.trim() || stringifyValue(requestData?.service_prompt),
         description: descriptionState.description || stringifyValue(requestData?.description),
         descriptionFiles: descriptionState.files,
         scopeSnapshot,
         kickoffMeeting: addonsState.kickoffMeeting.enabled,
         serviceComponentSections,
+        projectServices: requestData?.project_services || [],
       }
 
       if (!cancelled) setReview(nextReview)
@@ -1199,12 +1210,49 @@ export default function ProjectReviewStep({
         editStepId: projectWizardStepIds.whoAreYou,
       },
       {
-        label: isRTL ? 'موعد التسليم' : 'Delivery deadline',
-        value: review.deadline ? [review.deadline] : [],
-        editStepId: projectWizardStepIds.projectDeadline,
+        label: isRTL ? 'البدء المخطط' : 'Planned start',
+        value: review.plannedStartDate ? [formatIsoDate(review.plannedStartDate, locale)] : [],
+        editStepId: projectWizardStepIds.projectSchedule,
+      },
+      {
+        label: isRTL ? 'المدة' : 'Duration',
+        value:
+          review.durationDays === null
+            ? []
+            : [
+                durationLabel(locale, review.durationDays),
+                ...(review.plannedStartDate
+                  ? [
+                      `${isRTL ? 'الإغلاق المخطط' : 'Planned close'}: ${formatIsoDate(
+                        addDaysToIsoDate(review.plannedStartDate, review.durationDays),
+                        locale
+                      )}`,
+                    ]
+                  : []),
+              ],
+        editStepId: projectWizardStepIds.projectSchedule,
       },
     ]
   }, [isRTL, isSpecifiedInsighter, locale, review, specifiedInsighterDisplayName])
+
+  const serviceSections = useMemo(() => {
+    if (!review) return []
+    return [...review.projectServices].sort((a, b) => (a.position || 0) - (b.position || 0)).map((service, index) => {
+      const name = service.title || service.service?.name || ''
+      const components = Object.assign({}, ...(service.components || [])) as Record<string, unknown>
+      const stage = components['deliverable-stage'] as { deliverables?: ProjectDeliverable[] } | undefined
+      const deliverables = stage?.deliverables || []
+      const scopeGroups = (service.scopes || []).map(scope => ({ name: scope.scope, subscopes: (scope.children || []).map(child => child.scope) }))
+      const select = () => startServiceFlow(locale, { mode: 'edit', projectServiceUuid: service.uuid, returnStepId: projectWizardStepIds.projectReview }, serviceSessionSeed(locale, { serviceId: service.service?.id ?? null, name, isOther: service.service?.slug === 'other', prompt: service.prompt_ai }))
+      const rows: ReviewRow[] = [
+        ...(service.prompt_ai ? [{ label: isRTL ? 'وصف الخدمة' : 'Service description', value: [service.prompt_ai], full: true }] : []),
+        { label: isRTL ? 'النطاقات والنطاقات الفرعية' : 'Scopes and sub-scopes', value: scopeGroups.map(group => group.name), variant: 'scope-table', scopeGroups, full: true, editStepId: projectWizardStepIds.projectScope, onEdit: select },
+        { label: isRTL ? 'المخرجات' : 'Deliverables', value: deliverables.map(item => item.title), variant: 'deliverables-table', deliverables, full: true, editStepId: 'deliverables-plan', onEdit: select },
+        ...((service.addons || []).length ? [{ label: isRTL ? 'إضافات الخدمة' : 'Service add-ons', value: (service.addons || []).flatMap(addon => Object.keys(addon)).map(humanizeSlug), variant: 'chips' as const }] : []),
+      ]
+      return { title: `${isRTL ? 'الخدمة' : 'Service'} ${index + 1}: ${name}`, rows, uuid: service.uuid }
+    })
+  }, [isRTL, locale, review])
 
   const scopeRows = useMemo(() => {
     if (!review) return []
@@ -1278,7 +1326,8 @@ export default function ProjectReviewStep({
             {
               label: isRTL ? 'الأصل المفضل' : 'Preferred origin',
               value: [review.origin],
-              editStepId: projectWizardStepIds.insighterOrigin,
+              // "Any" insighter type is always worldwide.
+              editStepId: review.anyInsighterType ? undefined : projectWizardStepIds.insighterOrigin,
             },
             {
               label: isRTL ? 'سنوات الخبرة' : 'Experience range',
@@ -1401,15 +1450,15 @@ export default function ProjectReviewStep({
                 editHrefFor={nav.editHrefFor}
               />
 
-              <SectionBlock
-                title={isRTL ? 'النطاق والمخرجات' : 'Scope and deliverables'}
-                rows={scopeRows}
-                emptyText={emptyText}
-                toneIndex={1}
-                isRTL={isRTL}
-                editLabel={editLabel}
-                editHrefFor={nav.editHrefFor}
-              />
+              {serviceSections.length ? serviceSections.map(section => (
+                <SectionBlock key={section.uuid} locale={locale} plannedStartDate={review.plannedStartDate}
+                  title={section.title} rows={section.rows} emptyText={emptyText} toneIndex={1}
+                  isRTL={isRTL} editLabel={editLabel} editHrefFor={nav.editHrefFor} />
+              )) : (
+                <SectionBlock title={isRTL ? 'النطاق والمخرجات' : 'Scope and deliverables'}
+                  rows={scopeRows} emptyText={emptyText} toneIndex={1} isRTL={isRTL}
+                  editLabel={editLabel} editHrefFor={nav.editHrefFor} />
+              )}
 
               <SectionBlock
                 title={
@@ -1429,7 +1478,7 @@ export default function ProjectReviewStep({
                 editHrefFor={nav.editHrefFor}
               />
 
-              {review.serviceComponentSections.map((section, index) => (
+              {review.serviceComponentSections.filter(section => !serviceSections.length || section.title !== getComponentTitle(locale, 'deliverable-stage')).map((section, index) => (
                 <SectionBlock
                   key={section.title}
                   title={section.title}

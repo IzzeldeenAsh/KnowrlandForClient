@@ -2,6 +2,7 @@
 
 import { usePopularKnowledge } from '@/hooks/knowledgs/usePopularKnowledge'
 import DocumentsListCard from './DocumentsListCard'
+import { getInsightsSearchHref } from './FeedSearchScopeToggle'
 
 type TopDocumentsCardProps = {
   locale: string
@@ -55,7 +56,7 @@ export default function TopDocumentsCard({ locale, className }: TopDocumentsCard
       emptyText={copy.empty}
       unavailableText={copy.unavailable}
       openInNewTabLabel={copy.openInNewTab}
-      viewAllHref={`/${locale}/home`}
+      viewAllHref={getInsightsSearchHref(locale, '')}
       viewAllLabel={copy.viewAll}
       viewAllDescription={copy.viewAllDescription}
       className={className}

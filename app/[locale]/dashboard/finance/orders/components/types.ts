@@ -36,7 +36,10 @@ export type Suborder = {
 };
 
 export type Payment = {
+  /** Pre-phase-2 payment kind (down/final/full); phase 2 sends `order_installment` instead. */
   type?: string | null;
+  order_installment_id?: number | null;
+  order_installment?: { title?: string | null; position?: number | null } | null;
   method: string;
   provider: string | null;
   amount: number;

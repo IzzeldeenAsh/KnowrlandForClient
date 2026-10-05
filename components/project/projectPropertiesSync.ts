@@ -2,6 +2,8 @@ import { getApiUrl } from '@/app/config'
 import { getAuthToken } from '@/lib/authToken'
 import { assertProjectApiResponse } from './projectApiError'
 import { readStoredProjectRequestUuid } from './projectRequestUuid'
+import { readProjectSchedule } from './projectSchedule'
+import { readProjectLevelComponents } from './serviceComponentsSync'
 import { isSpecifiedInsighterProject } from './specifiedInsighterProject'
 import { projectWizardStorage, type WizardLocale } from './wizardStorage'
 
@@ -72,7 +74,9 @@ function mapPreferredInsighterType(value: string): 'individual' | 'company' | 'e
 export type ProjectPropertiesPayload = {
   phase: string
   business_type: string
-  deadline: string
+  planned_start_date?: string
+  duration_days?: number
+  components?: Record<string, unknown>
   insighter_preferred_type?: 'individual' | 'company' | 'either' | ''
   insighter_origin_id?: string
   insighter_origin_type?: string
@@ -80,6 +84,16 @@ export type ProjectPropertiesPayload = {
   insighter_max_years_experience?: string
   company_min_team_size?: string
   company_max_team_size?: string
+}
+
+function scheduleFields(locale: WizardLocale) {
+  const schedule = readProjectSchedule(locale)
+  if (!schedule) return {}
+
+  return {
+    planned_start_date: schedule.plannedStartDate,
+    duration_days: schedule.durationDays,
+  }
 }
 
 export function buildProjectPropertiesPayload(
@@ -103,7 +117,8 @@ export function buildProjectPropertiesPayload(
     business_type: mapBusinessType(
       readStorageValue(locale, projectWizardStorage.whoAreYouKey(locale))
     ),
-    deadline: readStorageValue(locale, projectWizardStorage.deadlineKey(locale)).trim(),
+    ...scheduleFields(locale),
+    components: readProjectLevelComponents(locale),
   }
 
   if (isSpecifiedInsighterProject(locale)) {
@@ -138,6 +153,17 @@ export function buildProjectPropertiesPayload(
         ? readStorageValue(locale, projectWizardStorage.companyMaxTeamSizeKey(locale)).trim()
         : '',
   }
+}
+
+/**
+ * Property questions come before the service step, which creates the project.
+ * Until then answers stay in storage and are synced later (description step,
+ * review); once the project exists they sync right away.
+ */
+export async function syncProjectPropertiesIfReady(locale: WizardLocale): Promise<boolean> {
+  if (!readStoredProjectRequestUuid(locale)) return false
+  await syncProjectProperties(locale)
+  return true
 }
 
 export async function syncProjectProperties(locale: WizardLocale) {

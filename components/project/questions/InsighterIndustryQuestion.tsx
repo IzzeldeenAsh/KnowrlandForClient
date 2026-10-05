@@ -55,29 +55,34 @@ type IndustryMeta = {
   iconClass: string
 }
 
+// Industry labels arrive translated, so each entry lists English and Arabic keywords.
+// Arabic keywords are written with a bare alef (see normalizeIndustryLabel).
+// Order matters: the first entry with a matching keyword wins.
 const INDUSTRY_META: Array<{
   words: string[]
   meta: IndustryMeta
 }> = [
-  { words: ['chemical', 'resource'], meta: { Icon: IconFlask2, iconClass: 'bg-blue-50 text-blue-600' } },
-  { words: ['construction'], meta: { Icon: IconBuilding, iconClass: 'bg-amber-50 text-amber-600' } },
-  { words: ['commerce', 'retail', 'trade'], meta: { Icon: IconShoppingCart, iconClass: 'bg-emerald-50 text-emerald-600' } },
-  { words: ['economy', 'politic'], meta: { Icon: IconBuildingMonument, iconClass: 'bg-violet-50 text-violet-600' } },
-  { words: ['energy', 'environment'], meta: { Icon: IconBolt, iconClass: 'bg-yellow-50 text-yellow-700' } },
-  { words: ['health', 'pharma', 'medtech'], meta: { Icon: IconHeartbeat, iconClass: 'bg-rose-50 text-rose-600' } },
-  { words: ['internet'], meta: { Icon: IconWorld, iconClass: 'bg-cyan-50 text-cyan-600' } },
-  { words: ['life', 'society'], meta: { Icon: IconUsers, iconClass: 'bg-pink-50 text-pink-600' } },
-  { words: ['real estate'], meta: { Icon: IconHome, iconClass: 'bg-teal-50 text-teal-600' } },
-  { words: ['sport', 'recreation'], meta: { Icon: IconBallFootball, iconClass: 'bg-orange-50 text-orange-600' } },
-  { words: ['management', 'professional', 'service'], meta: { Icon: IconBriefcase, iconClass: 'bg-indigo-50 text-indigo-600' } },
-  { words: ['travel', 'tourism', 'hospitality'], meta: { Icon: IconPlane, iconClass: 'bg-sky-50 text-sky-600' } },
-  { words: ['agriculture'], meta: { Icon: IconLeaf, iconClass: 'bg-lime-50 text-lime-700' } },
-  { words: ['finance', 'insurance'], meta: { Icon: IconBuildingBank, iconClass: 'bg-cyan-50 text-cyan-700' } },
-  { words: ['advertising', 'marketing', 'media'], meta: { Icon: IconSpeakerphone, iconClass: 'bg-fuchsia-50 text-fuchsia-600' } },
-  { words: ['consumer', 'fmcg'], meta: { Icon: IconPackage, iconClass: 'bg-orange-50 text-orange-700' } },
-  { words: ['technology', 'telecommunication'], meta: { Icon: IconDeviceMobile, iconClass: 'bg-violet-50 text-violet-600' } },
-  { words: ['metal', 'electronic', 'mining', 'material'], meta: { Icon: IconCpu, iconClass: 'bg-slate-200 text-slate-700' } },
-  { words: ['transportation', 'logistics'], meta: { Icon: IconTruck, iconClass: 'bg-blue-50 text-blue-700' } },
+  // First: "transportation" contains "sport", and the Arabic for logistics contains "خدمات".
+  { words: ['transportation', 'logistics', 'نقل', 'لوجست'], meta: { Icon: IconTruck, iconClass: 'bg-blue-50 text-blue-700' } },
+  // Before commerce: an Arabic professional-services label contains "تجار".
+  { words: ['management', 'professional', 'service', 'اداره', 'ادارة', 'منهجيه', 'منهجية', 'تخطيط', 'مهني', 'خدمات'], meta: { Icon: IconBriefcase, iconClass: 'bg-indigo-50 text-indigo-600' } },
+  { words: ['chemical', 'resource', 'كيميا', 'موارد'], meta: { Icon: IconFlask2, iconClass: 'bg-blue-50 text-blue-600' } },
+  { words: ['construction', 'بناء', 'تشييد', 'انشاء'], meta: { Icon: IconBuilding, iconClass: 'bg-amber-50 text-amber-600' } },
+  { words: ['commerce', 'retail', 'trade', 'تجار', 'تجزئه', 'تجزئة'], meta: { Icon: IconShoppingCart, iconClass: 'bg-emerald-50 text-emerald-600' } },
+  { words: ['economy', 'politic', 'اقتصاد', 'سياسه', 'سياسة'], meta: { Icon: IconBuildingMonument, iconClass: 'bg-violet-50 text-violet-600' } },
+  { words: ['energy', 'environment', 'طاقه', 'طاقة', 'بيئه', 'بيئة'], meta: { Icon: IconBolt, iconClass: 'bg-yellow-50 text-yellow-700' } },
+  { words: ['health', 'pharma', 'medtech', 'صحه', 'صحة', 'صحي', 'صيدل', 'طبيه', 'طبية'], meta: { Icon: IconHeartbeat, iconClass: 'bg-rose-50 text-rose-600' } },
+  { words: ['internet', 'انترنت'], meta: { Icon: IconWorld, iconClass: 'bg-cyan-50 text-cyan-600' } },
+  { words: ['life', 'society', 'حياه', 'حياة', 'مجتمع'], meta: { Icon: IconUsers, iconClass: 'bg-pink-50 text-pink-600' } },
+  { words: ['real estate', 'عقار'], meta: { Icon: IconHome, iconClass: 'bg-teal-50 text-teal-600' } },
+  { words: ['sport', 'recreation', 'رياض', 'ترفيه'], meta: { Icon: IconBallFootball, iconClass: 'bg-orange-50 text-orange-600' } },
+  { words: ['travel', 'tourism', 'hospitality', 'سفر', 'سياح', 'ضياف'], meta: { Icon: IconPlane, iconClass: 'bg-sky-50 text-sky-600' } },
+  { words: ['agriculture', 'زراع'], meta: { Icon: IconLeaf, iconClass: 'bg-lime-50 text-lime-700' } },
+  { words: ['finance', 'insurance', 'تمويل', 'تامين', 'مالي'], meta: { Icon: IconBuildingBank, iconClass: 'bg-cyan-50 text-cyan-700' } },
+  { words: ['advertising', 'marketing', 'media', 'اعلان', 'تسويق', 'اعلام', 'وسائط'], meta: { Icon: IconSpeakerphone, iconClass: 'bg-fuchsia-50 text-fuchsia-600' } },
+  { words: ['consumer', 'fmcg', 'استهلاك'], meta: { Icon: IconPackage, iconClass: 'bg-orange-50 text-orange-700' } },
+  { words: ['technology', 'telecommunication', 'تكنولوج', 'تقني', 'اتصالات'], meta: { Icon: IconDeviceMobile, iconClass: 'bg-violet-50 text-violet-600' } },
+  { words: ['metal', 'electronic', 'mining', 'material', 'manufactur', 'معادن', 'تعدين', 'الكترونيات', 'تصنيع'], meta: { Icon: IconCpu, iconClass: 'bg-slate-200 text-slate-700' } },
 ]
 
 const FALLBACK_META: IndustryMeta = {
@@ -85,8 +90,17 @@ const FALLBACK_META: IndustryMeta = {
   iconClass: 'bg-slate-100 text-slate-600',
 }
 
+// Lowercases English and folds Arabic alef/hamza variants and tatweel so keywords match either spelling.
+function normalizeIndustryLabel(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[أإآٱ]/g, 'ا')
+    .replace(/ـ/g, '')
+}
+
 function getIndustryMeta(industry: IndustryNode): IndustryMeta {
-  const label = industry.label.trim().toLowerCase()
+  const label = normalizeIndustryLabel(industry.label)
   return (
     INDUSTRY_META.find(({ words }) => words.some((word) => label.includes(word)))
       ?.meta || FALLBACK_META

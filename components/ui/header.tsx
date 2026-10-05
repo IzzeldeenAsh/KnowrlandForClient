@@ -322,14 +322,12 @@ export default function Header() {
     handleSearch(searchQuery);
   };
 
-  // With a query typed, "By Insights" searches Insights right away; on an empty
-  // field it only switches where the next search goes.
+  // Enabling with a query opens Insights; disabling returns to feed search.
   const handleSearchInsightsChange = (active: boolean) => {
-    if (searchQuery.trim()) {
-      router.push(getInsightsSearchHref(currentLocale, searchQuery));
-      return;
-    }
     setSearchInsights(active);
+    if (active && searchQuery.trim()) {
+      router.push(getInsightsSearchHref(currentLocale, searchQuery));
+    }
   };
 
   const clearFeedSearch = () => {

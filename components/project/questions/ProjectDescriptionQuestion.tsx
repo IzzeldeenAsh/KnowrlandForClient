@@ -17,6 +17,7 @@ import {
 } from '../projectDescriptionState'
 import { getProjectApiErrorMessage } from '../projectApiError'
 import { syncProjectDescription } from '../projectDescriptionSync'
+import { syncProjectProperties } from '../projectPropertiesSync'
 import { useProjectStepErrorToast } from '../useProjectStepErrorToast'
 import { useProjectWizardNavigation } from '../useProjectWizardNavigation'
 import { projectWizardStorage, type WizardLocale } from '../wizardStorage'
@@ -209,6 +210,8 @@ export default function ProjectDescriptionQuestion({
     setError(null)
 
     try {
+      // Property answers were collected before the project existed; save them now.
+      await syncProjectProperties(locale)
       await syncProjectDescription({
         locale,
         description: nextDescription,

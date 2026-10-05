@@ -13,10 +13,18 @@ import {
   readStoredProjectRequestUuid,
 } from '@/components/project/projectRequestUuid'
 import { clearStoredProposalMatchUuid } from '@/components/project/projectProposalMatchUuid'
+import {
+  clearStoredProjectServiceUuid,
+  ensureProjectServiceUuid,
+  pickProjectServiceFromProject,
+} from '@/components/project/projectServiceUuid'
 import { useProjectStepErrorToast } from '@/components/project/useProjectStepErrorToast'
 import { useProjectWizardNavigation } from '@/components/project/useProjectWizardNavigation'
+import { isServiceFlowActive, projectWizardStepIds } from '@/components/project/projectWizardFlow'
+import { BACKEND_STRING_MAX } from '@/components/project/backendLimits'
 import { getApiUrl } from '@/app/config'
 import { getAuthToken } from '@/lib/authToken'
+import { resetServiceComponentsPayload } from '@/components/project/serviceComponentsPayload'
 import { projectWizardStorage, type WizardLocale } from '@/components/project/wizardStorage'
 
 type ScopeChild = { id: number; name: string }
@@ -261,7 +269,7 @@ function AiClarificationQuestions({
             rows={2}
             dir="auto"
             placeholder={isRTL ? 'اكتب إجابتك...' : 'Type your answer...'}
-            className="mt-2 min-h-[54px] w-full resize-none rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-900 outline-none focus:border-sky-300 focus:ring-2 focus:ring-sky-100"
+            className="mt-2 min-h-[54px] w-full resize-none rounded-xl border border-slate-200 bg-white px-3 py-2 text-base font-medium text-slate-900 outline-none sm:text-sm focus:border-sky-300 focus:ring-2 focus:ring-sky-100"
           />
         </label>
       </div>
@@ -330,7 +338,7 @@ function AiIntakeFallback({
 
   const message = isRTL
     ? 'يرجى الرجوع واختيار خدمة من الخدمات المعرّفة مسبقًا للمتابعة.'
-    : 'Please go back and choose one of the predefined services to continue.'
+    : 'Return to your services to review the request, or start a new request.'
 
   return (
     <div className="max-w-2xl rounded-2xl border border-rose-100 bg-white/85 p-4 shadow-sm">
@@ -343,7 +351,7 @@ function AiIntakeFallback({
         onClick={onBackToServices}
         className="mt-4 rounded-full bg-[#1C7CBB] px-5 py-2 text-sm font-semibold text-white hover:bg-[#176799]"
       >
-        {isRTL ? 'اختيار خدمة معرّفة مسبقًا' : 'Choose a predefined service'}
+        {isRTL ? 'إدارة الخدمات' : 'Manage services'}
       </button>
     </div>
   )
@@ -359,6 +367,15 @@ function safeParseSelectedServiceId(value: string | null): number | null {
     const n = Number(value)
     return Number.isFinite(n) ? n : null
   }
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
 }
 
 function readServiceIsOther(locale: WizardLocale): boolean {
@@ -478,6 +495,7 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
   const [entered, setEntered] = useState(false)
   const [projectType, setProjectType] = useState<string | null>(null)
   const [serviceId, setServiceId] = useState<number | null>(null)
+  const [serviceLabel, setServiceLabel] = useState<string | null>(null)
   const [projectUuid, setProjectUuid] = useState('')
 
   const [scopes, setScopes] = useState<ScopeParent[] | null>(null)
@@ -513,6 +531,10 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
         safeParseSelectedServiceId(
           window.sessionStorage.getItem(projectWizardStorage.serviceIdsKey(locale))
         )
+      )
+      setServiceLabel(
+        window.sessionStorage.getItem(projectWizardStorage.serviceLabelKey(locale))?.trim() ||
+          null
       )
       setProjectUuid(readStoredProjectRequestUuid(locale))
       setSelectedParentIds(
@@ -575,6 +597,8 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
             if (cancelled) return
           }
 
+          const projectServiceUuid = await ensureProjectServiceUuid(locale)
+
           for (let attempt = 1; attempt <= AI_POLL_ATTEMPTS; attempt += 1) {
             if (cancelled) return
             activeController?.abort()
@@ -582,7 +606,7 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
 
             try {
               const url = getApiUrl(
-                `/api/account/project/definition/ai-intake/check-clarification/${projectUuid}`
+                `/api/account/project/definition/ai-intake/check-clarification/${projectUuid}/${projectServiceUuid}`
               )
               const res = await fetch(url, {
                 method: 'GET',
@@ -646,7 +670,9 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
                   )
 
                   const showJson = (await showRes.json()) as unknown
-                  showList = extractSuggestedScopesFromProjectRequest(showJson)
+                  showList = extractSuggestedScopesFromProjectRequest(
+                    pickProjectServiceFromProject(showJson, projectServiceUuid) ?? {}
+                  )
                 }
 
                 if (!cancelled) {
@@ -813,9 +839,13 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
       ? isRTL
         ? 'أضف نطاقات المشروع'
         : 'Add project scopes'
-      : isRTL
-        ? 'اختر نطاق المشروع'
-        : 'Select project scope'
+      : serviceLabel
+        ? isRTL
+          ? `اختر نطاق <span class="bg-gradient-to-r from-blue-700 via-sky-600 to-cyan-500 bg-clip-text text-transparent">${escapeHtml(serviceLabel)}</span>`
+          : `Select <span class="bg-gradient-to-r from-blue-700 via-sky-600 to-cyan-500 bg-clip-text text-transparent">${escapeHtml(serviceLabel)}</span> scope`
+        : isRTL
+          ? 'اختر نطاق المشروع'
+          : 'Select project scope'
 
   const subtitle = isOtherFlow
     ? availableScopes.length > 0
@@ -864,6 +894,13 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
   }
 
   const selectableCount = availableScopes.length + namedManualScopes.length
+
+  // Stagger only the entrance (opacity/transform); checked styling must respond immediately.
+  const entranceTransition = (delayMs: number) => ({
+    transitionDelay: `${delayMs}ms, ${delayMs}ms, 0ms, 0ms`,
+  })
+  const entranceTransitionClass =
+    'transition-[opacity,transform,background-color,border-color] duration-300'
 
   const allSelected =
     selectableCount > 0 &&
@@ -953,6 +990,12 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
   }
 
   const returnToDefinedServices = () => {
+    // While adding a service, keep the project; the service can be removed from the services list.
+    if (isServiceFlowActive(locale)) {
+      nav.goBack()
+      return
+    }
+
     try {
       window.sessionStorage.removeItem(projectWizardStorage.serviceIdsKey(locale))
       window.sessionStorage.removeItem(projectWizardStorage.serviceIsOtherKey(locale))
@@ -973,14 +1016,16 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
         JSON.stringify([])
       )
       window.sessionStorage.setItem(
-        projectWizardStorage.serviceComponentsPayloadKey(locale),
-        JSON.stringify({ components: {} })
+        projectWizardStorage.projectComponentSlugsKey(locale),
+        JSON.stringify([])
       )
+      resetServiceComponentsPayload(locale)
     } catch {
       // ignore
     }
 
     clearStoredProjectRequestUuid(locale)
+    clearStoredProjectServiceUuid(locale)
     clearStoredProposalMatchUuid(locale)
     nav.goBack()
   }
@@ -1008,8 +1053,11 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
     setError(null)
 
     try {
+      const projectServiceUuid = await ensureProjectServiceUuid(locale)
       const res = await fetch(
-        getApiUrl(`/api/account/project/definition/ai-intake/answers/${projectUuid}`),
+        getApiUrl(
+          `/api/account/project/definition/ai-intake/answers/${projectUuid}/${projectServiceUuid}`
+        ),
         {
           method: 'POST',
           headers: {
@@ -1067,11 +1115,17 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
       // ignore
     }
 
+    // Scopes are only saved by the sub-scopes step, so a review edit continues there.
+    if (nav.isReviewEditMode) {
+      window.location.assign(nav.hrefFor(projectWizardStepIds.projectSubscopes))
+      return
+    }
+
     nav.goNext()
   }
 
   return (
-    <div className="mx-auto w-full max-w-5xl" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="mx-auto w-full max-w-5xl touch-manipulation" dir={isRTL ? 'rtl' : 'ltr'}>
       <ProjectSelectedTypeHeader
         locale={locale}
         entered={entered}
@@ -1099,7 +1153,8 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
       >
         {isEnglish ? (
           <style>{`
-            #project-scope-question-title {
+            #project-scope-question-title,
+            #project-scope-question-title * {
               font-family: "IBM Plex Serif", serif !important;
             }
           `}</style>
@@ -1157,7 +1212,8 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
               <button
                 type="button"
                 onClick={toggleSelectAll}
-                className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors ${
+                aria-pressed={allSelected}
+                className={`inline-flex min-h-[36px] select-none items-center gap-2 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors [-webkit-tap-highlight-color:transparent] ${
                   allSelected
                     ? 'border-blue-300 bg-blue-50 text-[#1C7CBB]'
                     : 'border-slate-200 bg-white/70 text-slate-600 hover:bg-white'
@@ -1185,17 +1241,17 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
           <div
             className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3"
             role="group"
-            aria-label={title}
+            aria-label={title.replace(/<[^>]*>/g, '')}
           >
             {availableScopes.map((scope, index) => {
               const checked = selectedParentIds.includes(scope.id)
               return (
                 <label
                   key={scope.id}
-                  className={`flex min-h-[56px] cursor-pointer items-center gap-2.5 rounded-xl border px-3.5 py-3 text-start shadow-sm backdrop-blur-md transition-all duration-300 sm:px-4 ${
+                  className={`flex min-h-[56px] cursor-pointer select-none items-center gap-3 rounded-xl border px-3.5 py-3 text-start shadow-sm backdrop-blur-md [-webkit-tap-highlight-color:transparent] sm:px-4 ${entranceTransitionClass} ${
                     checked
                       ? 'border-blue-300 bg-white/70'
-                      : 'border-white/30 bg-white/40 hover:bg-white/55'
+                      : 'border-white/30 bg-white/40 hover:bg-white/55 active:bg-white/60'
                   } ${
                     entered
                       ? 'translate-x-0 opacity-100'
@@ -1203,13 +1259,13 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
                         ? 'translate-x-4 opacity-0'
                         : '-translate-x-4 opacity-0'
                   }`}
-                  style={{ transitionDelay: `${110 + index * 45}ms` }}
+                  style={entranceTransition(110 + index * 45)}
                 >
                   <input
                     type="checkbox"
                     checked={checked}
                     onChange={() => toggleParent(scope.id)}
-                    className="h-4 w-4 shrink-0 rounded border-slate-300 text-[#1C7CBB] focus:ring-2 focus:ring-blue-200"
+                    className="h-5 w-5 shrink-0 cursor-pointer rounded border-slate-300 text-[#1C7CBB] focus:ring-2 focus:ring-blue-200"
                   />
                   <span className="text-sm font-semibold leading-snug text-slate-900">
                     {scope.name}
@@ -1223,28 +1279,32 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
               return (
               <div
                 key={scope.id}
-                className={`flex min-h-[56px] items-center gap-2.5 rounded-xl border px-3.5 py-3 shadow-sm backdrop-blur-md sm:px-4 ${
+                className={`flex min-h-[56px] items-stretch rounded-xl border shadow-sm backdrop-blur-md transition-colors duration-300 ${
                   checked
                     ? 'border-blue-300 bg-white/70'
-                    : 'border-white/30 bg-white/40'
-                } ${isRTL ? 'flex-row-reverse' : ''}`}
+                    : 'border-white/30 bg-white/40 hover:bg-white/55'
+                }`}
               >
-                <input
-                  type="checkbox"
-                  checked={checked}
-                  onChange={() => toggleManualScope(scope.id)}
-                  className="h-4 w-4 shrink-0 rounded border-slate-300 text-[#1C7CBB] focus:ring-2 focus:ring-blue-200"
-                />
-                <span className={`flex-1 text-sm font-semibold leading-snug text-slate-900 ${isRTL ? 'text-right' : 'text-left'}`}>
-                  {scope.name}
-                </span>
+                <label className="flex min-w-0 flex-1 cursor-pointer select-none items-center gap-3 py-3 ps-3.5 text-start [-webkit-tap-highlight-color:transparent] sm:ps-4">
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={() => toggleManualScope(scope.id)}
+                    className="h-5 w-5 shrink-0 cursor-pointer rounded border-slate-300 text-[#1C7CBB] focus:ring-2 focus:ring-blue-200"
+                  />
+                  <span className="min-w-0 flex-1 break-words text-sm font-semibold leading-snug text-slate-900">
+                    {scope.name}
+                  </span>
+                </label>
                 <button
                   type="button"
                   onClick={() => removeManualScope(scope.id)}
                   aria-label={isRTL ? 'إزالة النطاق' : 'Remove scope'}
-                  className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white/80 text-slate-500 hover:bg-white hover:text-slate-700"
+                  className="group inline-flex w-11 shrink-0 items-center justify-center [-webkit-tap-highlight-color:transparent] sm:w-12"
                 >
-                  <IconXboxXFilled size={14} />
+                  <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-200 bg-white/80 text-slate-500 group-hover:bg-white group-hover:text-slate-700 group-active:bg-slate-100">
+                    <IconXboxXFilled size={14} />
+                  </span>
                 </button>
               </div>
               )
@@ -1252,14 +1312,15 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
 
             {pendingScopeName !== null ? (
               <div
-                className={`flex min-h-[56px] items-center gap-2.5 rounded-xl border border-white/30 bg-white/55 px-3.5 py-3 shadow-sm backdrop-blur-md sm:px-4 ${isRTL ? 'flex-row-reverse' : ''}`}
+                className="flex min-h-[56px] items-center gap-3 rounded-xl border border-white/30 bg-white/55 px-3.5 py-3 shadow-sm backdrop-blur-md sm:px-4"
               >
                 <span
-                  className="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded border border-slate-300 bg-white/80"
+                  className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded border border-slate-300 bg-white/80"
                   aria-hidden="true"
                 />
                 <input
                   value={pendingScopeName}
+                  maxLength={BACKEND_STRING_MAX}
                   onChange={(e) => setPendingScopeName(e.target.value)}
                   onBlur={commitPendingScope}
                   onKeyDown={(e) => {
@@ -1267,7 +1328,7 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
                     if (e.key === 'Escape') cancelPendingScope()
                   }}
                   placeholder={isRTL ? 'اسم النطاق…' : 'Scope name…'}
-                  className={`flex-1 border-0 bg-transparent p-0 text-sm font-semibold text-slate-900 shadow-none outline-none ring-0 placeholder:text-slate-400 focus:border-transparent focus:outline-none focus:ring-0 ${isRTL ? 'text-right' : 'text-left'}`}
+                  className="min-w-0 flex-1 border-0 bg-transparent p-0 text-start text-base font-semibold text-slate-900 shadow-none outline-none ring-0 placeholder:text-slate-400 focus:border-transparent focus:outline-none focus:ring-0 sm:text-sm"
                   autoFocus
                 />
                 <button
@@ -1275,7 +1336,7 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
                   onMouseDown={(event) => event.preventDefault()}
                   onClick={commitPendingScope}
                   aria-label={isRTL ? 'إضافة النطاق' : 'Add scope'}
-                  className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white shadow-sm hover:bg-emerald-600 active:bg-emerald-700"
+                  className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-500 sm:h-6 sm:w-6 text-white shadow-sm hover:bg-emerald-600 active:bg-emerald-700"
                 >
                   <IconCheck size={13} stroke={2.5} />
                 </button>
@@ -1284,7 +1345,7 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
                   onMouseDown={(event) => event.preventDefault()}
                   onClick={cancelPendingScope}
                   aria-label={isRTL ? 'إلغاء' : 'Cancel'}
-                  className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-rose-500 text-white shadow-sm hover:bg-rose-600 active:bg-rose-700"
+                  className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-rose-500 sm:h-6 sm:w-6 text-white shadow-sm hover:bg-rose-600 active:bg-rose-700"
                 >
                   <IconXboxXFilled size={13} />
                 </button>
@@ -1297,14 +1358,14 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
                 if (pendingScopeName !== null) event.preventDefault()
               }}
               onClick={startAddScope}
-              className={`flex min-h-[56px] w-full items-center justify-center gap-2 rounded-xl border border-dashed border-blue-300 bg-white/35 px-3.5 py-3 shadow-sm backdrop-blur-md transition-all duration-200 hover:bg-blue-50/30 sm:px-4 ${
+              className={`flex min-h-[56px] w-full items-center justify-center gap-2 rounded-xl border border-dashed border-blue-300 bg-white/35 px-3.5 py-3 shadow-sm backdrop-blur-md [-webkit-tap-highlight-color:transparent] hover:bg-blue-50/30 active:bg-blue-50/40 sm:px-4 ${entranceTransitionClass} ${
                 entered
                   ? 'translate-x-0 opacity-100'
                   : isRTL
                     ? 'translate-x-4 opacity-0'
                     : '-translate-x-4 opacity-0'
               }`}
-              style={{ transitionDelay: `${110 + availableScopes.length * 45}ms` }}
+              style={entranceTransition(110 + availableScopes.length * 45)}
             >
               <IconPlusFilled size={15} className="shrink-0 text-blue-500" />
               <span className="text-sm font-semibold text-blue-500">

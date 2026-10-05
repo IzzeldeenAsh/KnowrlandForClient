@@ -165,8 +165,29 @@ export const projectWizardStorage = {
   specifiedInsighterDisplayKey(locale: WizardLocale) {
     return `project:wizard:${locale}:specifiedInsighterDisplay`
   },
-  deadlineKey(locale: WizardLocale) {
-    return `project:wizard:${locale}:deadline`
+  projectServiceUuidKey(locale: WizardLocale) {
+    return `project:wizard:${locale}:projectServiceUuid`
+  },
+  /** The project's first service — the one the main wizard flow edits. */
+  primaryProjectServiceUuidKey(locale: WizardLocale) {
+    return `project:wizard:${locale}:primaryProjectServiceUuid`
+  },
+  /** Set while the client adds or edits an additional service from the review step. */
+  serviceFlowKey(locale: WizardLocale) {
+    return `project:wizard:${locale}:serviceFlow`
+  },
+  /** Saved wizard answers of one project service. */
+  serviceSessionKey(locale: WizardLocale, projectServiceUuid: string) {
+    return `project:wizard:${locale}:serviceSession:${projectServiceUuid}`
+  },
+  projectComponentSlugsKey(locale: WizardLocale) {
+    return `project:wizard:${locale}:projectComponentSlugs`
+  },
+  plannedStartDateKey(locale: WizardLocale) {
+    return `project:wizard:${locale}:plannedStartDate`
+  },
+  durationDaysKey(locale: WizardLocale) {
+    return `project:wizard:${locale}:durationDays`
   },
 } as const
 
