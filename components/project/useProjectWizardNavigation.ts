@@ -39,7 +39,10 @@ export function useProjectWizardNavigation(locale: WizardLocale) {
 
   const index = useMemo(() => stepOrder.indexOf(currentStep), [currentStep, stepOrder])
 
-  const prevStepId = index > 0 ? stepOrder[index - 1] : null
+  // Catalog loading is a routing step, so Back returns to the last question.
+  const prevStepId = index > 0
+    ? stepOrder.slice(0, index).reverse().find(step => step !== projectWizardStepIds.componentSetup) ?? null
+    : null
   const nextStepId =
     index >= 0 && index < stepOrder.length - 1 ? stepOrder[index + 1] : null
 

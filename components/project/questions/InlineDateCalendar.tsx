@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Calendar } from '@mantine/dates'
 import type { WizardLocale } from '@/components/project/wizardStorage'
+import classes from './InlineDateCalendar.module.css'
 
 type InlineDateCalendarProps = {
   value: string
@@ -12,6 +13,9 @@ type InlineDateCalendarProps = {
   locale: WizardLocale
   label: string
   className?: string
+  /** Highlights the days from rangeStart to rangeEnd, both ends drawn as selected. */
+  rangeStart?: string
+  rangeEnd?: string
 }
 
 function parseIsoDate(value?: string): Date | null {
@@ -68,11 +72,15 @@ export default function InlineDateCalendar({
   locale,
   label,
   className = '',
+  rangeStart,
+  rangeEnd,
 }: InlineDateCalendarProps) {
   const isRTL = locale === 'ar'
   const selectedDate = useMemo(() => parseIsoDate(value), [value])
   const minDate = useMemo(() => parseIsoDate(min) || undefined, [min])
   const maxDate = useMemo(() => parseIsoDate(max) || undefined, [max])
+  const rangeStartDate = useMemo(() => parseIsoDate(rangeStart), [rangeStart])
+  const rangeEndDate = useMemo(() => parseIsoDate(rangeEnd), [rangeEnd])
   const [visibleMonth, setVisibleMonth] = useState(() => getInitialMonth(value, min))
 
   useEffect(() => {
@@ -95,9 +103,10 @@ export default function InlineDateCalendar({
   return (
     <div
       aria-label={label}
-      className={`w-fit rounded-[10px] bg-white/95 p-3 shadow-sm ${className}`}
+      className={`w-fit rounded-[10px] bg-white/95 p-3 shadow-sm ${classes.calendar} ${className}`}
     >
       <Calendar
+        classNames={{ day: classes.day }}
         date={visibleMonth}
         onDateChange={(date) => setVisibleMonth(startOfMonth(date))}
         minDate={minDate}
@@ -110,10 +119,23 @@ export default function InlineDateCalendar({
         size="sm"
         withCellSpacing={false}
         highlightToday={false}
-        getDayProps={(date) => ({
-          selected: sameDate(selectedDate, date),
-          onClick: () => onChange(toLocalIsoDate(date)),
-        })}
+        getDayProps={(date) => {
+          const isRangeStart = sameDate(rangeStartDate, date)
+          const isRangeEnd = sameDate(rangeEndDate, date)
+          // Days spilling in from other months stay plain.
+          const inRange =
+            Boolean(rangeStartDate && rangeEndDate) &&
+            sameMonth(date, visibleMonth) &&
+            date >= rangeStartDate! &&
+            date <= rangeEndDate!
+          return {
+            selected: sameDate(selectedDate, date) || (inRange && (isRangeStart || isRangeEnd)),
+            inRange,
+            firstInRange: inRange && isRangeStart,
+            lastInRange: inRange && isRangeEnd,
+            onClick: () => onChange(toLocalIsoDate(date)),
+          }
+        }}
         ariaLabels={{
           nextMonth: isRTL ? 'الشهر التالي' : 'Next month',
           previousMonth: isRTL ? 'الشهر السابق' : 'Previous month',
@@ -145,7 +167,6 @@ export default function InlineDateCalendar({
             textTransform: 'none',
           },
           day: {
-            borderRadius: 999,
             fontSize: 14,
             fontWeight: 400,
           },

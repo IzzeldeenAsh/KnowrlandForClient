@@ -1,0 +1,18 @@
+/* Round days; a range reads as one band with round ends. */
+.calendar .day {
+  border-radius: 999px;
+}
+
+.calendar .day[data-in-range] {
+  border-radius: 0;
+}
+
+.calendar .day[data-first-in-range] {
+  border-start-start-radius: 999px;
+  border-end-start-radius: 999px;
+}
+
+.calendar .day[data-last-in-range] {
+  border-start-end-radius: 999px;
+  border-end-end-radius: 999px;
+}

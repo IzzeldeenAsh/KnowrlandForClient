@@ -11,32 +11,27 @@ import {
 import ProjectSelectedTypeHeader from '../ProjectSelectedTypeHeader'
 import {
   clearStoredProjectRequestUuid,
-  extractProjectRequestUuid,
   readStoredProjectRequestUuid,
-  writeStoredProjectRequestUuid,
 } from '../projectRequestUuid'
 import {
   clearStoredProposalMatchUuid,
-  extractProjectProposalMatchUuid,
-  writeStoredProposalMatchUuid,
 } from '../projectProposalMatchUuid'
 import {
   clearStoredProjectServiceUuid,
-  extractProjectServiceUuid,
-  writeStoredProjectServiceUuid,
 } from '../projectServiceUuid'
 import {
   serviceSessionSeed,
   startServiceFlow,
-  writePrimaryProjectServiceUuid,
 } from '../projectServiceSessions'
 import {
+  getProjectWizardStepOrder,
   isServiceAddPending,
   projectWizardStepIds,
   readServiceFlowReturnStepId,
 } from '../projectWizardFlow'
 import { readStoredSpecifiedInsighterUuid } from '../specifiedInsighterProject'
 import { serviceMetaForSlug, type ServiceMeta } from '../serviceMeta'
+import { readDefinitionMode } from '../projectDefinitionMode'
 import { resetServiceComponentsPayload } from '../serviceComponentsPayload'
 import { projectWizardStorage, type WizardLocale } from '../wizardStorage'
 import { getApiUrl } from '@/app/config'
@@ -96,12 +91,14 @@ function safeParseSelectedServiceId(value: string | null): number | null {
 }
 
 function AiScopePromptComposer({
+  simple,
   isRTL,
   value,
   loading,
   onChange,
   onSend,
 }: {
+  simple: boolean
   isRTL: boolean
   value: string
   loading: boolean
@@ -132,7 +129,7 @@ function AiScopePromptComposer({
         </span>
         <div>
           <h3 className="text-base font-semibold text-slate-900">
-            {isRTL ? 'أو صف خدمتك للذكاء الاصطناعي لنقترح عليك نطاقًا مناسبًا' : 'Or describe your service to our AI so we can suggest a related scope for you'}
+            {simple ? (isRTL ? 'أو صف الخدمة التي تحتاجها لتوضيح طلبك' : 'Or describe the service you need to clarify your request') : (isRTL ? 'أو صف خدمتك للذكاء الاصطناعي لنقترح عليك نطاقًا مناسبًا' : 'Or describe your service to our AI so we can suggest a related scope for you')}
           </h3>
         </div>
       </div>
@@ -160,8 +157,8 @@ function AiScopePromptComposer({
           type="button"
           onClick={onSend}
           disabled={!canSend}
-          aria-label={isRTL ? 'توليد النطاقات' : 'Generate scopes'}
-          title={isRTL ? 'توليد النطاقات' : 'Generate scopes'}
+          aria-label={simple ? (isRTL ? 'توضيح الطلب' : 'Clarify request') : (isRTL ? 'توليد النطاقات' : 'Generate scopes')}
+          title={simple ? (isRTL ? 'توضيح الطلب' : 'Clarify request') : (isRTL ? 'توليد النطاقات' : 'Generate scopes')}
           className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition ${canSend
               ? 'bg-[#1C7CBB] text-white shadow-md shadow-sky-500/20 hover:bg-[#176799]'
               : 'bg-slate-200 text-slate-500'
@@ -185,9 +182,6 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
 
   const [entered, setEntered] = useState(false)
   const [projectType, setProjectType] = useState<string | null>(null)
-  const [deliverablesLanguage, setDeliverablesLanguage] = useState<string | null>(
-    null
-  )
 
   const [services, setServices] = useState<Service[] | null>(null)
   const [loading, setLoading] = useState(false)
@@ -208,11 +202,6 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
     try {
       setProjectType(
         window.sessionStorage.getItem(projectWizardStorage.projectTypeKey(locale))
-      )
-      setDeliverablesLanguage(
-        window.sessionStorage.getItem(
-          projectWizardStorage.deliverablesLanguageKey(locale)
-        )
       )
       const adding = isServiceAddPending(locale)
       setAddingService(adding)
@@ -318,21 +307,6 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
 
   const canContinue = selectedId != null && services != null
 
-  const toApiLanguage = (value: string | null) => {
-    const v = (value || '').toLowerCase()
-    if (v.includes('arab')) return 'arabic'
-    if (v.includes('english')) return 'english'
-    return locale === 'ar' ? 'arabic' : 'english'
-  }
-
-  const toApiProjectType = (value: string | null) => {
-    if (value === 'ad_hoc') return 'ad_hoc'
-    if (value === 'frame_work_agreement' || value === 'framework')
-      return 'frame_work_agreement'
-    if (value === 'urgent_request' || value === 'urgent') return 'urgent_request'
-    return 'ad_hoc'
-  }
-
   const persistSelection = (
     nextSelectedId: number,
     nextIsOtherSelected: boolean,
@@ -348,6 +322,8 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
         projectWizardStorage.servicePromptKey(locale),
         nextPrompt
       )
+      // A new or edited request is checked by the AI intake again.
+      window.sessionStorage.removeItem(projectWizardStorage.aiIntakeReadyKey(locale))
       if (nextIsOtherSelected || !nextServiceLabel?.trim()) {
         window.sessionStorage.removeItem(projectWizardStorage.serviceLabelKey(locale))
       } else {
@@ -377,7 +353,9 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
         window.sessionStorage.removeItem(projectWizardStorage.servicePromptKey(locale))
       }
 
-      resetServiceComponentsPayload(locale)
+      resetServiceComponentsPayload(locale, false)
+      window.sessionStorage.removeItem(projectWizardStorage.serviceScopeDeferredKey(locale))
+      window.sessionStorage.removeItem(projectWizardStorage.componentCatalogKey(locale))
       window.sessionStorage.setItem(
         projectWizardStorage.serviceComponentSlugsKey(locale),
         JSON.stringify([])
@@ -458,7 +436,8 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
           prompt,
         })
       )
-      router.push(`/${locale}/project/wizard/${projectWizardStepIds.projectScope}`)
+      const steps = getProjectWizardStepOrder(locale)
+      router.push(`/${locale}/project/wizard/${steps[0]}`)
     } catch (err) {
       setError(
         getProjectApiErrorMessage(
@@ -482,134 +461,20 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
     }
 
     setError(null)
-
-    persistSelection(
-      payload.serviceId,
-      payload.isOtherSelected,
-      payload.servicePrompt,
-      payload.serviceLabel
-    )
-
-    const token = getAuthToken()
-    if (!token) {
-      setError(isRTL ? 'يرجى تسجيل الدخول للمتابعة.' : 'Please sign in to continue.')
-      return
+    const previousId = safeParseSelectedServiceId(window.sessionStorage.getItem(projectWizardStorage.serviceIdsKey(locale)))
+    const previousPrompt = window.sessionStorage.getItem(projectWizardStorage.servicePromptKey(locale)) || ''
+    if (previousId !== payload.serviceId || previousPrompt !== payload.servicePrompt) {
+      resetDownstreamWizardState(false)
     }
-
-    setSubmitting(true)
-    try {
-      const headers: HeadersInit = {
-        Authorization: `Bearer ${token}`,
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        'Accept-Language': locale === 'ar' ? 'ar' : 'en',
-        'X-Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
-      }
-
-      const prompt = payload.isOtherSelected ? payload.servicePrompt.trim() : ''
-      const apiServiceId = payload.serviceId
-      const insighterIndustryId = safeParseSelectedServiceId(
-        window.sessionStorage.getItem(
-          projectWizardStorage.insighterIndustryIdKey(locale)
-        )
-      )
-      const specifiedInsighterUuid = readStoredSpecifiedInsighterUuid(locale)
-      const initiatePath = specifiedInsighterUuid
-        ? `/api/account/project/definition/initiate-specific/${encodeURIComponent(
-            specifiedInsighterUuid
-          )}`
-        : '/api/account/project/definition/initiate'
-
-      const initRes = await fetch(getApiUrl(initiatePath), {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          language: toApiLanguage(deliverablesLanguage),
-          type: toApiProjectType(projectType),
-          service_id: apiServiceId,
-          ...(insighterIndustryId != null
-            ? { insighter_industry_id: insighterIndustryId }
-            : {}),
-          service_prompt: prompt,
-          prompt_ai: prompt,
-        }),
-      })
-
-      await assertProjectApiResponse(initRes, 'Failed to create the project.')
-
-      const initJson = (await initRes.json()) as unknown
-      const projectUuid = extractProjectRequestUuid(initJson)
-      if (!projectUuid) throw new Error('init_bad_response')
-
-      const projectServiceUuid = extractProjectServiceUuid(initJson)
-      if (!projectServiceUuid) throw new Error('init_bad_response')
-
-      writeStoredProjectRequestUuid(locale, projectUuid)
-      writeStoredProjectServiceUuid(locale, projectServiceUuid)
-      writePrimaryProjectServiceUuid(locale, projectServiceUuid)
-      if (specifiedInsighterUuid) {
-        const proposalMatchUuid = extractProjectProposalMatchUuid(initJson)
-        if (!proposalMatchUuid) throw new Error('init_bad_response')
-        writeStoredProposalMatchUuid(locale, proposalMatchUuid)
-      } else {
-        clearStoredProposalMatchUuid(locale)
-      }
-      try {
-        resetServiceComponentsPayload(locale)
-      } catch {
-        // ignore
-      }
-
-      try {
-        window.sessionStorage.setItem(
-          projectWizardStorage.serviceComponentSlugsKey(locale),
-          JSON.stringify([])
-        )
-        window.sessionStorage.setItem(
-          projectWizardStorage.projectComponentSlugsKey(locale),
-          JSON.stringify([])
-        )
-        window.sessionStorage.setItem(
-          projectWizardStorage.serviceScopeHasChildrenKey(locale),
-          '0'
-        )
-        window.sessionStorage.setItem(
-          projectWizardStorage.serviceScopeParentIdsKey(locale),
-          JSON.stringify([])
-        )
-        window.sessionStorage.setItem(
-          projectWizardStorage.serviceScopeChildIdsByParentKey(locale),
-          JSON.stringify({})
-        )
-        window.sessionStorage.removeItem(projectWizardStorage.serviceManualScopesKey(locale))
-        window.sessionStorage.removeItem(
-          projectWizardStorage.serviceAiSuggestedScopesKey(locale)
-        )
-        window.sessionStorage.removeItem(
-          projectWizardStorage.serviceManualSubscopesByScopeKey(locale)
-        )
-      } catch {
-        // ignore
-      }
-
-      nav.goNext()
-    } catch (err) {
-      setError(
-        getProjectApiErrorMessage(
-          err,
-          isRTL ? 'تعذر إنشاء المشروع.' : 'Failed to create the project.'
-        )
-      )
-    } finally {
-      setSubmitting(false)
-    }
+    persistSelection(payload.serviceId, payload.isOtherSelected, payload.servicePrompt, payload.serviceLabel)
+    nav.goNext()
   }
 
   const onContinue = async () => {
     if (!canContinue || selectedId == null || submitting) return
 
     if (isOtherSelected && !addingService) {
-      nav.goNext()
+      await onSendAiPrompt()
       return
     }
 
@@ -644,16 +509,9 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
       return
     }
 
-    persistSelection(
-      service.id,
-      nextIsOtherSelected,
-      nextPrompt,
-      nextIsOtherSelected ? null : service.name
-    )
-
     if (nextIsOtherSelected) {
       resetDownstreamWizardState(true)
-      nav.goNext()
+      persistSelection(service.id, true, nextPrompt, null)
       return
     }
 
@@ -672,8 +530,8 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
     if (!prompt) {
       setError(
         isRTL
-          ? 'اكتب وصفًا للخدمة أولًا لتوليد النطاقات.'
-          : 'Write a service description first to generate scopes.'
+          ? 'اكتب وصفًا للخدمة أولًا للمتابعة.'
+          : 'Write a service description first to continue.'
       )
       return
     }
@@ -810,6 +668,7 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
 
             <div className="mt-6">
               <AiScopePromptComposer
+                simple={!addingService || readDefinitionMode(locale) === 'simple'}
                 isRTL={isRTL}
                 value={servicePrompt}
                 loading={submitting}

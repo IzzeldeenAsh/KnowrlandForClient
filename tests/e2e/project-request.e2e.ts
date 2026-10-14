@@ -35,27 +35,27 @@ test('project request completes every step and retries failed saves without losi
   await preferences(ctx);
   await screen.getByRole('radio', /^Any/).tap();
   await step(ctx, 'project-schedule');
-  await screen.getByRole('textbox', /^Duration in days\b/).fill('45');
-  await screen.getByRole('textbox', /^Duration in days\b/).press('Enter');
+  await screen.getByRole('textbox', /^Project duration\b/).fill('45');
+  await screen.getByRole('textbox', /^Project duration\b/).press('Enter');
   await screen.getByRole('button', 'Continue').tap();
-  await step(ctx, 'target-market');
+  await step(ctx, 'service');
   await screen.getByRole('link', 'Back').tap();
   await step(ctx, 'project-schedule');
   await browser.reload();
-  await expect(screen.getByRole('textbox', /^Duration in days\b/)).toHaveValue('45');
+  await expect(screen.getByRole('textbox', /^Project duration\b/)).toHaveValue('45');
   await screen.getByRole('button', 'Continue').tap();
-  await step(ctx, 'target-market');
-  await screen.getByRole('radio', 'Worldwide').tap();
-  await step(ctx, 'data-sources-expected');
-  await screen.getByRole('radio', 'Both').tap();
   await step(ctx, 'service');
   expect(projectApi.calls.filter(c => c.path.includes('/definition/initiate'))).toHaveLength(0);
   await expect(screen.getByRole('button', 'Continue')).toBeDisabled();
   await screen.getByRole('radio', /^Market research/).tap();
+  await step(ctx, 'definition-mode');
+  expect(projectApi.calls.filter(c => c.path.includes('/definition/initiate'))).toHaveLength(0);
+  await screen.getByRole('radio', 'Define it myself').tap();
+  await screen.getByRole('button', 'Continue').tap();
   await step(ctx, 'project-scope');
   expect(projectApi.calls.filter(c => c.path.endsWith('/definition/initiate'))).toHaveLength(1);
   expect(projectApi.calls.find(c => c.path.endsWith('/definition/initiate'))?.body).toMatchObject({
-    service_id: 1, insighter_industry_id: 8, language: 'english', type: 'ad_hoc',
+    service_id: 1, definition_mode: 'advanced', insighter_industry_id: 8, language: 'english', type: 'ad_hoc',
   });
   await expect(screen.getByRole('button', 'Continue')).toBeDisabled();
   await screen.getByRole('checkbox', 'Analysis').check();
@@ -69,12 +69,24 @@ test('project request completes every step and retries failed saves without losi
   await expect(screen.getByText('Enter a name for this deliverable.')).toBeVisible();
   expect(projectApi.calls.filter(c => c.path.includes('/definition/component/sync/'))).toHaveLength(0);
   await screen.getByLabel('Deliverable name').fill('Market opportunity report');
+  await screen.getByRole('button', 'Due date').tap();
+  await screen.getByRole('spinbutton', 'Days from project start').fill('7');
+  await screen.getByRole('spinbutton', 'Days from project start').press('Escape');
+  await screen.getByRole('button', 'File format').tap();
+  await screen.getByRole('option', 'PDF Report').tap();
+  await screen.getByRole('option', 'PDF Report').press('Escape');
+  await screen.getByRole('button', 'Delivery method').tap();
+  await screen.getByRole('option', 'On platform').tap();
   projectApi.failComponentsOnce = true;
   await screen.getByRole('button', 'Continue').tap();
   await expect(screen.getByText('Please correct deliverables.').first()).toBeVisible();
   await step(ctx, 'deliverables-plan');
   await expect(screen.getByLabel('Deliverable name')).toHaveValue('Market opportunity report');
   await screen.getByRole('button', 'Continue').tap();
+  await step(ctx, 'target-market');
+  await screen.getByRole('radio', 'Worldwide').tap();
+  await step(ctx, 'data-sources-expected');
+  await screen.getByRole('radio', 'Both').tap();
   await step(ctx, 'project-description');
   await screen.getByRole('textbox').fill('Assess the Jordanian software market and identify customer segments.');
   await screen.getByRole('button', 'Continue').tap();
@@ -83,7 +95,7 @@ test('project request completes every step and retries failed saves without losi
   await step(ctx, 'kickoff-meeting');
   await screen.getByRole('radio', /^Yes/).tap();
   await step(ctx, 'project-review');
-  await expect(screen.getByText(/^Market opportunity report — 30 Days/).first()).toBeVisible();
+  await expect(screen.getByText('Market opportunity report', { visible: true }).first()).toBeVisible();
   await expect(screen.getByText('Primary and secondary data')).toBeVisible();
   await screen.getByRole('link', 'Edit: Selection').tap();
   await expect(browser).toHaveURL(`${path('data-sources-expected')}?returnTo=project-review`);
@@ -113,7 +125,7 @@ test('project request completes every step and retries failed saves without losi
     insighter_preferred_type: 'either', components: {
       'data-sources-expected': 'primary_data', 'target-market': { type: 'region', ids: [1, 2] },
     } });
-  const initialProperties = projectApi.calls.find(c => c.path.includes('/properties/sync/'))?.body;
+  const initialProperties = projectApi.calls.find(c => c.path.includes('/properties/sync/') && c.body.components?.['data-sources-expected'])?.body;
   expect(initialProperties?.components['data-sources-expected']).toBe('both');
   expect(projectApi.calls.find(c => c.path.includes('/description/sync/'))?.raw).toContain('Assess the Jordanian software market');
   expect(projectApi.calls.find(c => c.path.includes('/addon/sync/'))?.raw).toContain('addons[kickoff-meeting][date]');
@@ -123,7 +135,7 @@ test('project request completes every step and retries failed saves without losi
   const componentCalls = projectApi.calls.filter(c => c.path.includes('/definition/component/sync/'));
   expect(componentCalls).toHaveLength(2);
   expect(componentCalls[1].body.components).toEqual({ 'deliverable-stage': { deliverables: [{
-    title: 'Market opportunity report', period_days: 30, report_type: ['pdf'],
+    title: 'Market opportunity report', period_days: 7, report_type: ['pdf'],
     way: { selected: 'on_platform', address: null },
   }] } });
   const submissions = projectApi.calls.filter(c => c.path.includes('/proposal/submit/'));
@@ -177,13 +189,11 @@ test('agent starts an urgent request and the schedule stays within 24 hours', {
   await preferences(ctx, /^Within 24 hours/, () => agent.act('choose the Within 24 hours project type'));
   await agent.act('select Any as the preferred expert type');
   await step(ctx, 'project-schedule');
-  await expect(screen.getByRole('textbox', /^Duration in days\b/)).toHaveValue('1');
-  await screen.getByRole('textbox', /^Duration in days\b/).fill('90');
-  await screen.getByRole('textbox', /^Duration in days\b/).press('Enter');
-  await expect(screen.getByRole('textbox', /^Duration in days\b/)).toHaveValue('1');
+  await expect(screen.getByRole('textbox', /^Project duration\b/)).toHaveValue('1');
+  await expect(screen.getByRole('textbox', /^Project duration\b/)).toBeDisabled();
   await agent.assert('the schedule shows a one-day duration and explains that only this date is available for urgent 24-hour requests');
   await screen.getByRole('button', 'Continue').tap();
-  await step(ctx, 'target-market');
+  await step(ctx, 'service');
   const schedule = await browser.evaluate(() => {
     const today = new Date();
     const iso = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;

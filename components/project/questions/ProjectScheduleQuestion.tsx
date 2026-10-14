@@ -16,6 +16,7 @@ import { syncProjectPropertiesIfReady } from '@/components/project/projectProper
 import {
   URGENT_MAX_DURATION_DAYS,
   addDaysToIsoDate,
+  diffIsoDays,
   formatIsoDate,
   isUrgentProjectType,
   readProjectSchedule,
@@ -26,22 +27,40 @@ import { latestSavedSessionDeliverableDay } from '@/components/project/projectSe
 import { readServiceComponentSlugs } from '@/components/project/projectWizardFlow'
 import { useProjectStepErrorToast } from '@/components/project/useProjectStepErrorToast'
 import InlineDateCalendar from './InlineDateCalendar'
-import TimelineSlider from './TimelineSlider'
 import UrgentDateNotice from './UrgentDateNotice'
 import ProjectSelectedTypeHeader from '../ProjectSelectedTypeHeader'
 import { useProjectWizardNavigation } from '../useProjectWizardNavigation'
 import { projectWizardStorage, type WizardLocale } from '../wizardStorage'
 
 const DEFAULT_LEAD_DAYS = 7
-const MIN_RANGE_DAYS = 60
 
-function rangeFor(durationDays: number) {
-  return Math.max(MIN_RANGE_DAYS, Math.ceil((durationDays + 30) / 30) * 30)
+// Duration is stored in days; weeks and months only change how it is shown and typed.
+type DurationUnit = 'days' | 'weeks' | 'months'
+const UNIT_DAYS: Record<DurationUnit, number> = { days: 1, weeks: 7, months: 30 }
+const UNITS: DurationUnit[] = ['days', 'weeks', 'months']
+
+function unitButtonLabel(locale: WizardLocale, unit: DurationUnit) {
+  if (locale === 'ar') return { days: 'أيام', weeks: 'أسابيع', months: 'أشهر' }[unit]
+  return { days: 'Days', weeks: 'Weeks', months: 'Months' }[unit]
 }
 
-function durationUnit(locale: WizardLocale, days: number) {
-  if (locale === 'ar') return days >= 3 && days <= 10 ? 'أيام' : days > 10 ? 'يومًا' : 'يوم'
-  return days === 1 ? 'Day' : 'Days'
+function durationUnit(locale: WizardLocale, unit: DurationUnit, value: number) {
+  if (locale === 'ar') {
+    const forms = {
+      days: ['يوم', 'أيام', 'يومًا'],
+      weeks: ['أسبوع', 'أسابيع', 'أسبوعًا'],
+      months: ['شهر', 'أشهر', 'شهرًا'],
+    }[unit]
+    if (value === 1) return forms[0]
+    return Number.isInteger(value) && value > 10 ? forms[2] : forms[1]
+  }
+  const singular = { days: 'Day', weeks: 'Week', months: 'Month' }[unit]
+  return value === 1 ? singular : `${singular}s`
+}
+
+/** Days shown in the chosen unit, to one decimal place. */
+function durationInUnit(days: number, unit: DurationUnit) {
+  return Math.round((days / UNIT_DAYS[unit]) * 10) / 10
 }
 
 export default function ProjectScheduleQuestion({ locale }: { locale: WizardLocale }) {
@@ -57,7 +76,7 @@ export default function ProjectScheduleQuestion({ locale }: { locale: WizardLoca
   const [startDate, setStartDate] = useState('')
   const [durationDays, setDurationDays] = useState(30)
   const [durationDraft, setDurationDraft] = useState<string | null>(null)
-  const [rangeMax, setRangeMax] = useState(MIN_RANGE_DAYS)
+  const [unit, setUnit] = useState<DurationUnit>('days')
   const [showUrgentWarning, setShowUrgentWarning] = useState(false)
   const [urgentAcknowledged, setUrgentAcknowledged] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -76,7 +95,10 @@ export default function ProjectScheduleQuestion({ locale }: { locale: WizardLoca
     otherServicesLatestDay
   )
   const maxDuration = isUrgent ? URGENT_MAX_DURATION_DAYS : Number.MAX_SAFE_INTEGER
+  // A project lasts at least a day, so the close date is never the start date.
+  const minCloseDays = Math.min(maxDuration, Math.max(minDuration, 1))
   const plannedCloseDate = startDate ? addDaysToIsoDate(startDate, durationDays) : ''
+  const durationValue = durationInUnit(durationDays, unit)
 
   useEffect(() => {
     const timer = window.setTimeout(() => setEntered(true), 30)
@@ -91,7 +113,7 @@ export default function ProjectScheduleQuestion({ locale }: { locale: WizardLoca
       // ignore
     }
     const urgent = isUrgentProjectType(storedProjectType)
-    const storedDeliverables = readDeliverables(locale, storedProjectType)
+    const storedDeliverables = readDeliverables(locale)
     const otherLatest = latestSavedSessionDeliverableDay(locale)
     const latest = Math.max(latestDeliverableDay(storedDeliverables), otherLatest)
     const stored = readProjectSchedule(locale)
@@ -102,32 +124,30 @@ export default function ProjectScheduleQuestion({ locale }: { locale: WizardLoca
       : stored && stored.plannedStartDate >= todayValue
         ? stored.plannedStartDate
         : addDaysToIsoDate(todayValue, DEFAULT_LEAD_DAYS)
+    // At least one day: older drafts could save a same-day close.
     const initialDuration = urgent
-      ? Math.min(URGENT_MAX_DURATION_DAYS, Math.max(stored?.durationDays ?? 1, latest))
-      : Math.max(stored?.durationDays ?? Math.max(latest, 30), latest)
+      ? Math.min(URGENT_MAX_DURATION_DAYS, Math.max(stored?.durationDays ?? 1, latest, 1))
+      : Math.max(stored?.durationDays ?? Math.max(latest, 30), latest, 1)
 
     setProjectType(storedProjectType)
     setOtherServicesLatestDay(otherLatest)
     setDeliverables(storedDeliverables)
     setStartDate(initialStart)
     setDurationDays(initialDuration)
-    setRangeMax(urgent ? URGENT_MAX_DURATION_DAYS : rangeFor(initialDuration))
     setReady(true)
   }, [locale])
 
-  // The range only grows outside a drag, so the handle never jumps under the pointer.
-  const updateDuration = (value: number, growRange = true) => {
-    const next = Math.min(maxDuration, Math.max(minDuration, Math.round(value) || 0))
+  const updateDuration = (value: number) => {
+    const next = Math.min(maxDuration, Math.max(minCloseDays, Math.round(value) || 0))
     setDurationDays(next)
     setUrgentAcknowledged(false)
     setError(null)
-    if (growRange && !isUrgent && next + 14 > rangeMax) setRangeMax(rangeFor(next))
   }
 
   // Typed values below the minimum stay a draft until blur, so "45" can be typed past a minimum of 10.
   const commitDurationDraft = () => {
     if (durationDraft === null) return
-    updateDuration(durationDraft ? Number(durationDraft) : durationDays)
+    if (durationDraft) updateDuration(Number(durationDraft) * UNIT_DAYS[unit])
     setDurationDraft(null)
   }
 
@@ -170,6 +190,11 @@ export default function ProjectScheduleQuestion({ locale }: { locale: WizardLoca
     await submit()
   }
 
+  // Fixed to a six-week month so both calendars match and never jump when paging months.
+  const calendarClassName = 'mt-3 h-[334px]'
+  const fullDateFormat: Intl.DateTimeFormatOptions = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }
+  const shortDateFormat: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' }
+
   const fadeIn = entered
     ? 'opacity-100 translate-x-0'
     : isRTL
@@ -198,18 +223,23 @@ export default function ProjectScheduleQuestion({ locale }: { locale: WizardLoca
         </div>
 
         <div
-          className={`mt-8 grid gap-6 transition-all duration-700 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] ${fadeIn}`}
+          className={`mt-8 flex flex-col items-center gap-8 transition-all duration-700 lg:flex-row lg:items-start lg:justify-between lg:gap-6 ${fadeIn}`}
           style={{ transitionDelay: '160ms' }}
         >
-          <div>
+          <div className="w-fit">
             <h3 className="text-sm font-bold text-slate-800">
               {isRTL ? 'تاريخ البدء المتوقع' : 'Expected start date'}
             </h3>
+            <p className="mt-0.5 text-base font-bold text-slate-900">
+              {startDate ? formatIsoDate(startDate, locale, fullDateFormat) : '—'}
+            </p>
             <InlineDateCalendar
-              className="mt-3"
+              className={calendarClassName}
               value={startDate}
               min={today}
               max={isUrgent ? today : undefined}
+              rangeStart={startDate}
+              rangeEnd={plannedCloseDate}
               onChange={(date) => {
                 setStartDate(date)
                 setUrgentAcknowledged(false)
@@ -221,107 +251,114 @@ export default function ProjectScheduleQuestion({ locale }: { locale: WizardLoca
             {isUrgent ? <UrgentDateNotice locale={locale} /> : null}
           </div>
 
-          <div className="flex min-w-0 flex-col">
-            <h3 className="text-sm font-bold text-slate-800">
-              {isRTL ? 'مدة المشروع' : 'Project duration'}
-            </h3>
-            <label className="mt-1 inline-flex items-baseline gap-2 self-start lg:mb-4">
-              <span className="sr-only">{isRTL ? 'المدة بالأيام' : 'Duration in days'}</span>
-              <input
-                type="text"
-                inputMode="numeric"
-                value={durationDraft ?? String(durationDays)}
-                onChange={(event) => {
-                  const digits = event.target.value.replace(/\D/g, '').slice(0, 4)
-                  setDurationDraft(digits)
-                  const typed = Number(digits)
-                  if (digits && typed >= minDuration && typed <= maxDuration) updateDuration(typed, false)
-                }}
-                onFocus={(event) => event.target.select()}
-                onBlur={commitDurationDraft}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter') event.currentTarget.blur()
-                }}
-                style={{ width: `${Math.max(2, (durationDraft ?? String(durationDays)).length) + 0.25}ch` }}
-                className="border-0 border-b-2 border-transparent bg-transparent p-0 text-6xl font-semibold leading-none tracking-tight tabular-nums text-slate-900 transition-colors hover:border-slate-200 focus:border-[#1C7CBB] focus:outline-none focus:ring-0"
+          <div className="flex min-w-0 flex-1 flex-col items-center gap-4 lg:self-stretch lg:justify-center lg:pt-12">
+            <div className="relative flex w-full justify-center">
+              <div
+                aria-hidden="true"
+                className="absolute inset-x-0 top-1/2 hidden border-t-2 border-dashed border-slate-300 lg:block"
               />
-              <span className="text-2xl font-medium text-slate-500">{durationUnit(locale, durationDays)}</span>
-            </label>
-
-            <div className="mt-4 rounded-[10px] border border-slate-200 bg-white/80 px-2 sm:px-4 lg:mt-auto">
-              <TimelineSlider
-                min={0}
-                max={rangeMax}
-                isRTL={isRTL}
-                fillTo={durationDays}
-                tickEvery={isUrgent ? undefined : rangeMax > 120 ? 30 : 7}
-                startLabel={startDate ? formatIsoDate(startDate, locale) : ''}
-                endLabel={startDate ? formatIsoDate(addDaysToIsoDate(startDate, rangeMax), locale) : ''}
-                onChange={(_, value) => updateDuration(value, false)}
-                onCommit={(_, value) => updateDuration(value)}
-                points={[
-                  ...(hasDeliverables
-                    ? deliverables.map((item, index) => ({
-                        id: `deliverable-${index}`,
-                        value: item.period_days,
-                        label: item.title.length > 16 ? `${item.title.slice(0, 15)}…` : item.title,
-                        ariaLabel: item.title,
-                        valueText: dayLabel(locale, item.period_days),
-                        tone: 'muted' as const,
-                        draggable: false,
-                      }))
-                    : []),
-                  {
-                    id: 'close',
-                    value: durationDays,
-                    min: minDuration,
-                    label: plannedCloseDate
-                      ? `${isRTL ? 'الإغلاق' : 'Close'} · ${formatIsoDate(plannedCloseDate, locale, { month: 'short', day: 'numeric' })}`
-                      : isRTL
-                        ? 'الإغلاق'
-                        : 'Close',
-                    ariaLabel: isRTL ? 'مدة المشروع' : 'Project duration',
-                    valueText: durationLabel(locale, durationDays),
-                    tone: 'primary' as const,
-                    draggable: !isUrgent || URGENT_MAX_DURATION_DAYS > minDuration,
-                  },
-                ]}
-              />
+              <label className="relative flex h-44 w-44 flex-col items-center justify-center rounded-full border-2 border-[#1C7CBB] bg-white text-center shadow-[0_0_0_10px_rgba(28,124,187,0.08),0_8px_24px_rgba(15,23,42,0.08)]">
+                <span className="sr-only">
+                  {isRTL ? 'مدة المشروع' : 'Project duration'} ({unitButtonLabel(locale, unit)})
+                </span>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={durationDraft ?? String(durationValue)}
+                  onChange={(event) => {
+                    const digits = event.target.value.replace(/\D/g, '').slice(0, 4)
+                    setDurationDraft(digits)
+                    const typedDays = Number(digits) * UNIT_DAYS[unit]
+                    if (digits && typedDays >= minCloseDays && typedDays <= maxDuration) updateDuration(typedDays)
+                  }}
+                  onFocus={(event) => event.target.select()}
+                  onBlur={commitDurationDraft}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') event.currentTarget.blur()
+                  }}
+                  disabled={isUrgent}
+                  style={{ width: `${Math.max(2, (durationDraft ?? String(durationValue)).length) + 0.25}ch` }}
+                  className="border-0 border-b-2 border-transparent bg-transparent p-0 text-center text-5xl font-semibold leading-none tracking-tight tabular-nums text-slate-900 transition-colors hover:border-slate-200 focus:border-[#1C7CBB] focus:outline-none focus:ring-0 disabled:hover:border-transparent"
+                />
+                <span className="mt-1.5 text-[15px] font-medium text-slate-500">
+                  {durationUnit(locale, unit, durationValue)}
+                </span>
+                <span className="mt-1.5 text-xs font-semibold text-[#1C7CBB]">
+                  {unit === 'days'
+                    ? startDate
+                      ? `${formatIsoDate(startDate, locale, shortDateFormat)} ${isRTL ? '←' : '→'} ${formatIsoDate(plannedCloseDate, locale, shortDateFormat)}`
+                      : ''
+                    : durationLabel(locale, durationDays)}
+                </span>
+              </label>
             </div>
 
-            <dl className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {[
-                {
-                  term: isRTL ? 'البدء المتوقع' : 'Expected start',
-                  value: startDate ? formatIsoDate(startDate, locale) : '—',
-                },
-                {
-                  term: isRTL ? 'الإغلاق المتوقع' : 'Expected close',
-                  value: plannedCloseDate ? formatIsoDate(plannedCloseDate, locale) : '—',
-                },
-              ].map((item) => (
-                <div key={item.term} className="rounded-[10px] border border-slate-200 bg-white/85 px-3 py-2.5">
-                  <dt className="text-xs font-semibold text-slate-500">{item.term}</dt>
-                  <dd className="mt-0.5 text-sm font-bold text-slate-900">{item.value}</dd>
-                </div>
-              ))}
-            </dl>
+            <div
+              role="group"
+              aria-label={isRTL ? 'عرض المدة بـ' : 'Show duration in'}
+              className="inline-flex gap-0.5 rounded-full bg-slate-200/70 p-[3px]"
+            >
+              {UNITS.map((option) => {
+                const active = option === unit
+                return (
+                  <button
+                    key={option}
+                    type="button"
+                    aria-pressed={active}
+                    onClick={() => {
+                      setDurationDraft(null)
+                      setUnit(option)
+                    }}
+                    className={`min-h-10 rounded-full px-[18px] text-sm transition-colors ${
+                      active
+                        ? 'bg-white font-bold text-[#1C7CBB] shadow-sm'
+                        : 'font-medium text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    {unitButtonLabel(locale, option)}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
 
-            {hasDeliverables && minDuration > 0 ? (
-              <p className="mt-3 text-xs font-semibold text-slate-500">
-                {isRTL
-                  ? `يجب أن تشمل المدة آخر مخرج (${dayLabel(locale, minDuration)}).`
-                  : `The duration has to cover your last deliverable (${dayLabel(locale, minDuration)}).`}
-              </p>
-            ) : null}
-            {startInPast ? (
-              <p className="mt-3 text-sm text-rose-700">
-                {isRTL ? 'لا يمكن أن يكون تاريخ البدء في الماضي.' : 'The start date cannot be in the past.'}
-              </p>
-            ) : null}
-            {error ? <p className="mt-3 text-sm text-rose-700">{error}</p> : null}
+          <div className="w-fit">
+            <h3 className="text-sm font-bold text-slate-800">
+              {isRTL ? 'تاريخ الإغلاق المتوقع' : 'Expected close date'}
+            </h3>
+            <p className="mt-0.5 text-base font-bold text-slate-900">
+              {plannedCloseDate ? formatIsoDate(plannedCloseDate, locale, fullDateFormat) : '—'}
+            </p>
+            <InlineDateCalendar
+              className={calendarClassName}
+              value={plannedCloseDate}
+              min={startDate ? addDaysToIsoDate(startDate, minCloseDays) : undefined}
+              max={startDate && isUrgent ? addDaysToIsoDate(startDate, maxDuration) : undefined}
+              rangeStart={startDate}
+              rangeEnd={plannedCloseDate}
+              onChange={(date) => {
+                setDurationDraft(null)
+                updateDuration(diffIsoDays(startDate, date))
+              }}
+              locale={locale}
+              label={isRTL ? 'تاريخ الإغلاق المتوقع' : 'Expected close date'}
+            />
           </div>
         </div>
+
+        {hasDeliverables && minDuration > 0 ? (
+          <p className="mt-4 text-center text-xs font-semibold text-slate-500">
+            {isRTL
+              ? `يجب أن تشمل المدة آخر مخرج (${dayLabel(locale, minDuration)}).`
+              : `The duration has to cover your last deliverable (${dayLabel(locale, minDuration)}).`}
+          </p>
+        ) : null}
+        {startInPast ? (
+          <p className="mt-3 text-center text-sm text-rose-700">
+            {isRTL ? 'لا يمكن أن يكون تاريخ البدء في الماضي.' : 'The start date cannot be in the past.'}
+          </p>
+        ) : null}
+        {error ? <p className="mt-3 text-center text-sm text-rose-700">{error}</p> : null}
 
         <div
           className={`mt-6 flex items-start gap-3 rounded-[10px] border border-[#1C7CBB]/25 bg-[#1C7CBB]/[0.07] px-4 py-3 text-start transition-all duration-700 ${fadeIn}`}

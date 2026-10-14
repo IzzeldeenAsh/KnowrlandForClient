@@ -13,11 +13,6 @@ import { getApiUrl } from '@/app/config'
 import { getAuthToken } from '@/lib/authToken'
 import { writeProjectScopeSnapshot } from '@/components/project/projectAddonsState'
 import {
-  fetchProjectLevelComponentSlugs,
-  fetchProjectServiceComponentSlugs,
-  storeComponentSlugs,
-} from '@/components/project/projectComponentsCatalog'
-import {
   ensureProjectServiceUuid,
   pickProjectServiceFromProject,
 } from '@/components/project/projectServiceUuid'
@@ -927,19 +922,6 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
           subscopes: scope.subscopes.map((subscope) => subscope.name),
         }))
       )
-
-      const [projectServiceSlugs, projectSlugs] = await Promise.all([
-        fetchProjectServiceComponentSlugs({
-          locale,
-          token,
-          serviceId,
-          isOther: readServiceIsOther(locale),
-          projectUuid,
-          projectServiceUuid,
-        }),
-        fetchProjectLevelComponentSlugs({ locale, token, projectUuid }),
-      ])
-      storeComponentSlugs(locale, { projectServiceSlugs, projectSlugs })
 
       nav.goNext()
     } catch (err) {

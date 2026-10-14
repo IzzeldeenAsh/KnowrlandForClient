@@ -6,7 +6,9 @@ import ProjectSelectedTypeHeader from '@/components/project/ProjectSelectedTypeH
 import { getProjectApiErrorMessage } from '@/components/project/projectApiError'
 import {
   readServiceComponentPayloadValue,
+  readServiceComponentsPayload,
   updateServiceComponentPayload,
+  writeServiceComponentsPayload,
 } from '@/components/project/serviceComponentsPayload'
 import { syncProjectProperties } from '@/components/project/projectPropertiesSync'
 import { useProjectStepErrorToast } from '@/components/project/useProjectStepErrorToast'
@@ -92,13 +94,18 @@ export default function DataSourcesExpectedQuestion({
 
   const canContinue = selected !== null
 
-  const persist = async (value: DataSourceId) => {
+  const persist = async (value: DataSourceId | null) => {
     setBusy(true)
     setError(null)
     try {
-      updateServiceComponentPayload(locale, 'data-sources-expected', value)
-      // Project-level component, asked before the project exists: the description
-      // step's properties sync sends it. In review edit mode that step won't run again.
+      if (value) {
+        updateServiceComponentPayload(locale, 'data-sources-expected', value)
+      } else {
+        const payload = readServiceComponentsPayload(locale)
+        delete payload.components['data-sources-expected']
+        writeServiceComponentsPayload(locale, payload)
+      }
+      // The description step sends project components together. Review edits save immediately.
       if (nav.isReviewEditMode) await syncProjectProperties(locale)
       nav.goNext()
     } catch (err) {
@@ -121,6 +128,13 @@ export default function DataSourcesExpectedQuestion({
   const onContinue = () => {
     if (!selected) return
     void persist(selected)
+  }
+
+  // Data sources are optional: skipping clears any earlier answer.
+  const onSkip = () => {
+    if (busy) return
+    setSelected(null)
+    void persist(null)
   }
 
   return (
@@ -211,21 +225,32 @@ export default function DataSourcesExpectedQuestion({
               {isRTL ? 'رجوع' : 'Back'}
             </Link>
 
-            <button
-              type="button"
-              onClick={onContinue}
-              disabled={!canContinue || busy}
-              className={`btn-sm px-6 py-2 rounded-full ${canContinue && !busy
-                  ? 'text-white bg-[#1C7CBB] hover:bg-opacity-90'
-                  : 'text-slate-500 bg-slate-200 cursor-not-allowed'
-                }`}
-            >
-              {busy
-                ? isRTL
-                  ? 'جاري الحفظ...'
-                  : 'Saving...'
-                : nav.continueLabel}
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={onSkip}
+                disabled={busy}
+                className="btn-sm px-5 py-2 rounded-full text-slate-700 bg-white/80 hover:bg-white border border-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isRTL ? 'تخطي' : 'Skip'}
+              </button>
+
+              <button
+                type="button"
+                onClick={onContinue}
+                disabled={!canContinue || busy}
+                className={`btn-sm px-6 py-2 rounded-full ${canContinue && !busy
+                    ? 'text-white bg-[#1C7CBB] hover:bg-opacity-90'
+                    : 'text-slate-500 bg-slate-200 cursor-not-allowed'
+                  }`}
+              >
+                {busy
+                  ? isRTL
+                    ? 'جاري الحفظ...'
+                    : 'Saving...'
+                  : nav.continueLabel}
+              </button>
+            </div>
           </div>
         </div>
       </div>

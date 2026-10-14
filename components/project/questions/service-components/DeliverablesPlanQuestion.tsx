@@ -20,6 +20,7 @@ import {
   IconMapPin,
   IconMinus,
   IconPlus,
+  IconBooks,
   IconTrash,
 } from "@tabler/icons-react";
 import ProjectSelectedTypeHeader from "@/components/project/ProjectSelectedTypeHeader";
@@ -28,9 +29,9 @@ import {
   MAX_DELIVERABLES,
   createDeliverable,
   dayLabel,
-  latestDeliverableDay,
   readDeliverables,
   writeDeliverables,
+  type DeliverableDraft,
   type DeliverableWay,
   type ProjectDeliverable,
 } from "@/components/project/projectDeliverables";
@@ -42,7 +43,6 @@ import {
   URGENT_MAX_DURATION_DAYS,
   type ProjectSchedule,
 } from "@/components/project/projectSchedule";
-import { isLeavingComponentSteps } from "@/components/project/projectWizardFlow";
 import { syncServiceComponents } from "@/components/project/serviceComponentsSync";
 import { useProjectStepErrorToast } from "@/components/project/useProjectStepErrorToast";
 import { useProjectWizardNavigation } from "@/components/project/useProjectWizardNavigation";
@@ -54,8 +54,6 @@ import {
   getReportTypeOptions,
   type ReportTypeOption,
 } from "./deliverableReportTypes";
-
-const DEFAULT_DAY = 30;
 
 const WAY_OPTIONS: Array<{
   value: DeliverableWay;
@@ -86,12 +84,16 @@ const WAY_OPTIONS: Array<{
 const PILL_CLASS =
   "inline-flex h-9 items-center gap-2 rounded-full border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-800 transition-colors hover:border-slate-300 hover:bg-slate-50 focus:outline-none data-[focus]:ring-2 data-[focus]:ring-blue-200 data-[open]:border-blue-300 data-[open]:bg-blue-50/60";
 
+const PLACEHOLDER_CLASS = "font-medium text-slate-500";
+
 const PANEL_CLASS =
   "z-50 rounded-[12px] border border-slate-200 bg-white p-2 shadow-lg [--anchor-gap:6px] focus:outline-none";
 
-function isDeliverableComplete(item: ProjectDeliverable) {
+function isDeliverableComplete(item: DeliverableDraft): item is ProjectDeliverable {
   if (!item.title.trim()) return false;
+  if (item.period_days === null) return false;
   if (item.report_type.length === 0) return false;
+  if (item.way.selected === null) return false;
   if (item.way.selected === "physical_workshop")
     return Boolean(item.way.address?.trim());
   return true;
@@ -139,7 +141,7 @@ export default function DeliverablesPlanQuestion({
 
   const [entered, setEntered] = useState(false);
   const [projectType, setProjectType] = useState<string | null>(null);
-  const [deliverables, setDeliverables] = useState<ProjectDeliverable[]>([]);
+  const [deliverables, setDeliverables] = useState<DeliverableDraft[]>([]);
   // Only a freshly added deliverable grabs focus.
   const [focusIndex, setFocusIndex] = useState<number | null>(null);
   // The schedule step comes first, so deliverables fit inside the planned duration.
@@ -171,14 +173,14 @@ export default function DeliverablesPlanQuestion({
       : storedSchedule
         ? storedSchedule.durationDays
         : null;
-    const initial = readDeliverables(locale, storedProjectType).map((item) =>
+    const stored: DeliverableDraft[] = readDeliverables(locale).map((item) =>
       limit === null
         ? item
         : { ...item, period_days: Math.min(item.period_days, limit) },
     );
     setProjectType(storedProjectType);
     setSchedule(storedSchedule);
-    setDeliverables(initial);
+    setDeliverables(stored.length > 0 ? stored : [createDeliverable()]);
   }, [locale]);
 
   const isUrgent = isUrgentProjectType(projectType);
@@ -219,15 +221,18 @@ export default function DeliverablesPlanQuestion({
     return isRTL ? labels[day].ar : labels[day].en;
   };
 
-  const update = (index: number, patch: Partial<ProjectDeliverable>) => {
+  const update = (index: number, patch: Partial<DeliverableDraft>) => {
     setDeliverables((prev) =>
       prev.map((item, i) => (i === index ? { ...item, ...patch } : item)),
     );
   };
 
-  const setDay = (index: number, value: number) => {
+  const setDay = (index: number, value: number | null) => {
     update(index, {
-      period_days: Math.min(maxDay, Math.max(0, Math.round(value) || 0)),
+      period_days:
+        value === null
+          ? null
+          : Math.min(maxDay, Math.max(0, Math.round(value) || 0)),
     });
   };
 
@@ -244,16 +249,7 @@ export default function DeliverablesPlanQuestion({
 
   const addDeliverable = () => {
     if (deliverables.length >= MAX_DELIVERABLES) return;
-    const day = Math.min(
-      maxDay,
-      isUrgent
-        ? URGENT_MAX_DURATION_DAYS
-        : Math.max(DEFAULT_DAY, latestDeliverableDay(deliverables)),
-    );
-    setDeliverables((prev) => [
-      ...prev,
-      createDeliverable(locale, prev.length, day),
-    ]);
+    setDeliverables((prev) => [...prev, createDeliverable()]);
     setFocusIndex(deliverables.length);
     setAttempted(false);
   };
@@ -264,8 +260,9 @@ export default function DeliverablesPlanQuestion({
     setFocusIndex(null);
   };
 
+  const completed = deliverables.filter(isDeliverableComplete);
   const allComplete =
-    deliverables.length > 0 && deliverables.every(isDeliverableComplete);
+    deliverables.length > 0 && completed.length === deliverables.length;
 
   const onContinue = async () => {
     if (submitting) return;
@@ -276,7 +273,7 @@ export default function DeliverablesPlanQuestion({
     setError(null);
 
     // Keep deliverables in timeline order so positions match their dates.
-    const ordered = deliverables
+    const ordered = completed
       .map((item, index) => ({ item, index }))
       .sort(
         (a, b) => a.item.period_days - b.item.period_days || a.index - b.index,
@@ -290,16 +287,6 @@ export default function DeliverablesPlanQuestion({
         },
       }));
     writeDeliverables(locale, ordered);
-
-    const leavingComponents = isLeavingComponentSteps(
-      locale,
-      nav.nextStepId,
-      nav.isReviewEditMode,
-    );
-    if (!leavingComponents) {
-      nav.goNext();
-      return;
-    }
 
     setSubmitting(true);
     try {
@@ -319,16 +306,16 @@ export default function DeliverablesPlanQuestion({
 
   const formatSummary = (types: string[]) => {
     const first = reportTypeOptions.find((option) => option.value === types[0]);
-    if (!first) return isRTL ? "اختر الصيغة" : "Choose format";
+    if (!first) return isRTL ? "اختر صيغة الملف" : "Choose file format";
     return types.length > 1 ? `${first.label} +${types.length - 1}` : first.label;
   };
 
-  const renderDeliverable = (item: ProjectDeliverable, index: number) => {
-    const way =
-      WAY_OPTIONS.find((option) => option.value === item.way.selected) ??
-      WAY_OPTIONS[0];
+  const renderDeliverable = (item: DeliverableDraft, index: number) => {
+    const way = WAY_OPTIONS.find((option) => option.value === item.way.selected);
     const missingTitle = attempted && !item.title.trim();
+    const missingDay = attempted && item.period_days === null;
     const missingTypes = attempted && item.report_type.length === 0;
+    const missingWay = attempted && item.way.selected === null;
     const missingAddress =
       attempted &&
       item.way.selected === "physical_workshop" &&
@@ -380,16 +367,24 @@ export default function DeliverablesPlanQuestion({
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <Popover>
             <PopoverButton
-              className={PILL_CLASS}
+              className={`${PILL_CLASS} ${missingDay ? "border-rose-300" : ""}`}
               aria-label={isRTL ? "موعد التسليم" : "Due date"}
             >
               <IconCalendarEvent size={16} className="text-slate-500" />
-              <span>{dayLabel(locale, item.period_days)}</span>
-              {schedule ? (
-                <span className="font-medium text-slate-400">
-                  · {dateFor(item.period_days)}
+              {item.period_days === null ? (
+                <span className={PLACEHOLDER_CLASS}>
+                  {isRTL ? "اختر موعد التسليم" : "Choose due date"}
                 </span>
-              ) : null}
+              ) : (
+                <>
+                  <span>{dayLabel(locale, item.period_days)}</span>
+                  {schedule ? (
+                    <span className="font-medium text-slate-400">
+                      · {dateFor(item.period_days)}
+                    </span>
+                  ) : null}
+                </>
+              )}
               <IconChevronDown size={14} className="text-slate-400" />
             </PopoverButton>
             <PopoverPanel
@@ -422,8 +417,8 @@ export default function DeliverablesPlanQuestion({
                 <div className="flex items-center rounded-full border border-slate-200 bg-white">
                   <button
                     type="button"
-                    onClick={() => setDay(index, item.period_days - 1)}
-                    disabled={item.period_days <= 0}
+                    onClick={() => setDay(index, (item.period_days ?? 0) - 1)}
+                    disabled={item.period_days === null || item.period_days <= 0}
                     aria-label={isRTL ? "يوم أبكر" : "One day earlier"}
                     className="inline-flex h-8 w-8 items-center justify-center text-slate-600 hover:text-slate-900 disabled:text-slate-300"
                   >
@@ -434,9 +429,15 @@ export default function DeliverablesPlanQuestion({
                     inputMode="numeric"
                     min={0}
                     max={maxDay === Number.MAX_SAFE_INTEGER ? undefined : maxDay}
-                    value={item.period_days}
+                    value={item.period_days ?? ""}
+                    placeholder="—"
                     onChange={(event) =>
-                      setDay(index, Number(event.target.value))
+                      setDay(
+                        index,
+                        event.target.value === ""
+                          ? null
+                          : Number(event.target.value),
+                      )
                     }
                     aria-label={
                       isRTL
@@ -447,8 +448,10 @@ export default function DeliverablesPlanQuestion({
                   />
                   <button
                     type="button"
-                    onClick={() => setDay(index, item.period_days + 1)}
-                    disabled={item.period_days >= maxDay}
+                    onClick={() => setDay(index, (item.period_days ?? 0) + 1)}
+                    disabled={
+                      item.period_days !== null && item.period_days >= maxDay
+                    }
                     aria-label={isRTL ? "يوم لاحق" : "One day later"}
                     className="inline-flex h-8 w-8 items-center justify-center text-slate-600 hover:text-slate-900 disabled:text-slate-300"
                   >
@@ -486,7 +489,11 @@ export default function DeliverablesPlanQuestion({
               aria-label={isRTL ? "صيغة الملف" : "File format"}
             >
               <FormatIcons types={item.report_type} options={reportTypeOptions} />
-              <span>{formatSummary(item.report_type)}</span>
+              <span
+                className={item.report_type.length === 0 ? PLACEHOLDER_CLASS : ""}
+              >
+                {formatSummary(item.report_type)}
+              </span>
               <IconChevronDown size={14} className="text-slate-400" />
             </ListboxButton>
             <ListboxOptions anchor="bottom start" className={`${PANEL_CLASS} w-60`}>
@@ -514,14 +521,27 @@ export default function DeliverablesPlanQuestion({
 
           <Listbox
             value={item.way.selected}
-            onChange={(next: DeliverableWay) => setWay(index, next)}
+            onChange={(next: DeliverableWay | null) => {
+              if (next) setWay(index, next);
+            }}
           >
             <ListboxButton
-              className={PILL_CLASS}
+              className={`${PILL_CLASS} ${missingWay ? "border-rose-300" : ""}`}
               aria-label={isRTL ? "طريقة التسليم" : "Delivery method"}
             >
-              <way.Icon size={16} className={way.iconClass} />
-              <span>{isRTL ? way.label.ar : way.label.en}</span>
+              {way ? (
+                <>
+                  <way.Icon size={16} className={way.iconClass} />
+                  <span>{isRTL ? way.label.ar : way.label.en}</span>
+                </>
+              ) : (
+                <>
+                  <IconBooks size={16} className="text-slate-500" />
+                  <span className={PLACEHOLDER_CLASS}>
+                    {isRTL ? "اختر طريقة التسليم" : "Choose delivery method"}
+                  </span>
+                </>
+              )}
               <IconChevronDown size={14} className="text-slate-400" />
             </ListboxButton>
             <ListboxOptions anchor="bottom start" className={`${PANEL_CLASS} w-60`}>
@@ -574,16 +594,24 @@ export default function DeliverablesPlanQuestion({
           </label>
         ) : null}
 
-        {missingTitle || missingTypes || missingAddress ? (
+        {missingTitle || missingDay || missingTypes || missingWay || missingAddress ? (
           <p className="mt-2 text-xs font-semibold text-rose-600">
             {missingTitle
               ? isRTL
                 ? "أدخل اسم المخرج."
                 : "Enter a name for this deliverable."
+              : missingDay
+                ? isRTL
+                  ? "اختر موعد التسليم."
+                  : "Choose when it's due."
               : missingTypes
                 ? isRTL
                   ? "اختر صيغة ملف واحدة على الأقل."
                   : "Pick at least one file format."
+                : missingWay
+                  ? isRTL
+                    ? "اختر طريقة التسليم."
+                    : "Choose how it's delivered."
                 : isRTL
                   ? "أدخل عنوان الورشة."
                   : "Enter the workshop address."}

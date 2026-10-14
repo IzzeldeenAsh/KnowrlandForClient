@@ -156,7 +156,7 @@ export function buildProjectPropertiesPayload(
 }
 
 /**
- * Property questions come before the service step, which creates the project.
+ * General property questions come before the definition choice creates the project.
  * Until then answers stay in storage and are synced later (description step,
  * review); once the project exists they sync right away.
  */

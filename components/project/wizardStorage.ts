@@ -27,6 +27,11 @@ function listProjectWizardStorageKeys(locale: WizardLocale): string[] {
 }
 
 export const projectWizardStorage = {
+  definitionModeKey(locale: WizardLocale) { return `project:wizard:${locale}:definitionMode` },
+  serviceScopeDeferredKey(locale: WizardLocale) { return `project:wizard:${locale}:serviceScopeDeferred` },
+  /** Project service uuid whose AI intake finished with nothing left to ask. */
+  aiIntakeReadyKey(locale: WizardLocale) { return `project:wizard:${locale}:aiIntakeReady` },
+  componentCatalogKey(locale: WizardLocale) { return `project:wizard:${locale}:componentCatalog` },
   projectTypeKey(locale: WizardLocale) {
     return `project:wizard:${locale}:projectType`
   },

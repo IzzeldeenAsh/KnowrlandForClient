@@ -1,5 +1,7 @@
 'use client'
 
+import { readDefinitionMode, storeDefinitionMode } from '../projectDefinitionMode'
+
 import Image from 'next/image'
 import { Fragment, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
@@ -39,7 +41,7 @@ import {
   readServiceComponentsPayload,
   type ServiceComponentsPayload,
 } from '../serviceComponentsPayload'
-import { isServiceFlowActive, projectWizardStepIds, readServiceComponentSlugs } from '../projectWizardFlow'
+import { expandServiceComponentSlugs, isServiceFlowActive, projectWizardStepIds, readServiceComponentSlugs } from '../projectWizardFlow'
 import { useProjectStepErrorToast } from '../useProjectStepErrorToast'
 import { useProjectWizardNavigation } from '../useProjectWizardNavigation'
 import { projectWizardStorage, type WizardLocale } from '../wizardStorage'
@@ -81,6 +83,7 @@ type RequestService = {
 type ProjectRequestComponent = Record<string, unknown>
 
 type ProjectRequestData = {
+  definition_mode?: 'simple' | 'advanced'
   id: number
   uuid?: string
   title?: string | null
@@ -110,7 +113,7 @@ type ReviewRow = {
   label: string
   value: string[]
   fileTypes?: string[]
-  variant?: 'default' | 'chips' | 'scope-table' | 'deliverables-table'
+  variant?: 'default' | 'chips' | 'scope-table' | 'deliverables-table' | 'requirement-summary'
   deliverables?: ProjectDeliverable[]
   full?: boolean
   onEdit?: () => void
@@ -139,6 +142,7 @@ type ReviewData = {
   experienceRange: string
   teamSizeRange: string
   targetMarket: string[]
+  hasTargetMarket: boolean
   plannedStartDate: string
   durationDays: number | null
   servicePrompt: string
@@ -471,6 +475,7 @@ async function fetchProjectRequest(
   await assertProjectApiResponse(res)
 
   const json = (await res.json()) as { data?: ProjectRequestData }
+  if (json.data?.definition_mode === 'simple' || json.data?.definition_mode === 'advanced') storeDefinitionMode(locale, json.data.definition_mode)
   return json.data || null
 }
 
@@ -730,9 +735,11 @@ function SectionBlock({
 
             {row.value.length > 0 || (row.fileTypes?.length ?? 0) > 0 ? (
               <div className="space-y-3">
-                {row.variant === 'deliverables-table' && row.deliverables ? (
+                {row.variant === 'requirement-summary' ? (
+                  <p dir="auto" className="whitespace-pre-line break-words text-sm leading-6 text-slate-800">{row.value[0]}</p>
+                ) : row.variant === 'deliverables-table' && row.deliverables ? (
                   <DeliverablesReviewTable locale={locale || 'en'} deliverables={row.deliverables} plannedStartDate={plannedStartDate} />
-                ) : row.variant === 'scope-table' && row.scopeGroups ? (
+                ) : row.variant === 'scope-table' && row.scopeGroups?.length ? (
                   <div className="overflow-hidden rounded-xl border border-slate-200">
                     <table className="w-full border-collapse text-sm">
                       <tbody>
@@ -1062,12 +1069,13 @@ export default function ProjectReviewStep({
           ...(storedServiceComponentsPayload.components || {}),
         },
       }
+      const applicableComponentSteps = new Set(readServiceComponentSlugs(locale))
       const serviceComponentSlugs = Array.from(
         new Set([
           ...readServiceComponentSlugs(locale),
           ...Object.keys(serviceComponentsPayload.components || {}),
         ])
-      )
+      ).filter(slug => expandServiceComponentSlugs([slug]).some(step => applicableComponentSteps.has(step)))
       const apiTargetMarket = getTargetMarketLabels(
         locale,
         serviceComponentsPayload.components?.['target-market']
@@ -1133,6 +1141,7 @@ export default function ProjectReviewStep({
           companyMaxTeamSize,
           locale
         ),
+        hasTargetMarket: applicableComponentSteps.has('target-market'),
         targetMarket:
           targetMarket.length > 0
             ? targetMarket
@@ -1167,6 +1176,7 @@ export default function ProjectReviewStep({
     if (!review) return []
 
     return [
+      { label: isRTL ? 'تحديد النطاق والمخرجات' : 'Scope and deliverables', value: [readDefinitionMode(locale) === 'simple' ? (isRTL ? 'يقترحها الخبير' : 'Expert to propose') : (isRTL ? 'أحدد التفاصيل بنفسي' : 'Define details myself')] },
       {
         label: isRTL ? 'نوع المشروع' : 'Project type',
         value: [review.projectType],
@@ -1239,15 +1249,18 @@ export default function ProjectReviewStep({
     if (!review) return []
     return [...review.projectServices].sort((a, b) => (a.position || 0) - (b.position || 0)).map((service, index) => {
       const name = service.title || service.service?.name || ''
+      const requirementSummary = service.ai_intake?.requirement_summary?.trim()
       const components = Object.assign({}, ...(service.components || [])) as Record<string, unknown>
       const stage = components['deliverable-stage'] as { deliverables?: ProjectDeliverable[] } | undefined
       const deliverables = stage?.deliverables || []
       const scopeGroups = (service.scopes || []).map(scope => ({ name: scope.scope, subscopes: (scope.children || []).map(child => child.scope) }))
       const select = () => startServiceFlow(locale, { mode: 'edit', projectServiceUuid: service.uuid, returnStepId: projectWizardStepIds.projectReview }, serviceSessionSeed(locale, { serviceId: service.service?.id ?? null, name, isOther: service.service?.slug === 'other', prompt: service.prompt_ai }))
       const rows: ReviewRow[] = [
-        ...(service.prompt_ai ? [{ label: isRTL ? 'وصف الخدمة' : 'Service description', value: [service.prompt_ai], full: true }] : []),
-        { label: isRTL ? 'النطاقات والنطاقات الفرعية' : 'Scopes and sub-scopes', value: scopeGroups.map(group => group.name), variant: 'scope-table', scopeGroups, full: true, editStepId: projectWizardStepIds.projectScope, onEdit: select },
-        { label: isRTL ? 'المخرجات' : 'Deliverables', value: deliverables.map(item => item.title), variant: 'deliverables-table', deliverables, full: true, editStepId: 'deliverables-plan', onEdit: select },
+        ...(requirementSummary
+          ? [{ label: isRTL ? 'ملخص المتطلبات' : 'Requirement Summary', value: [requirementSummary], variant: 'requirement-summary' as const, full: true }]
+          : service.prompt_ai ? [{ label: isRTL ? 'وصف الخدمة' : 'Service description', value: [service.prompt_ai], full: true }] : []),
+        ...(readDefinitionMode(locale) === 'advanced' ? [{ label: isRTL ? 'النطاقات والنطاقات الفرعية' : 'Scopes and sub-scopes', value: scopeGroups.length ? scopeGroups.map(group => group.name) : [isRTL ? 'سيحدده الخبير ضمن العرض' : 'To be proposed by the expert in their offer'], variant: 'scope-table' as const, scopeGroups, full: true, editStepId: projectWizardStepIds.projectScope, onEdit: select }] : [{ label: isRTL ? 'نطاق الخدمة' : 'Service scope', value: [isRTL ? 'سيحدده الإنسايتر ضمن العرض' : 'To be proposed by the Insighter in their offer'], full: true }]),
+        ...(deliverables.length ? [{ label: isRTL ? 'المخرجات' : 'Deliverables', value: deliverables.map(item => item.title), variant: 'deliverables-table' as const, deliverables, full: true, editStepId: 'deliverables-plan', onEdit: select }] : []),
         ...((service.addons || []).length ? [{ label: isRTL ? 'إضافات الخدمة' : 'Service add-ons', value: (service.addons || []).flatMap(addon => Object.keys(addon)).map(humanizeSlug), variant: 'chips' as const }] : []),
       ]
       return { title: `${isRTL ? 'الخدمة' : 'Service'} ${index + 1}: ${name}`, rows, uuid: service.uuid }
@@ -1309,12 +1322,12 @@ export default function ProjectReviewStep({
     if (!review) return []
 
     return [
-      {
+      ...(review.hasTargetMarket ? [{
         label: isRTL ? 'السوق المستهدف' : 'Target market',
         value: review.targetMarket,
         variant: 'chips' as const,
         editStepId: 'target-market',
-      },
+      }] : []),
       ...(isSpecifiedInsighter
         ? []
         : [

@@ -431,6 +431,26 @@ export default function InsighterIndustryQuestion({ locale }: { locale: WizardLo
     advanceFromParent(selectedParent)
   }
 
+  // Industry is optional: clear any earlier pick so the sub-industry step drops out too.
+  const onSkip = () => {
+    if (isAdvancing) return
+    setError(null)
+    setSelectedParentId(null)
+    setIsAdvancing(true)
+    try {
+      ;[
+        projectWizardStorage.insighterIndustryParentIdKey(locale),
+        projectWizardStorage.insighterIndustryParentLabelKey(locale),
+        projectWizardStorage.insighterIndustryParentHasChildrenKey(locale),
+        projectWizardStorage.insighterIndustryIdKey(locale),
+        projectWizardStorage.insighterIndustryLabelKey(locale),
+      ].forEach((key) => window.sessionStorage.removeItem(key))
+    } catch {
+      // ignore
+    }
+    nav.goNext()
+  }
+
   const title = isRTL
     ? 'ما هي الصناعة الرئيسية لمشروعك؟'
     : 'What is your project\'s main industry?'
@@ -621,18 +641,29 @@ export default function InsighterIndustryQuestion({ locale }: { locale: WizardLo
               {isRTL ? 'رجوع' : 'Back'}
             </Link>
 
-            <button
-              type="button"
-              onClick={onContinue}
-              disabled={!selectedParent || isAdvancing}
-              className={`btn-sm px-6 py-2 rounded-full ${
-                selectedParent && !isAdvancing
-                  ? 'text-white bg-[#1C7CBB] hover:bg-opacity-90'
-                  : 'text-slate-500 bg-slate-200 cursor-not-allowed'
-              }`}
-            >
-              {nav.continueLabel}
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={onSkip}
+                disabled={isAdvancing}
+                className="btn-sm px-5 py-2 rounded-full text-slate-700 bg-white/80 hover:bg-white border border-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isRTL ? 'تخطي' : 'Skip'}
+              </button>
+
+              <button
+                type="button"
+                onClick={onContinue}
+                disabled={!selectedParent || isAdvancing}
+                className={`btn-sm px-6 py-2 rounded-full ${
+                  selectedParent && !isAdvancing
+                    ? 'text-white bg-[#1C7CBB] hover:bg-opacity-90'
+                    : 'text-slate-500 bg-slate-200 cursor-not-allowed'
+                }`}
+              >
+                {nav.continueLabel}
+              </button>
+            </div>
           </div>
         </div>
       </div>

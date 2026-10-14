@@ -1,6 +1,7 @@
+import { readDefinitionMode } from './projectDefinitionMode'
 import { getApiUrl } from '@/app/config'
 import { assertProjectApiResponse } from './projectApiError'
-import { expandServiceComponentSlugs } from './projectWizardFlow'
+import { clientComponentIsVisible, expandServiceComponentSlugs } from './projectWizardFlow'
 import { projectWizardStorage, type WizardLocale } from './wizardStorage'
 
 // Components come in two ownership levels:
@@ -18,19 +19,37 @@ function headers(locale: WizardLocale, token: string): HeadersInit {
   }
 }
 
-async function fetchComponentSlugs(url: string, locale: WizardLocale, token: string) {
+export type ProjectComponentCatalogItem = { id: number; name: string; slug: string; ownership_level?: string; is_required?: boolean; definition_mode_visibility?: string; fillable_by_insighter?: boolean }
+export function readComponentCatalog(locale: WizardLocale): ProjectComponentCatalogItem[] {
+  if (typeof window === 'undefined') return []
+  try {
+    const items = JSON.parse(window.sessionStorage.getItem(projectWizardStorage.componentCatalogKey(locale)) || '[]')
+    return Array.isArray(items) ? items : []
+  } catch { return [] }
+}
+async function fetchComponentSlugs(url: string, locale: WizardLocale, token: string, ownershipLevel: 'project' | 'project_service', signal?: AbortSignal) {
   const res = await fetch(url, {
     method: 'GET',
     headers: headers(locale, token),
     cache: 'no-store',
+    signal,
   })
   await assertProjectApiResponse(res, 'Failed to load service components.')
 
   const json = (await res.json()) as {
-    data?: Array<{ id?: number; name?: string; slug?: string }>
+    data?: ProjectComponentCatalogItem[]
   }
 
-  return (json.data || [])
+  const mode = readDefinitionMode(locale)
+  const items = (json.data || []).filter(item =>
+    clientComponentIsVisible(locale, item.slug || item.name) &&
+    (!item.definition_mode_visibility || item.definition_mode_visibility === 'both' || item.definition_mode_visibility === mode)
+  ).map(item => ({ ...item, ownership_level: ownershipLevel }))
+  window.sessionStorage.setItem(projectWizardStorage.componentCatalogKey(locale), JSON.stringify([
+    ...readComponentCatalog(locale).filter(item => item.ownership_level !== ownershipLevel && clientComponentIsVisible(locale, item.slug || item.name)),
+    ...items,
+  ]))
+  return items
     .map((item) => item.slug || item.name)
     .filter((slug): slug is string => Boolean(slug && slug.trim()))
 }
@@ -42,25 +61,29 @@ export async function fetchProjectServiceComponentSlugs(params: {
   isOther: boolean
   projectUuid: string
   projectServiceUuid: string
+  signal?: AbortSignal
 }): Promise<string[]> {
   const url = params.isOther
     ? getApiUrl(
         `/api/account/project/definition/service-prompt/component/${params.projectUuid}/${params.projectServiceUuid}`
       )
-    : getApiUrl(`/api/common/setting/service/component/${params.serviceId}`)
+    : getApiUrl(`/api/common/setting/service/component/${params.serviceId}?definition_mode=${readDefinitionMode(params.locale)}`)
 
-  return fetchComponentSlugs(url, params.locale, params.token)
+  return fetchComponentSlugs(url, params.locale, params.token, 'project_service', params.signal)
 }
 
 export async function fetchProjectLevelComponentSlugs(params: {
   locale: WizardLocale
   token: string
   projectUuid: string
+  signal?: AbortSignal
 }): Promise<string[]> {
   return fetchComponentSlugs(
     getApiUrl(`/api/account/project/definition/component/${params.projectUuid}`),
     params.locale,
-    params.token
+    params.token,
+    'project',
+    params.signal
   )
 }
 
@@ -73,9 +96,9 @@ export function storeComponentSlugs(
   locale: WizardLocale,
   params: { projectServiceSlugs: string[]; projectSlugs: string[] }
 ) {
-  const serviceSteps = expandServiceComponentSlugs(params.projectServiceSlugs)
+  const serviceSteps = expandServiceComponentSlugs(params.projectServiceSlugs).filter(slug => clientComponentIsVisible(locale, slug))
   const projectSlugs = params.projectSlugs.filter(
-    (slug) => !params.projectServiceSlugs.includes(slug)
+    (slug) => !params.projectServiceSlugs.includes(slug) && clientComponentIsVisible(locale, slug)
   )
 
   try {
@@ -101,7 +124,7 @@ export function readProjectComponentSlugs(locale: WizardLocale): string[] {
     )
     const parsed = raw ? (JSON.parse(raw) as unknown) : []
     return Array.isArray(parsed)
-      ? parsed.filter((slug): slug is string => typeof slug === 'string' && Boolean(slug))
+      ? parsed.filter((slug): slug is string => typeof slug === 'string' && Boolean(slug) && clientComponentIsVisible(locale, slug))
       : []
   } catch {
     return []

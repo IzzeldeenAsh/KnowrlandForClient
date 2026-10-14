@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import { IconCheck, IconLayoutGridAdd } from '@tabler/icons-react'
+import { readDefinitionMode } from './projectDefinitionMode'
 import { getApiUrl } from '@/app/config'
 import { getAuthToken } from '@/lib/authToken'
 import { dayLabel } from './projectDeliverables'
@@ -106,7 +107,7 @@ function buildCards(
           name: row.name,
           slug: row.slug,
           isOther: row.isOther,
-          complete: row.scopeNames.length > 0 && row.deliverables.length > 0,
+          complete: readDefinitionMode(locale) === 'simple' || row.deliverables.length > 0,
           summary: summaryFor(locale, row),
         }
   )

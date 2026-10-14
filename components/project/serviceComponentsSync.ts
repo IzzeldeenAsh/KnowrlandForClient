@@ -2,7 +2,7 @@ import { getApiUrl } from '@/app/config'
 import { getAuthToken } from '@/lib/authToken'
 import { assertProjectApiResponse } from './projectApiError'
 import { readProjectComponentSlugs } from './projectComponentsCatalog'
-import { isPreServiceProjectComponentSlug } from './projectWizardFlow'
+import { readProjectServiceStepSlugs, expandServiceComponentSlugs } from './projectWizardFlow'
 import { readStoredProjectRequestUuid } from './projectRequestUuid'
 import { ensureProjectServiceUuid } from './projectServiceUuid'
 import { type WizardLocale } from './wizardStorage'
@@ -24,13 +24,17 @@ function readProjectServiceComponents(locale: WizardLocale): Record<string, unkn
 
   return Object.fromEntries(
     Object.entries(components || {}).filter(
-      ([slug]) => !projectSlugs.has(slug) && !isPreServiceProjectComponentSlug(slug)
+      ([slug]) => !projectSlugs.has(slug) && expandServiceComponentSlugs([slug]).some(step => readProjectServiceStepSlugs(locale).includes(step))
     )
   )
 }
 
 export async function syncServiceComponents(locale: WizardLocale) {
   if (typeof window === 'undefined') throw new Error('client_only')
+
+  // Do not sync a service whose entire component set is delegated. Sending an
+  // empty payload can trigger older catalogs' client deliverable validation.
+  if (readProjectServiceStepSlugs(locale).length === 0) return
 
   const token = getAuthToken()
   if (!token) throw new Error('no_token')

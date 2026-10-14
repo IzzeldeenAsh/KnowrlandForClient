@@ -10,6 +10,7 @@ export type ReviewProjectService = {
   position?: number
   service?: { id?: number; name: string; slug?: string }
   prompt_ai?: string
+  ai_intake?: { requirement_summary?: string | null } | null
   scopes?: Array<{ scope: string; children?: Array<{ scope: string }> }>
   components?: Array<Record<string, unknown>>
   addons?: Array<Record<string, unknown>>

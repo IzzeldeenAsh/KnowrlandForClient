@@ -1,4 +1,4 @@
-import { diffIsoDays, isUrgentProjectType, todayIsoDate } from './projectSchedule'
+import { diffIsoDays, todayIsoDate } from './projectSchedule'
 import {
   readServiceComponentPayloadValue,
   updateServiceComponentPayload,
@@ -15,6 +15,12 @@ export type ProjectDeliverable = {
   period_days: number
   report_type: string[]
   way: { selected: DeliverableWay; address: string | null }
+}
+
+/** A deliverable being edited: due day, formats and delivery method start unset. */
+export type DeliverableDraft = Omit<ProjectDeliverable, 'period_days' | 'way'> & {
+  period_days: number | null
+  way: { selected: DeliverableWay | null; address: string | null }
 }
 
 export type DeliverableStagePayload = {
@@ -53,25 +59,14 @@ export function defaultDeliverableTitle(locale: WizardLocale, index: number): st
   return `Deliverable ${index + 1}`
 }
 
-/** New deliverables start unnamed — the client names each one. */
-export function createDeliverable(
-  _locale: WizardLocale,
-  _index: number,
-  periodDays: number
-): ProjectDeliverable {
+/** New deliverables start empty — the client names it and picks its due day, format and delivery method. */
+export function createDeliverable(): DeliverableDraft {
   return {
     title: '',
-    period_days: periodDays,
-    report_type: ['pdf'],
-    way: { selected: 'on_platform', address: null },
+    period_days: null,
+    report_type: [],
+    way: { selected: null, address: null },
   }
-}
-
-export function defaultDeliverables(
-  locale: WizardLocale,
-  projectType: string | null
-): ProjectDeliverable[] {
-  return [createDeliverable(locale, 0, isUrgentProjectType(projectType) ? 1 : 30)]
 }
 
 function normalizeDeliverable(value: unknown, locale: WizardLocale, index: number) {
@@ -122,10 +117,8 @@ function fromLegacyStages(raw: Record<string, any>, locale: WizardLocale) {
     .filter((item): item is ProjectDeliverable => Boolean(item))
 }
 
-export function readDeliverables(
-  locale: WizardLocale,
-  projectType: string | null
-): ProjectDeliverable[] {
+/** Saved deliverables; empty until the client completes the deliverables step. */
+export function readDeliverables(locale: WizardLocale): ProjectDeliverable[] {
   const raw = readServiceComponentPayloadValue<Record<string, any>>(locale, DELIVERABLE_STAGE_SLUG)
 
   if (raw && Array.isArray(raw.deliverables) && raw.deliverables.length > 0) {
@@ -139,7 +132,7 @@ export function readDeliverables(
     if (legacy.length > 0) return legacy
   }
 
-  return defaultDeliverables(locale, projectType)
+  return []
 }
 
 export function writeDeliverables(locale: WizardLocale, deliverables: ProjectDeliverable[]) {

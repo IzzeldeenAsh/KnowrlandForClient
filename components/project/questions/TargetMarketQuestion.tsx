@@ -380,8 +380,7 @@ export default function TargetMarketQuestion({ locale }: { locale: WizardLocale 
 
     updateServiceComponentPayload(locale, 'target-market', payload)
 
-    // Project-level component, asked before the project exists: the description
-    // step's properties sync sends it. In review edit mode that step won't run again.
+    // The description step sends project components together. Review edits save immediately.
     if (!nav.isReviewEditMode) {
       nav.goNext()
       return

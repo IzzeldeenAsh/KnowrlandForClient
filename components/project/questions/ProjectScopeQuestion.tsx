@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { IconArrowUp, IconCheck, IconPlusFilled, IconSparklesFilled, IconXboxXFilled } from '@tabler/icons-react'
 import ProjectSelectedTypeHeader from '@/components/project/ProjectSelectedTypeHeader'
 import {
@@ -20,25 +21,22 @@ import {
 } from '@/components/project/projectServiceUuid'
 import { useProjectStepErrorToast } from '@/components/project/useProjectStepErrorToast'
 import { useProjectWizardNavigation } from '@/components/project/useProjectWizardNavigation'
-import { isServiceFlowActive, projectWizardStepIds } from '@/components/project/projectWizardFlow'
+import { isServiceFlowActive, markAiIntakeReady, projectWizardStepIds } from '@/components/project/projectWizardFlow'
+import { waitForProjectAiIntake, type AiIntakeQuestion } from '../projectAiIntake'
 import { BACKEND_STRING_MAX } from '@/components/project/backendLimits'
 import { getApiUrl } from '@/app/config'
 import { getAuthToken } from '@/lib/authToken'
+import { writeProjectScopeSnapshot } from '../projectAddonsState'
 import { resetServiceComponentsPayload } from '@/components/project/serviceComponentsPayload'
 import { projectWizardStorage, type WizardLocale } from '@/components/project/wizardStorage'
 
 type ScopeChild = { id: number; name: string }
 type ScopeParent = { id: number; name: string; children: ScopeChild[] }
 type ManualScope = { id: string; name: string }
-type AiIntakeQuestion = { key: string; question: string }
 type AiIntakeStatus = 'idle' | 'polling' | 'clarification' | 'failed' | 'timeout'
 
-const AI_POLL_ATTEMPTS = 6
-const AI_POLL_INTERVAL_MS = 5000
-
-function sleep(ms: number) {
-  return new Promise<void>((resolve) => window.setTimeout(resolve, ms))
-}
+// Hidden for now; flip to true to bring back the "Let the expert propose the scope" box.
+const SHOW_DEFER_SCOPE_OPTION = false
 
 function createClientId(prefix: string) {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
@@ -81,11 +79,13 @@ function coerceNumericIdOrHash(rawId: unknown, name: string): number {
 }
 
 function AiGeneratingScopesLoader({
+  intakeOnly = false,
   isRTL,
   requestUnderstood,
 }: {
   isRTL: boolean
   requestUnderstood: boolean
+  intakeOnly?: boolean
 }) {
   const title = requestUnderstood
     ? isRTL
@@ -96,8 +96,8 @@ function AiGeneratingScopesLoader({
       : 'Thinking...'
   const subtitle = requestUnderstood
     ? isRTL
-      ? 'جاري تحديد النطاقات المناسبة لطلبك.'
-      : 'Preparing the right scopes for your request.'
+      ? intakeOnly ? 'جار تجهيز ملخص متطلبات طلبك.' : 'جاري تحديد النطاقات المناسبة لطلبك.'
+      : intakeOnly ? 'Preparing your requirement summary.' : 'Preparing the right scopes for your request.'
     : ''
 
   return (
@@ -148,38 +148,6 @@ function safeParseNumberArray(value: string | null): number[] {
     return parsed.map((n) => Number(n)).filter((n) => Number.isFinite(n))
   } catch {
     return []
-  }
-}
-
-function normalizeAiIntakeQuestions(input: unknown): AiIntakeQuestion[] {
-  if (!Array.isArray(input)) return []
-
-  return input
-    .map((item) => {
-      const raw = item as any
-      const key = String(raw?.key ?? raw?.id ?? '').trim()
-      const question = String(raw?.question ?? raw?.text ?? raw?.label ?? '').trim()
-
-      return { key, question }
-    })
-    .filter((item) => Boolean(item.key) && Boolean(item.question))
-}
-
-function extractAiIntakeStatus(payload: unknown): {
-  status: string
-  needsClarification: boolean
-  questions: AiIntakeQuestion[]
-} {
-  const data = (payload as any)?.data ?? payload
-  const status = String((data as any)?.status ?? '').trim().toLowerCase()
-  const questions = normalizeAiIntakeQuestions((data as any)?.questions)
-
-  return {
-    status,
-    needsClarification:
-      Boolean((data as any)?.needs_clarification) ||
-      status === 'needs_clarification',
-    questions,
   }
 }
 
@@ -486,8 +454,10 @@ function persistAiSuggestedScopes(locale: WizardLocale, scopes: ScopeParent[]) {
 
 // components are fetched after scope sync (next step)
 
-export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale }) {
+export default function ProjectScopeQuestion({ locale, intakeOnly = false, onIntakeReady }: { locale: WizardLocale; intakeOnly?: boolean; onIntakeReady?: () => void }) {
   const nav = useProjectWizardNavigation(locale)
+  const router = useRouter()
+  const [deferringScope, setDeferringScope] = useState(false)
   const isRTL = locale === 'ar'
   const isEnglish =
     typeof locale === 'string' && locale.toLowerCase().startsWith('en')
@@ -502,6 +472,7 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [aiMode, setAiMode] = useState<AiIntakeStatus>('idle')
+  const [aiReady, setAiReady] = useState(false)
   const [aiQuestions, setAiQuestions] = useState<AiIntakeQuestion[]>([])
   const [aiAnswers, setAiAnswers] = useState<Record<string, string>>({})
   const [submittingClarification, setSubmittingClarification] = useState(false)
@@ -588,142 +559,92 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
         }
 
         setLoading(true)
+        setAiReady(false)
         setAiMode('polling')
 
         try {
-          if (delayNextAiClarificationCheckRef.current) {
-            delayNextAiClarificationCheckRef.current = false
-            await sleep(AI_POLL_INTERVAL_MS)
-            if (cancelled) return
+          const projectServiceUuid = await ensureProjectServiceUuid(locale)
+          if (cancelled) return
+          activeController = new AbortController()
+          const delayFirstCheck = delayNextAiClarificationCheckRef.current
+          delayNextAiClarificationCheckRef.current = false
+          const intake = await waitForProjectAiIntake({
+            locale, token, projectUuid, projectServiceUuid,
+            signal: activeController.signal, delayFirstCheck,
+          })
+          if (cancelled) return
+          const json = intake.payload
+
+          if (intake.needsClarification) {
+            if (!cancelled) {
+              setAiQuestions(intake.questions)
+              setAiAnswers({})
+              setScopes(null)
+              setAiMode('clarification')
+            }
+            return
           }
 
-          const projectServiceUuid = await ensureProjectServiceUuid(locale)
+          if (intake.status === 'ready') {
+            setAiReady(true)
+            if (intakeOnly) {
+              if (!cancelled) { setScopes([]); setAiMode('idle') }
+              return
+            }
+            let showList = extractSuggestedScopesFromProjectRequest(json)
 
-          for (let attempt = 1; attempt <= AI_POLL_ATTEMPTS; attempt += 1) {
-            if (cancelled) return
-            activeController?.abort()
-            activeController = new AbortController()
+            if (showList.length === 0) {
+              activeController?.abort()
+              activeController = new AbortController()
 
-            try {
-              const url = getApiUrl(
-                `/api/account/project/definition/ai-intake/check-clarification/${projectUuid}/${projectServiceUuid}`
+              const showRes = await fetch(
+                getApiUrl(`/api/account/project/show/${projectUuid}`),
+                {
+                  method: 'GET',
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                    Accept: 'application/json',
+                    'Accept-Language': locale === 'ar' ? 'ar' : 'en',
+                    'X-Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
+                  },
+                  cache: 'no-store',
+                  signal: activeController.signal,
+                }
               )
-              const res = await fetch(url, {
-                method: 'GET',
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                  Accept: 'application/json',
-                  'Accept-Language': locale === 'ar' ? 'ar' : 'en',
-                  'X-Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
-                },
-                cache: 'no-store',
-                signal: activeController.signal,
-              })
 
               await assertProjectApiResponse(
-                res,
+                showRes,
                 isRTL
-                  ? 'تعذر التحقق من حالة الطلب.'
-                  : 'Failed to check the prompt status.'
+                  ? 'تعذر تحميل النطاقات المقترحة.'
+                  : 'Failed to load suggested scopes.'
               )
 
-              const json = (await res.json()) as unknown
-              const intake = extractAiIntakeStatus(json)
-
-              if (intake.needsClarification) {
-                if (!cancelled) {
-                  setAiQuestions(intake.questions)
-                  setAiAnswers({})
-                  setScopes(null)
-                  setAiMode('clarification')
-                }
-                return
-              }
-
-              if (intake.status === 'ready') {
-                let showList = extractSuggestedScopesFromProjectRequest(json)
-
-                if (showList.length === 0) {
-                  activeController?.abort()
-                  activeController = new AbortController()
-
-                  const showRes = await fetch(
-                    getApiUrl(`/api/account/project/show/${projectUuid}`),
-                    {
-                      method: 'GET',
-                      headers: {
-                        Authorization: `Bearer ${token}`,
-                        Accept: 'application/json',
-                        'Accept-Language': locale === 'ar' ? 'ar' : 'en',
-                        'X-Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
-                      },
-                      cache: 'no-store',
-                      signal: activeController.signal,
-                    }
-                  )
-
-                  await assertProjectApiResponse(
-                    showRes,
-                    isRTL
-                      ? 'تعذر تحميل النطاقات المقترحة.'
-                      : 'Failed to load suggested scopes.'
-                  )
-
-                  const showJson = (await showRes.json()) as unknown
-                  showList = extractSuggestedScopesFromProjectRequest(
-                    pickProjectServiceFromProject(showJson, projectServiceUuid) ?? {}
-                  )
-                }
-
-                if (!cancelled) {
-                  setScopes(showList)
-                  persistAiSuggestedScopes(locale, showList)
-                  setAiMode('idle')
-                }
-                return
-              }
-
-              if (intake.status === 'failed') {
-                if (!cancelled) {
-                  setScopes(null)
-                  setAiMode('failed')
-                }
-                return
-              }
-            } catch (err) {
-              if (cancelled) return
-              if (attempt >= AI_POLL_ATTEMPTS) {
-                setError(
-                  getProjectApiErrorMessage(
-                    err,
-                    isRTL
-                      ? 'تعذر التحقق من حالة الطلب.'
-                      : 'Failed to check the prompt status.'
-                  )
-                )
-                setScopes(null)
-                setAiMode('failed')
-                return
-              }
+              const showJson = (await showRes.json()) as unknown
+              showList = extractSuggestedScopesFromProjectRequest(
+                pickProjectServiceFromProject(showJson, projectServiceUuid) ?? {}
+              )
             }
 
-            if (attempt < AI_POLL_ATTEMPTS) await sleep(AI_POLL_INTERVAL_MS)
+            if (!cancelled) {
+              setScopes(showList)
+              persistAiSuggestedScopes(locale, showList)
+              setAiMode('idle')
+            }
+            return
           }
 
-          if (!cancelled) {
-            setScopes(null)
-            setAiMode('timeout')
-            setAiRequestUnderstood(false)
+          if (intake.status === 'failed') {
+            if (!cancelled) {
+              setScopes(null)
+              setAiMode('failed')
+            }
+            return
           }
-        } catch {
+        } catch (err) {
           if (!cancelled) {
-            setError(
-              isRTL
-                ? 'تعذر تحميل النطاقات المقترحة.'
-                : 'Failed to load suggested scopes.'
-            )
+            setError(getProjectApiErrorMessage(err, isRTL ? 'تعذر التحقق من حالة الطلب.' : 'Failed to check the prompt status.'))
             setScopes(null)
-            setAiMode('idle')
+            setAiMode('failed')
             setAiRequestUnderstood(false)
           }
         } finally {
@@ -744,7 +665,7 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
       setAiMode('idle')
 
       try {
-        const url = getApiUrl(`/api/common/setting/service/scope/${serviceId}`)
+        const url = getApiUrl(`/api/common/setting/service/scope/${serviceId}?definition_mode=advanced`)
 
         const res = await fetch(url, {
           method: 'GET',
@@ -884,8 +805,8 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
       submittingClarification)
 
   const canContinue =
-    (selectedParents.length > 0 || selectedManualScopes.length > 0) &&
-    !aiIntakeBlocking
+    (intakeOnly ? aiReady && scopes !== null : selectedParents.length > 0 || selectedManualScopes.length > 0) &&
+    !aiIntakeBlocking && !deferringScope
 
   const toggleParent = (id: number) => {
     setSelectedParentIds((prev) =>
@@ -1095,7 +1016,51 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
     }
   }
 
+  const onDeferScope = async () => {
+    if (intakeOnly || deferringScope || loading || aiIntakeBlocking || scopes === null || !projectUuid) return
+    setError(null)
+    setDeferringScope(true)
+    try {
+      const token = getAuthToken()
+      if (!token) throw new Error(isRTL ? 'يرجى تسجيل الدخول للمتابعة.' : 'Please sign in to continue.')
+      const projectServiceUuid = await ensureProjectServiceUuid(locale)
+      const response = await fetch(getApiUrl(`/api/account/project/definition/scope/sync/${projectUuid}/${projectServiceUuid}`), {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          'Accept-Language': locale === 'ar' ? 'ar' : 'en',
+          'X-Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
+        },
+        body: JSON.stringify({ scopes: [] }),
+      })
+      await assertProjectApiResponse(response, 'Failed to defer project scope.')
+      window.sessionStorage.setItem(projectWizardStorage.serviceScopeParentIdsKey(locale), '[]')
+      window.sessionStorage.setItem(projectWizardStorage.serviceScopeChildIdsByParentKey(locale), '{}')
+      window.sessionStorage.setItem(projectWizardStorage.serviceScopeHasChildrenKey(locale), '0')
+      window.sessionStorage.removeItem(projectWizardStorage.serviceManualScopesKey(locale))
+      window.sessionStorage.removeItem(projectWizardStorage.serviceManualSubscopesByScopeKey(locale))
+      window.sessionStorage.setItem(projectWizardStorage.serviceScopeDeferredKey(locale), '1')
+      writeProjectScopeSnapshot(locale, [])
+      router.push(nav.hrefFor(projectWizardStepIds.componentSetup))
+    } catch (err) {
+      setError(getProjectApiErrorMessage(err, isRTL ? 'تعذر حفظ اختيارك. حاول مجددًا.' : 'Could not save your choice. Please try again.'))
+    } finally { setDeferringScope(false) }
+  }
+
+  // Nothing left to clarify: skip the intake step instead of showing an empty page.
+  const intakeReady = intakeOnly && isOtherFlow && aiReady && !loading && aiMode === 'idle' && scopes !== null && !aiIntakeBlocking
+  useEffect(() => {
+    if (!intakeReady) return
+    markAiIntakeReady(locale)
+    if (onIntakeReady) onIntakeReady()
+    else router.replace(nav.hrefFor(projectWizardStepIds.componentSetup))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [intakeReady, locale, onIntakeReady])
+
   const onContinue = async () => {
+    if (intakeOnly && aiReady && scopes !== null && !aiIntakeBlocking) { nav.goNext(); return }
     if (!canContinue || !serviceId || !projectUuid) return
     setError(null)
 
@@ -1114,6 +1079,8 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
     } catch {
       // ignore
     }
+
+    window.sessionStorage.setItem(projectWizardStorage.serviceScopeDeferredKey(locale), '0')
 
     // Scopes are only saved by the sub-scopes step, so a review edit continues there.
     if (nav.isReviewEditMode) {
@@ -1162,14 +1129,23 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
         <h2
           id="project-scope-question-title"
           className="text-xl font-medium tracking-tight text-slate-900 sm:text-2xl"
-          dangerouslySetInnerHTML={{ __html: title }}
+          dangerouslySetInnerHTML={{ __html: intakeOnly ? (isRTL ? 'توضيح طلبك' : 'Clarify your request') : title }}
         />
         <p className="mt-1.5 max-w-3xl text-sm font-semibold leading-relaxed text-slate-600">
-          {subtitle}
+          {intakeOnly ? (isRTL ? 'أجب عن الأسئلة اللازمة لفهم طلبك.' : 'Answer any questions needed to understand your request.') : subtitle}
         </p>
       </div>
 
       {error ? <div className="mt-4 text-sm font-semibold text-rose-700">{error}</div> : null}
+      {SHOW_DEFER_SCOPE_OPTION && !intakeOnly && !loading && !aiIntakeBlocking && scopes !== null && (
+        <div className="mt-5 rounded-xl border border-sky-200 bg-sky-50 p-4 text-sm">
+          <p className="text-slate-600">{isRTL ? 'يمكنك ترك النطاق للخبير ليقترحه ضمن عرضه، ثم تراجعه قبل ترسية المشروع.' : 'You can leave the scope to the expert and review their proposal before awarding the project.'}</p>
+          <button type="button" disabled={deferringScope} onClick={() => void onDeferScope()} className="mt-2 font-semibold text-[#1C7CBB] underline disabled:opacity-50">
+            {deferringScope ? (isRTL ? 'جار الحفظ…' : 'Saving…') : (isRTL ? 'دع الخبير يقترح النطاق' : 'Let the expert propose the scope')}
+          </button>
+        </div>
+      )}
+
 
 
 
@@ -1177,6 +1153,7 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
         {loading ? (
           isOtherFlow && aiMode === 'polling' ? (
             <AiGeneratingScopesLoader
+              intakeOnly={intakeOnly}
               isRTL={isRTL}
               requestUnderstood={aiRequestUnderstood}
             />
@@ -1203,6 +1180,8 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
             mode={aiMode}
             onBackToServices={returnToDefinedServices}
           />
+        ) : intakeOnly ? (
+          <p className="text-slate-600">{isRTL ? 'تم توضيح طلبك. سيحدد الإنسايتر النطاق ضمن عرضه.' : 'Your request is ready. Insighters will define the scope in their offers.'}</p>
         ) : showScopePicker ? (
           <>
           {selectableCount > 0 ? (

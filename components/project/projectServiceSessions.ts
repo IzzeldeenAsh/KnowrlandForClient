@@ -1,5 +1,4 @@
-import { readProjectComponentSlugs } from './projectComponentsCatalog'
-import { isPreServiceProjectComponentSlug } from './projectWizardFlow'
+import { readComponentCatalog, readProjectComponentSlugs, type ProjectComponentCatalogItem } from './projectComponentsCatalog'
 import {
   readStoredProjectServiceUuid,
   writeStoredProjectServiceUuid,
@@ -18,6 +17,7 @@ import { projectWizardStorage, type WizardLocale } from './wizardStorage'
 type ServiceSession = {
   values: Record<string, string>
   components: Record<string, unknown>
+  componentCatalog?: ProjectComponentCatalogItem[]
 }
 
 export type ServiceFlow = {
@@ -36,6 +36,7 @@ function scopedKeys(locale: WizardLocale): string[] {
     projectWizardStorage.serviceScopeParentIdsKey(locale),
     projectWizardStorage.serviceScopeChildIdsByParentKey(locale),
     projectWizardStorage.serviceScopeHasChildrenKey(locale),
+    projectWizardStorage.serviceScopeDeferredKey(locale),
     projectWizardStorage.serviceManualScopesKey(locale),
     projectWizardStorage.serviceManualSubscopesByScopeKey(locale),
     projectWizardStorage.serviceAiSuggestedScopesKey(locale),
@@ -60,7 +61,7 @@ function splitComponents(locale: WizardLocale) {
   const serviceLevel: Record<string, unknown> = {}
 
   for (const [slug, value] of Object.entries(components || {})) {
-    if (projectSlugs.has(slug) || isPreServiceProjectComponentSlug(slug)) projectLevel[slug] = value
+    if (projectSlugs.has(slug)) projectLevel[slug] = value
     else serviceLevel[slug] = value
   }
 
@@ -79,7 +80,11 @@ export function saveActiveServiceSession(locale: WizardLocale) {
     if (value !== null) values[key] = value
   }
 
-  const session: ServiceSession = { values, components: splitComponents(locale).serviceLevel }
+  const session: ServiceSession = {
+    values,
+    components: splitComponents(locale).serviceLevel,
+    componentCatalog: readComponentCatalog(locale).filter(item => item.ownership_level === 'project_service'),
+  }
   try {
     window.sessionStorage.setItem(
       projectWizardStorage.serviceSessionKey(locale, uuid),
@@ -111,6 +116,10 @@ export function activateServiceSession(
     for (const key of scopedKeys(locale)) window.sessionStorage.removeItem(key)
     const values = saved?.values ?? seed
     for (const [key, value] of Object.entries(values)) window.sessionStorage.setItem(key, value)
+    window.sessionStorage.setItem(projectWizardStorage.componentCatalogKey(locale), JSON.stringify([
+      ...readComponentCatalog(locale).filter(item => item.ownership_level === 'project'),
+      ...(saved?.componentCatalog ?? []),
+    ]))
   } catch {
     // ignore
   }
@@ -209,6 +218,22 @@ export function finishServiceFlow(locale: WizardLocale) {
   if (primary && primary !== readStoredProjectServiceUuid(locale)) {
     activateServiceSession(locale, primary)
   }
+}
+
+/**
+ * The primary service was removed: `nextUuid` becomes the primary and active
+ * service, restoring its saved answers (or starting from `seed`).
+ */
+export function promoteServiceToPrimary(
+  locale: WizardLocale,
+  removedUuid: string,
+  nextUuid: string,
+  seed: Record<string, string> = {}
+) {
+  if (typeof window === 'undefined') return
+  activateServiceSession(locale, nextUuid, seed)
+  forgetServiceSession(locale, removedUuid)
+  writePrimaryProjectServiceUuid(locale, nextUuid)
 }
 
 export function forgetServiceSession(locale: WizardLocale, projectServiceUuid: string) {

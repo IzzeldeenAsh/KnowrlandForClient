@@ -1,4 +1,7 @@
-import Link from 'next/link'
+import GenericComponentQuestion from '@/components/project/questions/GenericComponentQuestion'
+import ComponentQuestionFrame from '@/components/project/ComponentQuestionFrame'
+import DefinitionModeQuestion from '@/components/project/questions/DefinitionModeQuestion'
+import ComponentSetupStep from '@/components/project/questions/ComponentSetupStep'
 import { redirect } from 'next/navigation'
 import ProjectServicesRailLayout from '@/components/project/ProjectServicesRail'
 import ProjectWizardShell from '@/components/project/ProjectWizardShell'
@@ -60,6 +63,10 @@ export default async function ProjectWizardStepPage({ params }: PageProps) {
     redirect(`/${locale}/project/wizard/${legacyTarget}`)
   }
 
+  if (step === 'definition-mode') return <ProjectWizardShell align="top"><DefinitionModeQuestion locale={locale} /></ProjectWizardShell>
+  if (step === 'component-setup') return <ProjectWizardShell align="top"><ComponentSetupStep locale={locale} /></ProjectWizardShell>
+  if (step === 'ai-intake') return <ProjectWizardShell align="top"><ComponentQuestionFrame locale={locale} step={step}><ProjectScopeQuestion locale={locale} intakeOnly /></ComponentQuestionFrame></ProjectWizardShell>
+
   if (step === 'project-type') {
     return (
       <ProjectWizardShell align="top">
@@ -117,7 +124,7 @@ export default async function ProjectWizardStepPage({ params }: PageProps) {
       <ProjectWizardShell align="top">
         <ProjectServicesRailLayout locale={locale} step={step}>
           <div className="w-full pt-2 sm:pt-4">
-            <ProjectScopeQuestion locale={locale} />
+            <ComponentQuestionFrame locale={locale} step={step}><ProjectScopeQuestion locale={locale} /></ComponentQuestionFrame>
           </div>
         </ProjectServicesRailLayout>
       </ProjectWizardShell>
@@ -129,7 +136,7 @@ export default async function ProjectWizardStepPage({ params }: PageProps) {
       <ProjectWizardShell align="top">
         <ProjectServicesRailLayout locale={locale} step={step}>
           <div className="w-full pt-2 sm:pt-4">
-            <ProjectSubscopesQuestion locale={locale} />
+            <ComponentQuestionFrame locale={locale} step={step}><ProjectSubscopesQuestion locale={locale} /></ComponentQuestionFrame>
           </div>
         </ProjectServicesRailLayout>
       </ProjectWizardShell>
@@ -141,7 +148,7 @@ export default async function ProjectWizardStepPage({ params }: PageProps) {
       <ProjectWizardShell align="top">
         <ProjectServicesRailLayout locale={locale} step={step}>
           <div className="w-full pt-2 sm:pt-4">
-            <DeliverablesPlanQuestion locale={locale} />
+            <ComponentQuestionFrame locale={locale} step={step}><DeliverablesPlanQuestion locale={locale} /></ComponentQuestionFrame>
           </div>
         </ProjectServicesRailLayout>
       </ProjectWizardShell>
@@ -153,7 +160,7 @@ export default async function ProjectWizardStepPage({ params }: PageProps) {
     return (
       <ProjectWizardShell align="top">
         <div className="w-full pt-2 sm:pt-4">
-          <DataSourcesExpectedQuestion locale={locale} />
+          <ComponentQuestionFrame locale={locale} step={step}><DataSourcesExpectedQuestion locale={locale} /></ComponentQuestionFrame>
         </div>
       </ProjectWizardShell>
     )
@@ -163,7 +170,7 @@ export default async function ProjectWizardStepPage({ params }: PageProps) {
     return (
       <ProjectWizardShell align="top">
         <div className="w-full pt-2 sm:pt-4">
-          <TargetMarketQuestion locale={locale} />
+          <ComponentQuestionFrame locale={locale} step={step}><TargetMarketQuestion locale={locale} /></ComponentQuestionFrame>
         </div>
       </ProjectWizardShell>
     )
@@ -319,37 +326,5 @@ export default async function ProjectWizardStepPage({ params }: PageProps) {
     )
   }
 
-  return (
-    <ProjectWizardShell align="top">
-      <div className="w-full max-w-2xl mx-auto pt-2 sm:pt-4 text-start">
-        <p className="text-sm font-semibold text-slate-600">Project wizard</p>
-        <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-slate-900">
-          Step {step}
-        </h2>
-        <p className="mt-4 text-slate-700">
-          This step is not implemented yet.
-        </p>
-
-        <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-slate-200/70 bg-white/80 backdrop-blur-md">
-          <div className="mx-auto w-full max-w-2xl px-4 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
-            <div className="flex items-center justify-between gap-3">
-              <Link
-                href={`/${locale}/project`}
-                className="btn-sm px-6 py-2 rounded-full text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
-              >
-                Back
-              </Link>
-              <button
-                type="button"
-                className="btn-sm px-6 py-2 rounded-full text-slate-500 bg-slate-200 cursor-not-allowed"
-                disabled
-              >
-                Continue
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </ProjectWizardShell>
-  )
+  return <ProjectWizardShell align="top"><ComponentQuestionFrame locale={locale} step={step}><GenericComponentQuestion locale={locale} step={step} /></ComponentQuestionFrame></ProjectWizardShell>
 }

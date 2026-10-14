@@ -168,6 +168,32 @@ export default function InsighterSubIndustryQuestion({
     advanceWithChild(selectedChild)
   }
 
+  // Sub-industry is optional: fall back to the main industry the client picked.
+  const onSkip = () => {
+    if (isAdvancing) return
+    setError(null)
+    setSelectedId(null)
+    setIsAdvancing(true)
+    try {
+      if (parent) {
+        window.sessionStorage.setItem(
+          projectWizardStorage.insighterIndustryIdKey(locale),
+          String(parent.key)
+        )
+        window.sessionStorage.setItem(
+          projectWizardStorage.insighterIndustryLabelKey(locale),
+          parent.label
+        )
+      } else {
+        window.sessionStorage.removeItem(projectWizardStorage.insighterIndustryIdKey(locale))
+        window.sessionStorage.removeItem(projectWizardStorage.insighterIndustryLabelKey(locale))
+      }
+    } catch {
+      // ignore
+    }
+    nav.goNext()
+  }
+
   const title = isRTL
     ? 'ما هي الصناعة الفرعية لمشروعك؟'
     : 'Which sub-industry best fits your project?'
@@ -255,18 +281,29 @@ export default function InsighterSubIndustryQuestion({
               {isRTL ? 'رجوع' : 'Back'}
             </Link>
 
-            <button
-              type="button"
-              onClick={onContinue}
-              disabled={!selectedChild || isAdvancing}
-              className={`btn-sm px-6 py-2 rounded-full ${
-                selectedChild && !isAdvancing
-                  ? 'text-white bg-[#1C7CBB] hover:bg-opacity-90'
-                  : 'text-slate-500 bg-slate-200 cursor-not-allowed'
-              }`}
-            >
-              {nav.continueLabel}
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={onSkip}
+                disabled={isAdvancing || loading}
+                className="btn-sm px-5 py-2 rounded-full text-slate-700 bg-white/80 hover:bg-white border border-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isRTL ? 'تخطي' : 'Skip'}
+              </button>
+
+              <button
+                type="button"
+                onClick={onContinue}
+                disabled={!selectedChild || isAdvancing}
+                className={`btn-sm px-6 py-2 rounded-full ${
+                  selectedChild && !isAdvancing
+                    ? 'text-white bg-[#1C7CBB] hover:bg-opacity-90'
+                    : 'text-slate-500 bg-slate-200 cursor-not-allowed'
+                }`}
+              >
+                {nav.continueLabel}
+              </button>
+            </div>
           </div>
         </div>
       </div>

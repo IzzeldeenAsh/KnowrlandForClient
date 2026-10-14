@@ -27,10 +27,12 @@ import { readStoredProjectServiceUuid } from '@/components/project/projectServic
 import {
   beginServiceAdd,
   forgetServiceSession,
+  promoteServiceToPrimary,
   readPrimaryProjectServiceUuid,
   serviceSessionSeed,
   startServiceFlow,
 } from '@/components/project/projectServiceSessions'
+import { readDefinitionMode, storeDefinitionMode } from '@/components/project/projectDefinitionMode'
 import { projectWizardStepIds } from '@/components/project/projectWizardFlow'
 import { useProjectStepErrorToast } from '@/components/project/useProjectStepErrorToast'
 import type { WizardLocale } from '@/components/project/wizardStorage'
@@ -83,6 +85,7 @@ export default function ProjectServicesPanel({
       })
       await assertProjectApiResponse(projectRes, 'Failed to load the project.')
       const projectJson = (await projectRes.json()) as any
+      if (projectJson?.data?.definition_mode === 'simple' || projectJson?.data?.definition_mode === 'advanced') storeDefinitionMode(locale, projectJson.data.definition_mode)
       setRows(toProjectServiceRows(projectJson?.data?.project_services))
     } catch (err) {
       setError(getProjectApiErrorMessage(err, isRTL ? 'تعذر تحميل الخدمات.' : 'Failed to load services.'))
@@ -105,7 +108,7 @@ export default function ProjectServicesPanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [primaryUuid, rows]
   )
-  const goToScopes = () => router.push(`/${locale}/project/wizard/${projectWizardStepIds.projectScope}`)
+  const goToScopes = () => router.push(`/${locale}/project/wizard/${readDefinitionMode(locale) === 'simple' ? projectWizardStepIds.componentSetup : projectWizardStepIds.projectScope}`)
 
   const editService = (row: ProjectServiceRow, index: number) => {
     // The main service is edited through the regular steps, which lead back here.
@@ -139,7 +142,13 @@ export default function ProjectServicesPanel({
         { method: 'DELETE', headers: headers(locale, token) }
       )
       await assertProjectApiResponse(res, 'Failed to remove the service.')
-      forgetServiceSession(locale, row.uuid)
+      // Removing the main service makes the next one the main service the wizard steps edit.
+      const next = rows.find((item) => item.uuid !== row.uuid)
+      if (isPrimary(row, rows.indexOf(row)) && next) {
+        promoteServiceToPrimary(locale, row.uuid, next.uuid, serviceSessionSeed(locale, next))
+      } else {
+        forgetServiceSession(locale, row.uuid)
+      }
       setRows((prev) => prev.filter((item) => item.uuid !== row.uuid))
     } catch (err) {
       setError(getProjectApiErrorMessage(err, isRTL ? 'تعذر حذف الخدمة.' : 'Failed to remove the service.'))
@@ -164,8 +173,8 @@ export default function ProjectServicesPanel({
                   {row.scopeNames.length > 0
                     ? row.scopeNames.join(isRTL ? '، ' : ', ')
                     : isRTL
-                      ? 'لم تُحدد النطاقات بعد'
-                      : 'No scopes selected yet'}
+                      ? 'سيقترح الخبير النطاق ضمن عرضه'
+                      : 'Scope to be proposed by the expert'}
                 </p>
                 {row.deliverables.length > 0 ? (
                   <p className="mt-1 text-xs font-medium text-slate-500">
@@ -205,10 +214,9 @@ export default function ProjectServicesPanel({
 
   const renderServiceCard = (row: ProjectServiceRow) => {
     const index = rows.indexOf(row)
-    const primary = isPrimary(row, index)
     const meta = serviceMetaForSlug(row.isOther ? 'other' : row.slug)
     const Icon = meta.Icon
-    const complete = row.scopeNames.length > 0 && row.deliverables.length > 0
+    const complete = readDefinitionMode(locale) === 'simple' || row.deliverables.length > 0
     const description =
       row.isOther && row.prompt ? row.prompt : isRTL ? meta.description.ar : meta.description.en
     const firstDue = row.deliverables.reduce<number | null>(
@@ -289,7 +297,8 @@ export default function ProjectServicesPanel({
             >
               <IconPencil size={16} stroke={1.8} />
             </button>
-            {primary ? null : (
+            {/* A project keeps at least one service. */}
+            {rows.length > 1 ? (
               <button
                 type="button"
                 onClick={() => void removeService(row)}
@@ -300,7 +309,7 @@ export default function ProjectServicesPanel({
               >
                 <IconTrash size={16} stroke={1.8} />
               </button>
-            )}
+            ) : null}
           </div>
         </div>
 
