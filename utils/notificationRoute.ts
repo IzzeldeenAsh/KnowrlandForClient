@@ -149,11 +149,39 @@ function cancelledProjectUrl(notification: Pick<Notification, 'param' | 'url'>):
   return `${DASHBOARD}${pathWithParamId(path, notification.param)}${search}`
 }
 
+type RevisionNotification = Pick<Notification, 'param' | 'url' | 'recipient_role' | 'revision_id'>
+
+/**
+ * Agreement revisions open the project's revisions tab. The backend ships the
+ * exact URL; follow it when it points at a dashboard page. Revisions happen
+ * before signing, often before an award, so the insighter reviews them on the
+ * offer page rather than on-work details.
+ */
+function agreementRevisionUrl(notification: RevisionNotification, roles: string[]): string {
+  const { path, search } = partsFromBackendUrl(notification.url)
+  if (path.startsWith('/app/insighter-dashboard/')) {
+    return `${DASHBOARD}${path.replace('/app/insighter-dashboard/on-work-projects/details/', '/app/insighter-dashboard/project-offers/details/')}${search}`
+  }
+
+  const param = notification.param
+  const insighterSide = notification.recipient_role
+    ? notification.recipient_role === 'insighter'
+    : isInsighterSide(roles)
+  if (!hasParam(param)) return insighterSide ? PROJECT_OFFERS : CLIENT_PROJECTS
+
+  const query = `?tab=revisions&revision=${encodeURIComponent(String(notification.revision_id ?? ''))}`
+  return insighterSide ? `${PROJECT_OFFERS}/details/${param}${query}` : `${CLIENT_PROJECTS}/${param}${query}`
+}
+
 export function routeForNotification(
-  notification: Pick<Notification, 'event_name' | 'type' | 'sub_type' | 'param' | 'url'>,
+  notification: Pick<Notification, 'event_name' | 'type' | 'sub_type' | 'param' | 'url'> & Partial<RevisionNotification>,
   roles: string[] = []
 ): string | null {
   const param = notification.param
+
+  if (notification.event_name === 'project.agreement.revision' || notification.sub_type === 'project_agreement_revision') {
+    return agreementRevisionUrl(notification, roles)
+  }
 
   // 1) Route by event_name (realtime broadcasts) — most reliable.
   switch (notification.event_name) {

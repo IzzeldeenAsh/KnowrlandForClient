@@ -16,6 +16,20 @@ import ProjectSelectedTypeHeader from '../ProjectSelectedTypeHeader'
 import { useProjectWizardNavigation } from '../useProjectWizardNavigation'
 import { projectWizardStorage, type WizardLocale } from '../wizardStorage'
 import { addDaysToIsoDate, readProjectSchedule } from '../projectSchedule'
+import type { StepEditBase } from '../edit/stepEditAdapter'
+
+/**
+ * Agreement edit: the deadline can only be extended (never before the current one or
+ * today) and stays inside the project dates. Keeping the current date is always valid.
+ */
+export type DeadlineOfferEdit = StepEditBase & {
+  value: string
+  original: string
+  minDate: string
+  /** Planned close date of the edited schedule, or '' when unknown. */
+  projectEnd: string
+  onSave: (date: string) => void
+}
 
 function todayString(): string {
   const d = new Date()
@@ -65,8 +79,10 @@ function formatIsoDate(value: string, locale: WizardLocale): string {
 
 export default function DeadlineOfferQuestion({
   locale,
+  edit,
 }: {
   locale: WizardLocale
+  edit?: DeadlineOfferEdit
 }) {
   const router = useRouter()
   const nav = useProjectWizardNavigation(locale)
@@ -88,21 +104,23 @@ export default function DeadlineOfferQuestion({
   const storageKey = projectWizardStorage.deadlineOfferKey(locale)
   const today = todayString()
   const tomorrow = futureDateString(1)
-  const isUrgentProject = normalizeProjectType(projectType) === 'urgent_request'
+  const isUrgentProject = !edit && normalizeProjectType(projectType) === 'urgent_request'
   // The offer must expire within the project window, and never in the past.
-  const minDate = projectStart > today ? projectStart : today
+  const minDate = edit ? edit.minDate : projectStart > today ? projectStart : today
   const maxDate =
     [projectEnd, isUrgentProject ? tomorrow : ''].filter(Boolean).sort()[0] || ''
   const hasSelectableDates = !maxDate || minDate <= maxDate
-  const isPastDate = dateValue !== '' && dateValue < today
+  const keepsCurrentDeadline = !!edit && dateValue === edit.original
+  const isPastDate = dateValue !== '' && dateValue < (edit ? edit.minDate : today)
   const isAfterUrgentMaxDate =
     isUrgentProject && dateValue !== '' && dateValue > tomorrow
   const isOutsideProjectDates =
     dateValue !== '' &&
-    ((projectStart !== '' && dateValue < projectStart) ||
+    ((!edit && projectStart !== '' && dateValue < projectStart) ||
       (projectEnd !== '' && dateValue > projectEnd))
   const isInvalidDate =
-    !hasSelectableDates || isPastDate || isAfterUrgentMaxDate || isOutsideProjectDates
+    !keepsCurrentDeadline &&
+    (!hasSelectableDates || isPastDate || isAfterUrgentMaxDate || isOutsideProjectDates)
 
   useEffect(() => {
     const timer = window.setTimeout(() => setEntered(true), 30)
@@ -110,6 +128,12 @@ export default function DeadlineOfferQuestion({
   }, [])
 
   useEffect(() => {
+    if (edit) {
+      setProjectType(edit.projectType)
+      setProjectEnd(edit.projectEnd)
+      setDateValue(edit.value)
+      return
+    }
     try {
       const storedProjectType = window.sessionStorage.getItem(
         projectWizardStorage.projectTypeKey(locale)
@@ -139,6 +163,8 @@ export default function DeadlineOfferQuestion({
     } catch {
       // ignore
     }
+    // The edit adapter seeds the step once; later renders keep the local edits.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locale, storageKey])
 
   const submitProposal = async () => {
@@ -186,6 +212,11 @@ export default function DeadlineOfferQuestion({
       return
     }
 
+    if (edit) {
+      edit.onSave(dateValue)
+      return
+    }
+
     try {
       window.sessionStorage.setItem(storageKey, dateValue)
     } catch {
@@ -200,9 +231,13 @@ export default function DeadlineOfferQuestion({
       ? 'لا توجد تواريخ متاحة ضمن مدة المشروع. عدّل تاريخ البدء أو الموعد النهائي.'
       : 'No dates are available within the project dates. Update the start date or delivery deadline.'
     : isPastDate
-      ? isRTL
-        ? 'لا يمكن أن يكون التاريخ في الماضي.'
-        : 'Date cannot be in the past.'
+      ? edit
+        ? isRTL
+          ? 'لا يمكن أن يكون الموعد قبل الموعد الحالي أو في الماضي.'
+          : 'The deadline cannot be earlier than the current one or in the past.'
+        : isRTL
+          ? 'لا يمكن أن يكون التاريخ في الماضي.'
+          : 'Date cannot be in the past.'
       : isAfterUrgentMaxDate
         ? isRTL
           ? 'يجب أن تنتهي صلاحية عرض الطلب العاجل خلال 24 ساعة.'
@@ -212,7 +247,7 @@ export default function DeadlineOfferQuestion({
             ? 'اختر تاريخًا ضمن مدة المشروع.'
             : 'Choose a date within the project dates.'
           : null
-  const visibleError = validationError || error
+  const visibleError = (keepsCurrentDeadline ? null : validationError) || error
 
   return (
     <div
@@ -224,6 +259,7 @@ export default function DeadlineOfferQuestion({
           locale={locale}
           entered={entered}
           projectTypeId={projectType}
+          serviceLabelOverride={edit ? edit.serviceLabel : undefined}
         />
 
         <div
@@ -254,7 +290,13 @@ export default function DeadlineOfferQuestion({
               ? 'إذا لم يتم التعاقد قبل هذا التاريخ، سيتم إزالة العرض تلقائيًا.'
               : 'If no contract is made by this date, the offer will be automatically removed.'}
           </p>
-          {selectedMatchesCount > 0 ? (
+          {edit ? (
+            <p className="mt-2 text-sm font-semibold text-slate-600 max-w-2xl">
+              {isRTL
+                ? 'يمكن تمديد الموعد فقط، وينطبق على جميع الخبراء المدعوين لهذا الطلب.'
+                : 'The deadline can only be extended, and it applies to every Insighter invited to this request.'}
+            </p>
+          ) : selectedMatchesCount > 0 ? (
             <div className="mt-4 inline-flex max-w-full items-center gap-2 rounded-full border border-sky-100 bg-sky-50/80 px-3 py-2 text-sm font-semibold text-sky-800 shadow-sm">
               <span className="inline-flex h-7 min-w-7 shrink-0 items-center justify-center rounded-full bg-[#1C7CBB] px-2 text-xs font-bold text-white">
                 {selectedMatchesCount}
@@ -315,7 +357,7 @@ export default function DeadlineOfferQuestion({
         <div className="mx-auto px-4 lg:px-0 w-full max-w-4xl pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
           <div className="flex items-center justify-between gap-3">
             <Link
-              href={nav.backHref}
+              href={edit?.backHref ?? nav.backHref}
               className="btn-sm px-6 py-2 rounded-full text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
             >
               {isRTL ? 'رجوع' : 'Back'}
@@ -335,6 +377,8 @@ export default function DeadlineOfferQuestion({
                   ? isRTL
                     ? 'جاري الإرسال...'
                     : 'Submitting...'
+                  : edit
+                    ? edit.continueLabel
                   : isRTL
                     ? 'إرسال الطلب'
                     : 'Submit proposal'}

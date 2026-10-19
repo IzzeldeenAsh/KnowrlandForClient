@@ -26,13 +26,19 @@ import {
 import ProjectSelectedTypeHeader from "@/components/project/ProjectSelectedTypeHeader";
 import { getProjectApiErrorMessage } from "@/components/project/projectApiError";
 import {
+  DUE_UNITS,
+  DUE_UNIT_DAYS,
   MAX_DELIVERABLES,
   createDeliverable,
-  dayLabel,
+  dueLabel,
+  dueUnitHint,
+  dueUnitLabel,
+  inferDueUnit,
   readDeliverables,
   writeDeliverables,
   type DeliverableDraft,
   type DeliverableWay,
+  type DueUnit,
   type ProjectDeliverable,
 } from "@/components/project/projectDeliverables";
 import {
@@ -54,6 +60,18 @@ import {
   getReportTypeOptions,
   type ReportTypeOption,
 } from "./deliverableReportTypes";
+import type { StepEditBase } from "@/components/project/edit/stepEditAdapter";
+
+/** Saved deliverables keep their row id so the agreement edit updates them in place. */
+type EditableDeliverable = DeliverableDraft & { id?: number };
+
+export type DeliverablesPlanEdit = StepEditBase & {
+  deliverables: EditableDeliverable[];
+  schedule: ProjectSchedule | null;
+  /** Deliverables linked to a payment cannot be removed. */
+  lockedIds: number[];
+  onSave: (deliverables: Array<ProjectDeliverable & { id?: number }>) => void;
+};
 
 const WAY_OPTIONS: Array<{
   value: DeliverableWay;
@@ -127,8 +145,10 @@ function FormatIcons({
 
 export default function DeliverablesPlanQuestion({
   locale,
+  edit,
 }: {
   locale: WizardLocale;
+  edit?: DeliverablesPlanEdit;
 }) {
   const isRTL = locale === "ar";
   const isEnglish =
@@ -141,7 +161,9 @@ export default function DeliverablesPlanQuestion({
 
   const [entered, setEntered] = useState(false);
   const [projectType, setProjectType] = useState<string | null>(null);
-  const [deliverables, setDeliverables] = useState<DeliverableDraft[]>([]);
+  const [deliverables, setDeliverables] = useState<EditableDeliverable[]>([]);
+  // The unit each row's due date is entered in, by row position; never saved.
+  const [dueUnits, setDueUnits] = useState<Array<DueUnit | undefined>>([]);
   // Only a freshly added deliverable grabs focus.
   const [focusIndex, setFocusIndex] = useState<number | null>(null);
   // The schedule step comes first, so deliverables fit inside the planned duration.
@@ -158,6 +180,23 @@ export default function DeliverablesPlanQuestion({
   }, []);
 
   useEffect(() => {
+    if (edit) {
+      const limit = isUrgentProjectType(edit.projectType)
+        ? URGENT_MAX_DURATION_DAYS
+        : edit.schedule?.durationDays ?? null;
+      setProjectType(edit.projectType);
+      setSchedule(isUrgentProjectType(edit.projectType) ? null : edit.schedule);
+      setDeliverables(
+        edit.deliverables.length > 0
+          ? edit.deliverables.map((item) =>
+              limit === null || item.period_days === null
+                ? item
+                : { ...item, period_days: Math.min(item.period_days, limit) },
+            )
+          : [createDeliverable()],
+      );
+      return;
+    }
     let storedProjectType: string | null = null;
     try {
       storedProjectType = window.sessionStorage.getItem(
@@ -181,6 +220,8 @@ export default function DeliverablesPlanQuestion({
     setProjectType(storedProjectType);
     setSchedule(storedSchedule);
     setDeliverables(stored.length > 0 ? stored : [createDeliverable()]);
+    // The edit adapter seeds the step once; later renders keep the local edits.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locale]);
 
   const isUrgent = isUrgentProjectType(projectType);
@@ -201,24 +242,14 @@ export default function DeliverablesPlanQuestion({
         )
       : "";
 
-  const quickDays = useMemo(() => {
-    if (isUrgent) return [0, 1];
-    const presets = [7, 14, 30, 60].filter((day) => day < maxDay);
-    return schedule ? [...presets, schedule.durationDays] : presets;
-  }, [isUrgent, maxDay, schedule]);
-
-  const quickDayLabel = (day: number) => {
-    if (schedule && day === schedule.durationDays) {
-      return isRTL ? "نهاية المشروع" : "At the end";
-    }
-    if (isUrgent) return dayLabel(locale, day);
-    const labels: Record<number, { en: string; ar: string }> = {
-      7: { en: "1 week", ar: "أسبوع" },
-      14: { en: "2 weeks", ar: "أسبوعان" },
-      30: { en: "1 month", ar: "شهر" },
-      60: { en: "2 months", ar: "شهران" },
-    };
-    return isRTL ? labels[day].ar : labels[day].en;
+  // Urgent requests are due within a day, so they stay in days.
+  const unitFor = (index: number): DueUnit =>
+    isUrgent
+      ? "days"
+      : dueUnits[index] ?? inferDueUnit(deliverables[index]?.period_days ?? null);
+  const amountFor = (index: number): number | null => {
+    const days = deliverables[index]?.period_days ?? null;
+    return days === null ? null : Math.round(days / DUE_UNIT_DAYS[unitFor(index)]);
   };
 
   const update = (index: number, patch: Partial<DeliverableDraft>) => {
@@ -234,6 +265,28 @@ export default function DeliverablesPlanQuestion({
           ? null
           : Math.min(maxDay, Math.max(0, Math.round(value) || 0)),
     });
+  };
+
+  const setDueAmount = (index: number, amount: number | null) => {
+    setDay(
+      index,
+      amount === null
+        ? null
+        : Math.max(0, Math.round(amount) || 0) * DUE_UNIT_DAYS[unitFor(index)],
+    );
+  };
+
+  /** Switching the unit keeps the due date as close as the new unit allows, never moving a later date to the start day. */
+  const setDueUnit = (index: number, unit: DueUnit) => {
+    setDueUnits((prev) => {
+      const next = [...prev];
+      next[index] = unit;
+      return next;
+    });
+    const days = deliverables[index]?.period_days ?? null;
+    if (days === null) return;
+    const amount = days > 0 ? Math.max(1, Math.round(days / DUE_UNIT_DAYS[unit])) : 0;
+    setDay(index, amount * DUE_UNIT_DAYS[unit]);
   };
 
   const setWay = (index: number, selected: DeliverableWay) => {
@@ -257,6 +310,7 @@ export default function DeliverablesPlanQuestion({
   const removeDeliverable = (index: number) => {
     if (deliverables.length <= 1) return;
     setDeliverables((prev) => prev.filter((_, i) => i !== index));
+    setDueUnits((prev) => prev.filter((_, i) => i !== index));
     setFocusIndex(null);
   };
 
@@ -286,6 +340,10 @@ export default function DeliverablesPlanQuestion({
           address: item.way.address ? item.way.address.trim() : item.way.address,
         },
       }));
+    if (edit) {
+      edit.onSave(ordered);
+      return;
+    }
     writeDeliverables(locale, ordered);
 
     setSubmitting(true);
@@ -310,7 +368,8 @@ export default function DeliverablesPlanQuestion({
     return types.length > 1 ? `${first.label} +${types.length - 1}` : first.label;
   };
 
-  const renderDeliverable = (item: DeliverableDraft, index: number) => {
+  const renderDeliverable = (item: EditableDeliverable, index: number) => {
+    const linkedToPayment = !!item.id && !!edit?.lockedIds.includes(item.id);
     const way = WAY_OPTIONS.find((option) => option.value === item.way.selected);
     const missingTitle = attempted && !item.title.trim();
     const missingDay = attempted && item.period_days === null;
@@ -339,7 +398,11 @@ export default function DeliverablesPlanQuestion({
                 ? "اسم المخرج"
                 : "Deliverable name"}
           </label>
-          {deliverables.length > 1 ? (
+          {linkedToPayment ? (
+            <span className="text-[11px] font-semibold text-slate-400">
+              {isRTL ? "مرتبط بدفعة" : "Linked to a payment"}
+            </span>
+          ) : deliverables.length > 1 ? (
             <button
               type="button"
               onClick={() => removeDeliverable(index)}
@@ -377,7 +440,7 @@ export default function DeliverablesPlanQuestion({
                 </span>
               ) : (
                 <>
-                  <span>{dayLabel(locale, item.period_days)}</span>
+                  <span>{dueLabel(locale, item.period_days, unitFor(index))}</span>
                   {schedule ? (
                     <span className="font-medium text-slate-400">
                       · {dateFor(item.period_days)}
@@ -394,32 +457,40 @@ export default function DeliverablesPlanQuestion({
               <p className="text-xs font-bold text-slate-500">
                 {isRTL ? "موعد التسليم" : "Due"}
               </p>
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {quickDays.map((day) => {
-                  const selected = item.period_days === day;
-                  return (
-                    <button
-                      key={day}
-                      type="button"
-                      onClick={() => setDay(index, day)}
-                      className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${
-                        selected
-                          ? "border-blue-300 bg-blue-50 text-blue-800"
-                          : "border-slate-200 text-slate-600 hover:bg-slate-50"
-                      }`}
-                    >
-                      {quickDayLabel(day)}
-                    </button>
-                  );
-                })}
-              </div>
+              {isUrgent ? null : (
+                <div
+                  role="radiogroup"
+                  aria-label={isRTL ? "وحدة المدة" : "Duration unit"}
+                  className="mt-2 grid grid-cols-3 gap-0.5 rounded-[10px] border border-slate-200 bg-slate-50 p-[3px]"
+                >
+                  {DUE_UNITS.map((unit) => {
+                    const selected = unitFor(index) === unit;
+                    return (
+                      <button
+                        key={unit}
+                        type="button"
+                        role="radio"
+                        aria-checked={selected}
+                        onClick={() => setDueUnit(index, unit)}
+                        className={`h-[30px] rounded-[7px] px-2 text-xs font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-200 ${
+                          selected
+                            ? "bg-white text-blue-700 ring-1 ring-blue-200"
+                            : "text-slate-500 hover:text-slate-900"
+                        }`}
+                      >
+                        {dueUnitLabel(locale, unit)}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
               <div className="mt-3 flex items-center gap-2">
                 <div className="flex items-center rounded-full border border-slate-200 bg-white">
                   <button
                     type="button"
-                    onClick={() => setDay(index, (item.period_days ?? 0) - 1)}
-                    disabled={item.period_days === null || item.period_days <= 0}
-                    aria-label={isRTL ? "يوم أبكر" : "One day earlier"}
+                    onClick={() => setDueAmount(index, Math.max(0, (amountFor(index) ?? 0) - 1))}
+                    disabled={!amountFor(index)}
+                    aria-label={isRTL ? "أبكر" : "Earlier"}
                     className="inline-flex h-8 w-8 items-center justify-center text-slate-600 hover:text-slate-900 disabled:text-slate-300"
                   >
                     <IconMinus size={14} />
@@ -428,40 +499,58 @@ export default function DeliverablesPlanQuestion({
                     type="number"
                     inputMode="numeric"
                     min={0}
-                    max={maxDay === Number.MAX_SAFE_INTEGER ? undefined : maxDay}
-                    value={item.period_days ?? ""}
+                    max={
+                      maxDay === Number.MAX_SAFE_INTEGER
+                        ? undefined
+                        : Math.floor(maxDay / DUE_UNIT_DAYS[unitFor(index)])
+                    }
+                    value={amountFor(index) ?? ""}
                     placeholder="—"
                     onChange={(event) =>
-                      setDay(
+                      setDueAmount(
                         index,
                         event.target.value === ""
                           ? null
                           : Number(event.target.value),
                       )
                     }
-                    aria-label={
-                      isRTL
-                        ? "عدد الأيام من بدء المشروع"
-                        : "Days from project start"
-                    }
+                    aria-label={dueUnitHint(locale, unitFor(index))}
                     className="w-12 appearance-none border-0 bg-transparent p-0 text-center text-sm font-bold tabular-nums text-slate-900 focus:outline-none [-moz-appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                   />
                   <button
                     type="button"
-                    onClick={() => setDay(index, (item.period_days ?? 0) + 1)}
+                    onClick={() => setDueAmount(index, (amountFor(index) ?? 0) + 1)}
                     disabled={
-                      item.period_days !== null && item.period_days >= maxDay
+                      ((amountFor(index) ?? 0) + 1) * DUE_UNIT_DAYS[unitFor(index)] > maxDay
                     }
-                    aria-label={isRTL ? "يوم لاحق" : "One day later"}
+                    aria-label={isRTL ? "لاحقًا" : "Later"}
                     className="inline-flex h-8 w-8 items-center justify-center text-slate-600 hover:text-slate-900 disabled:text-slate-300"
                   >
                     <IconPlus size={14} />
                   </button>
                 </div>
                 <span className="text-xs font-semibold text-slate-500">
-                  {isRTL ? "يوم بعد البدء" : "days after start"}
+                  {dueUnitHint(locale, unitFor(index))}
                 </span>
               </div>
+              {item.period_days !== null && (unitFor(index) !== "days" || schedule) ? (
+                <p className="mt-2 text-[11px] font-medium text-slate-500">
+                  {[
+                    unitFor(index) !== "days"
+                      ? isRTL
+                        ? `= ${item.period_days} يومًا`
+                        : `= ${item.period_days} days`
+                      : null,
+                    schedule
+                      ? isRTL
+                        ? `التسليم في ${formatIsoDate(addDaysToIsoDate(schedule.plannedStartDate, item.period_days), locale)}`
+                        : `Due ${formatIsoDate(addDaysToIsoDate(schedule.plannedStartDate, item.period_days), locale)}`
+                      : null,
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </p>
+              ) : null}
               {schedule ? (
                 <p className="mt-2 text-[11px] font-semibold text-slate-400">
                   {isRTL
@@ -627,6 +716,7 @@ export default function DeliverablesPlanQuestion({
         locale={locale}
         entered={entered}
         projectTypeId={projectType}
+        serviceLabelOverride={edit ? edit.serviceLabel : undefined}
       />
 
       <div
@@ -679,7 +769,7 @@ export default function DeliverablesPlanQuestion({
         <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
           <div className="flex items-center justify-between gap-3">
             <Link
-              href={nav.backHref}
+              href={edit?.backHref ?? nav.backHref}
               className="btn-sm px-6 py-2 rounded-full text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
             >
               {isRTL ? "رجوع" : "Back"}
@@ -698,7 +788,7 @@ export default function DeliverablesPlanQuestion({
                 ? isRTL
                   ? "جاري الحفظ…"
                   : "Saving…"
-                : nav.continueLabel}
+                : edit?.continueLabel ?? nav.continueLabel}
             </button>
           </div>
         </div>

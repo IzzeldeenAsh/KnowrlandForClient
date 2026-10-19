@@ -10,6 +10,8 @@ type Props = {
   entered: boolean
   projectTypeId: string | null
   status?: ReactNode
+  /** Set outside the wizard (agreement edit): skips the wizard storage and the insighter badge. */
+  serviceLabelOverride?: string | null
 }
 
 export default function ProjectSelectedTypeHeader({
@@ -17,12 +19,19 @@ export default function ProjectSelectedTypeHeader({
   entered,
   projectTypeId,
   status,
+  serviceLabelOverride,
 }: Props) {
   const isRTL = locale === 'ar'
   const typeLabel = projectTypeLabel(locale, projectTypeId)
   const [serviceLabel, setServiceLabel] = useState<string | null>(null)
 
+  const outsideWizard = serviceLabelOverride !== undefined
+
   useEffect(() => {
+    if (outsideWizard) {
+      setServiceLabel(serviceLabelOverride?.trim() || null)
+      return
+    }
     try {
       const storedServiceLabel = window.sessionStorage.getItem(
         projectWizardStorage.serviceLabelKey(locale)
@@ -31,7 +40,7 @@ export default function ProjectSelectedTypeHeader({
     } catch {
       setServiceLabel(null)
     }
-  }, [locale])
+  }, [locale, outsideWizard, serviceLabelOverride])
 
   if (!typeLabel) return null
 
@@ -54,7 +63,7 @@ export default function ProjectSelectedTypeHeader({
           </span>
           {status ? <span className="text-xs font-semibold text-slate-600 rounded-full px-3 py-1 border border-slate-400">{status}</span> : null}
         </div>
-        <SpecifiedInsighterBadge locale={locale} className="max-w-full sm:max-w-[45%]" />
+        {outsideWizard ? null : <SpecifiedInsighterBadge locale={locale} className="max-w-full sm:max-w-[45%]" />}
       </div>
     </div>
   )

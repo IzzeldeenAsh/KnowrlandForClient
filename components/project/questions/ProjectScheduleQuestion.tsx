@@ -22,7 +22,9 @@ import {
   readProjectSchedule,
   todayIsoDate,
   writeProjectSchedule,
+  type ProjectSchedule,
 } from '@/components/project/projectSchedule'
+import type { StepEditBase } from '@/components/project/edit/stepEditAdapter'
 import { latestSavedSessionDeliverableDay } from '@/components/project/projectServiceSessions'
 import { readServiceComponentSlugs } from '@/components/project/projectWizardFlow'
 import { useProjectStepErrorToast } from '@/components/project/useProjectStepErrorToast'
@@ -33,6 +35,19 @@ import { useProjectWizardNavigation } from '../useProjectWizardNavigation'
 import { projectWizardStorage, type WizardLocale } from '../wizardStorage'
 
 const DEFAULT_LEAD_DAYS = 7
+
+/**
+ * Agreement edit: the schedule can only move forward. The start never goes before
+ * the agreed start (or today) and the duration never drops below the agreed one.
+ */
+export type ProjectScheduleEdit = StepEditBase & {
+  value: ProjectSchedule
+  original: ProjectSchedule
+  minStartDate: string
+  /** Latest deliverable day across all services. */
+  latestDeliverableDay: number
+  onSave: (schedule: ProjectSchedule) => void
+}
 
 // Duration is stored in days; weeks and months only change how it is shown and typed.
 type DurationUnit = 'days' | 'weeks' | 'months'
@@ -63,7 +78,7 @@ function durationInUnit(days: number, unit: DurationUnit) {
   return Math.round((days / UNIT_DAYS[unit]) * 10) / 10
 }
 
-export default function ProjectScheduleQuestion({ locale }: { locale: WizardLocale }) {
+export default function ProjectScheduleQuestion({ locale, edit }: { locale: WizardLocale; edit?: ProjectScheduleEdit }) {
   const router = useRouter()
   const nav = useProjectWizardNavigation(locale)
   const isRTL = locale === 'ar'
@@ -85,15 +100,14 @@ export default function ProjectScheduleQuestion({ locale }: { locale: WizardLoca
   useProjectStepErrorToast(error, locale)
 
   const today = todayIsoDate()
-  const isUrgent = isUrgentProjectType(projectType)
+  const isUrgent = !edit && isUrgentProjectType(projectType)
   const hasDeliverables =
-    readServiceComponentSlugs(locale).includes('deliverables-plan') && deliverables.length > 0
+    !edit && readServiceComponentSlugs(locale).includes('deliverables-plan') && deliverables.length > 0
   // Other services' deliverables (specific-insighter projects) must fit in the duration too.
   const [otherServicesLatestDay, setOtherServicesLatestDay] = useState(0)
-  const minDuration = Math.max(
-    hasDeliverables ? latestDeliverableDay(deliverables) : 0,
-    otherServicesLatestDay
-  )
+  const minDuration = edit
+    ? Math.max(edit.original.durationDays, edit.latestDeliverableDay)
+    : Math.max(hasDeliverables ? latestDeliverableDay(deliverables) : 0, otherServicesLatestDay)
   const maxDuration = isUrgent ? URGENT_MAX_DURATION_DAYS : Number.MAX_SAFE_INTEGER
   // A project lasts at least a day, so the close date is never the start date.
   const minCloseDays = Math.min(maxDuration, Math.max(minDuration, 1))
@@ -106,6 +120,13 @@ export default function ProjectScheduleQuestion({ locale }: { locale: WizardLoca
   }, [])
 
   useEffect(() => {
+    if (edit) {
+      setProjectType(edit.projectType)
+      setStartDate(edit.value.plannedStartDate)
+      setDurationDays(edit.value.durationDays)
+      setReady(true)
+      return
+    }
     let storedProjectType: string | null = null
     try {
       storedProjectType = window.sessionStorage.getItem(projectWizardStorage.projectTypeKey(locale))
@@ -135,6 +156,8 @@ export default function ProjectScheduleQuestion({ locale }: { locale: WizardLoca
     setStartDate(initialStart)
     setDurationDays(initialDuration)
     setReady(true)
+    // The edit adapter seeds the step once; later renders keep the local edits.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locale])
 
   const updateDuration = (value: number) => {
@@ -153,11 +176,18 @@ export default function ProjectScheduleQuestion({ locale }: { locale: WizardLoca
 
   // Finishing by tomorrow turns a normal request into an urgent one.
   const becomesUrgent =
-    !isUrgent && Boolean(plannedCloseDate) && plannedCloseDate <= addDaysToIsoDate(today, 1)
-  const startInPast = Boolean(startDate) && startDate < today
+    !edit && !isUrgent && Boolean(plannedCloseDate) && plannedCloseDate <= addDaysToIsoDate(today, 1)
+  const minStartDate = edit ? edit.minStartDate : today
+  // Keeping the agreed start is always allowed, even once it has passed.
+  const startInPast =
+    Boolean(startDate) && startDate < minStartDate && startDate !== edit?.original.plannedStartDate
   const canContinue = ready && Boolean(startDate) && !startInPast && !submitting
 
   const submit = async () => {
+    if (edit) {
+      edit.onSave({ plannedStartDate: startDate, durationDays })
+      return
+    }
     writeProjectSchedule(locale, { plannedStartDate: startDate, durationDays })
     setSubmitting(true)
     setError(null)
@@ -204,7 +234,12 @@ export default function ProjectScheduleQuestion({ locale }: { locale: WizardLoca
   return (
     <div className="w-full max-w-5xl mx-auto min-h-full flex flex-col" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="flex-1 pb-32">
-        <ProjectSelectedTypeHeader locale={locale} entered={entered} projectTypeId={projectType} />
+        <ProjectSelectedTypeHeader
+          locale={locale}
+          entered={entered}
+          projectTypeId={projectType}
+          serviceLabelOverride={edit ? edit.serviceLabel : undefined}
+        />
 
         <div className={`mt-2 text-start transition-all duration-700 ${fadeIn}`}>
           {isEnglish ? (
@@ -236,7 +271,7 @@ export default function ProjectScheduleQuestion({ locale }: { locale: WizardLoca
             <InlineDateCalendar
               className={calendarClassName}
               value={startDate}
-              min={today}
+              min={minStartDate}
               max={isUrgent ? today : undefined}
               rangeStart={startDate}
               rangeEnd={plannedCloseDate}
@@ -353,9 +388,22 @@ export default function ProjectScheduleQuestion({ locale }: { locale: WizardLoca
               : `The duration has to cover your last deliverable (${dayLabel(locale, minDuration)}).`}
           </p>
         ) : null}
+        {edit ? (
+          <p className="mt-4 text-center text-xs font-semibold text-slate-500">
+            {isRTL
+              ? `يمكن تأجيل تاريخ البدء وتمديد المدة فقط، ولا يمكن أن تقل عن ${durationLabel(locale, minDuration)}.`
+              : `The start can only move later and the duration can only be extended; it cannot go below ${durationLabel(locale, minDuration)}.`}
+          </p>
+        ) : null}
         {startInPast ? (
           <p className="mt-3 text-center text-sm text-rose-700">
-            {isRTL ? 'لا يمكن أن يكون تاريخ البدء في الماضي.' : 'The start date cannot be in the past.'}
+            {edit
+              ? isRTL
+                ? 'لا يمكن أن يكون تاريخ البدء قبل التاريخ المتفق عليه أو في الماضي.'
+                : 'The start date cannot be earlier than the agreed start or in the past.'
+              : isRTL
+                ? 'لا يمكن أن يكون تاريخ البدء في الماضي.'
+                : 'The start date cannot be in the past.'}
           </p>
         ) : null}
         {error ? <p className="mt-3 text-center text-sm text-rose-700">{error}</p> : null}
@@ -377,7 +425,7 @@ export default function ProjectScheduleQuestion({ locale }: { locale: WizardLoca
         <div className="mx-auto px-4 lg:px-0 w-full max-w-5xl pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
           <div className="flex items-center justify-between gap-3">
             <Link
-              href={nav.backHref}
+              href={edit?.backHref ?? nav.backHref}
               className="btn-sm px-6 py-2 rounded-full text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
             >
               {isRTL ? 'رجوع' : 'Back'}
@@ -391,7 +439,7 @@ export default function ProjectScheduleQuestion({ locale }: { locale: WizardLoca
                 : 'text-slate-500 bg-slate-200 cursor-not-allowed'
               }`}
             >
-              {submitting ? (isRTL ? 'جاري الحفظ...' : 'Saving...') : nav.continueLabel}
+              {submitting ? (isRTL ? 'جاري الحفظ...' : 'Saving...') : edit?.continueLabel ?? nav.continueLabel}
             </button>
           </div>
         </div>

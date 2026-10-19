@@ -12,6 +12,14 @@ import { useProjectStepErrorToast } from '../useProjectStepErrorToast'
 import { projectWizardStorage, type WizardLocale } from '../wizardStorage'
 import { useProjectWizardNavigation } from '../useProjectWizardNavigation'
 import { updateServiceComponentPayload } from '@/components/project/serviceComponentsPayload'
+import type { StepEditBase } from '@/components/project/edit/stepEditAdapter'
+
+type TargetMarketPayload = { type: 'country' | 'region' | 'economic'; ids: number[] }
+
+export type TargetMarketEdit = StepEditBase & {
+  value: TargetMarketPayload
+  onSave: (value: TargetMarketPayload, labels: string[]) => void
+}
 
 type Mode = 'worldwide' | 'country' | 'regions' | 'economic'
 
@@ -67,7 +75,7 @@ async function fetchList<T>(url: string, locale: WizardLocale): Promise<T[]> {
   return json.data || []
 }
 
-export default function TargetMarketQuestion({ locale }: { locale: WizardLocale }) {
+export default function TargetMarketQuestion({ locale, edit }: { locale: WizardLocale; edit?: TargetMarketEdit }) {
   const isRTL = locale === 'ar'
   const isEnglish =
     typeof locale === 'string' && locale.toLowerCase().startsWith('en')
@@ -100,6 +108,8 @@ export default function TargetMarketQuestion({ locale }: { locale: WizardLocale 
   // When the user actively picks "Worldwide", auto-advance to the next step
   // as soon as the (auto-selected) regions are loaded.
   const pendingWorldwideAdvanceRef = useRef(false)
+  // Edit mode: a saved "all regions" answer reopens as Worldwide.
+  const detectWorldwideRef = useRef(edit?.value.type === 'region')
 
   useEffect(() => {
     const timer = window.setTimeout(() => setEntered(true), 30)
@@ -107,6 +117,15 @@ export default function TargetMarketQuestion({ locale }: { locale: WizardLocale 
   }, [])
 
   useEffect(() => {
+    if (edit) {
+      const { type, ids } = edit.value
+      setProjectType(edit.projectType)
+      setMode(type === 'region' ? 'regions' : type)
+      if (type === 'country') setCountryIds(ids)
+      if (type === 'region') setRegionIds(ids)
+      if (type === 'economic') setBlocIds(ids)
+      return
+    }
     try {
       setProjectType(
         window.sessionStorage.getItem(projectWizardStorage.projectTypeKey(locale))
@@ -141,7 +160,15 @@ export default function TargetMarketQuestion({ locale }: { locale: WizardLocale 
     } catch {
       // ignore
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locale])
+
+  useEffect(() => {
+    if (!detectWorldwideRef.current || mode !== 'regions' || !regions?.length) return
+    detectWorldwideRef.current = false
+    const selected = new Set(regionIds)
+    if (regions.every((region) => selected.has(region.id))) setMode('worldwide')
+  }, [mode, regionIds, regions])
 
   const title = isRTL ? 'اختر السوق المستهدف' : 'Select the target market'
 
@@ -349,6 +376,18 @@ export default function TargetMarketQuestion({ locale }: { locale: WizardLocale 
   const onContinue = async () => {
     if (!mode || !canContinue || submitting) return
 
+    if (edit) {
+      edit.onSave(
+        mode === 'country'
+          ? { type: 'country', ids: countryIds }
+          : mode === 'economic'
+            ? { type: 'economic', ids: blocIds }
+            : { type: 'region', ids: regionIds },
+        selectedTargetMarketItems.map((item) => item.label.trim())
+      )
+      return
+    }
+
     try {
       window.sessionStorage.setItem(
         projectWizardStorage.targetMarketModeKey(locale),
@@ -416,6 +455,7 @@ export default function TargetMarketQuestion({ locale }: { locale: WizardLocale 
         locale={locale}
         entered={entered}
         projectTypeId={projectType}
+        serviceLabelOverride={edit ? edit.serviceLabel : undefined}
       />
 
       <div
@@ -723,7 +763,7 @@ export default function TargetMarketQuestion({ locale }: { locale: WizardLocale 
         <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
           <div className="flex items-center justify-between gap-3">
             <Link
-              href={nav.backHref}
+              href={edit?.backHref ?? nav.backHref}
               className="btn-sm px-6 py-2 rounded-full text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
             >
               {isRTL ? 'رجوع' : 'Back'}
@@ -738,7 +778,7 @@ export default function TargetMarketQuestion({ locale }: { locale: WizardLocale 
                 : 'text-slate-500 bg-slate-200 cursor-not-allowed'
                 }`}
             >
-              {submitting ? (isRTL ? 'جاري الحفظ…' : 'Saving…') : nav.continueLabel}
+              {submitting ? (isRTL ? 'جاري الحفظ…' : 'Saving…') : edit?.continueLabel ?? nav.continueLabel}
             </button>
           </div>
         </div>

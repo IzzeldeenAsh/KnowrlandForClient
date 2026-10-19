@@ -169,6 +169,43 @@ export function dayLabel(locale: WizardLocale, days: number): string {
   return days === 1 ? '1 Day' : `${days} Days`
 }
 
+/** A due date is entered in days, weeks or months and always saved as days (a month counts as 30). */
+export type DueUnit = 'days' | 'weeks' | 'months'
+export const DUE_UNITS: DueUnit[] = ['days', 'weeks', 'months']
+export const DUE_UNIT_DAYS: Record<DueUnit, number> = { days: 1, weeks: 7, months: 30 }
+
+/** The largest whole unit that fits a saved due day. */
+export function inferDueUnit(days: number | null): DueUnit {
+  if (days !== null && days > 0 && days % DUE_UNIT_DAYS.months === 0) return 'months'
+  if (days !== null && days > 0 && days % DUE_UNIT_DAYS.weeks === 0) return 'weeks'
+  return 'days'
+}
+
+export function dueUnitLabel(locale: WizardLocale, unit: DueUnit): string {
+  const labels = { days: ['Days', 'أيام'], weeks: ['Weeks', 'أسابيع'], months: ['Months', 'أشهر'] }[unit]
+  return locale === 'ar' ? labels[1] : labels[0]
+}
+
+export function dueUnitHint(locale: WizardLocale, unit: DueUnit): string {
+  if (locale === 'ar') return { days: 'يوم بعد البدء', weeks: 'أسبوع بعد البدء', months: 'شهر بعد البدء' }[unit]
+  return `${unit} after start`
+}
+
+/** Pill text in the row's own unit, e.g. "2 Weeks"; falls back to days when the day count is not a whole unit. */
+export function dueLabel(locale: WizardLocale, days: number, unit: DueUnit): string {
+  const size = DUE_UNIT_DAYS[unit]
+  if (unit === 'days' || days === 0 || days % size !== 0) return dayLabel(locale, days)
+  const count = days / size
+  if (locale === 'ar') {
+    const [one, two, few, many] = unit === 'weeks' ? ['أسبوع', 'أسبوعين', 'أسابيع', 'أسبوعًا'] : ['شهر', 'شهرين', 'أشهر', 'شهرًا']
+    if (count === 1) return `بعد ${one}`
+    if (count === 2) return `بعد ${two}`
+    return count <= 10 ? `بعد ${count} ${few}` : `بعد ${count} ${many}`
+  }
+  if (unit === 'weeks') return count === 1 ? '1 Week' : `${count} Weeks`
+  return count === 1 ? '1 Month' : `${count} Months`
+}
+
 export function durationLabel(locale: WizardLocale, days: number): string {
   if (locale === 'ar') {
     if (days === 0) return 'نفس اليوم'

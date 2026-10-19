@@ -30,6 +30,7 @@ type NotificationBellProps = {
 // These are routed to the Angular dashboard via routeForNotification(). See
 // utils/notificationRoute.ts for the per-event target URLs.
 const PROJECT_EVENTS = [
+  'project.agreement.revision',
   'project.proposal.offer',
   'project.match.invited',
   'project.client.closed',
@@ -60,7 +61,8 @@ export default function NotificationBell({ parent = 'client' }: NotificationBell
   const mapEventToNotification = (data: any, eventName?: string): Notification => {
     return {
       id: data?.id ?? `evt-${Date.now()}`,
-      message: data?.message ?? '',
+      // Some broadcasts ship an untranslated { key, variables } message; the list builds its own text for those.
+      message: typeof data?.message === 'string' ? data.message : '',
       type: data?.type ?? 'notification',
       notifiable_group_id: data?.notifiable_group_id ?? '',
       notifiable_id: data?.notifiable_id ?? 0,
@@ -75,6 +77,11 @@ export default function NotificationBell({ parent = 'client' }: NotificationBell
       tap: data?.tap,
       category: data?.category,
       event_name: data?.event_name ?? eventName,
+      recipient_role: data?.recipient_role,
+      project_title: data?.project_title,
+      changed_by: data?.changed_by,
+      revision_id: data?.revision_id,
+      revision_number: data?.revision_number,
     }
   }
 

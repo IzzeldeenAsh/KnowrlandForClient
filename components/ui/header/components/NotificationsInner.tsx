@@ -338,6 +338,8 @@ const getNotificationIconName = (subType: string, subTypeValue?: string, message
         return 'duotune/communication/com007.svg';
     case 'project_proposal_offer':
       return 'keen:briefcase';
+    case 'project_agreement_revision':
+      return 'duotune/art/art005.svg';
     // Project notifications
     case 'project_proposal': // new project request / invitation
       return 'keen:briefcase';
@@ -470,6 +472,7 @@ const getNotificationName = (subType: string, language: string): string => {
     'project_offer_technical_decision': { en: 'Project Offer Decision', ar: 'القرار الفني لعرض المشروع' },
     'project_offer_not_selected': { en: 'Project Offer Not Selected', ar: 'لم يتم اختيار عرض المشروع' },
     'project_cancelled': { en: 'Project Cancelled', ar: 'تم إلغاء المشروع' },
+    'project_agreement_revision': { en: 'Project Agreement Updated', ar: 'تم تحديث اتفاق المشروع' },
   };
 
   const names = nameMap[subType];
@@ -518,6 +521,7 @@ const getNotificationTitle = (notification: Notification, language: string): str
   }
 
   const projectSubTypes = new Set([
+    'project_agreement_revision', // sub_type_value is the bare revision number
     'project_offer_not_selected',
     'project_cancelled',
   ])
@@ -526,6 +530,21 @@ const getNotificationTitle = (notification: Notification, language: string): str
   }
 
   return notification.sub_type_value || getNotificationName(notification.sub_type, language)
+}
+
+// Agreement revisions get a clearer message than the backend's, naming the revision to review.
+const getNotificationMessage = (notification: Notification, language: string): string => {
+  if (notification.sub_type !== 'project_agreement_revision') return (notification.message ?? '').toString()
+  const revision = Number(notification.revision_number || notification.sub_type_value) || ''
+  const ar = language === 'ar'
+  const name = (notification.changed_by?.name ?? '').trim()
+  const title = (notification.project_title ?? '').trim()
+  if (name && title) return ar
+    ? `حدّث ${name} تفاصيل اتفاق «${title}». راجع المراجعة ${revision}.`
+    : `${name} updated the agreement for “${title}”. Review revision ${revision}.`
+  return ar
+    ? `تغيّرت تفاصيل الاتفاق. راجع المراجعة ${revision}.`
+    : `The agreement details changed. Review revision ${revision}.`
 }
 
 export default function NotificationsInner({
@@ -580,8 +599,11 @@ export default function NotificationsInner({
     notification: Notification
   }) => {
     const title = getNotificationTitle(notification, currentLanguage)
-    const messageText = htmlToText(notification.message)
-    const unreadMessageHtml = sanitizeNotificationHtml(notification.message)
+    const message = getNotificationMessage(notification, currentLanguage)
+    // The revision message is built from plain text (names, titles), so escape it rather than parse it as HTML.
+    const isRevision = notification.sub_type === 'project_agreement_revision'
+    const messageText = isRevision ? message : htmlToText(message)
+    const unreadMessageHtml = isRevision ? escapeHtml(message) : sanitizeNotificationHtml(message)
 
  
     

@@ -14,6 +14,12 @@ import { syncProjectProperties } from '@/components/project/projectPropertiesSyn
 import { useProjectStepErrorToast } from '@/components/project/useProjectStepErrorToast'
 import { useProjectWizardNavigation } from '@/components/project/useProjectWizardNavigation'
 import { projectWizardStorage, type WizardLocale } from '@/components/project/wizardStorage'
+import type { StepEditBase } from '@/components/project/edit/stepEditAdapter'
+
+export type DataSourcesExpectedEdit = StepEditBase & {
+  value: string
+  onSave: (value: string) => void
+}
 
 type DataSourceId = 'primary_data' | 'secondary_data' | 'both' | 'does_not_matter'
 
@@ -49,8 +55,10 @@ function getOptions(locale: WizardLocale): Option[] {
 
 export default function DataSourcesExpectedQuestion({
   locale,
+  edit,
 }: {
   locale: WizardLocale
+  edit?: DataSourcesExpectedEdit
 }) {
   const isRTL = locale === 'ar'
   const isEnglish =
@@ -73,6 +81,11 @@ export default function DataSourcesExpectedQuestion({
   }, [])
 
   useEffect(() => {
+    if (edit) {
+      setProjectType(edit.projectType)
+      if (dataSourceIds.includes(edit.value as DataSourceId)) setSelected(edit.value as DataSourceId)
+      return
+    }
     try {
       setProjectType(
         window.sessionStorage.getItem(projectWizardStorage.projectTypeKey(locale))
@@ -88,6 +101,7 @@ export default function DataSourcesExpectedQuestion({
     if (saved && dataSourceIds.includes(saved as DataSourceId)) {
       setSelected(saved as DataSourceId)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locale])
 
   const title = isRTL ? 'مصادر البيانات المتوقعة' : 'Expected data sources'
@@ -95,6 +109,10 @@ export default function DataSourcesExpectedQuestion({
   const canContinue = selected !== null
 
   const persist = async (value: DataSourceId | null) => {
+    if (edit) {
+      if (value) edit.onSave(value)
+      return
+    }
     setBusy(true)
     setError(null)
     try {
@@ -147,6 +165,7 @@ export default function DataSourcesExpectedQuestion({
           locale={locale}
           entered={entered}
           projectTypeId={projectType}
+          serviceLabelOverride={edit ? edit.serviceLabel : undefined}
         />
 
         <div
@@ -215,7 +234,7 @@ export default function DataSourcesExpectedQuestion({
         <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
           <div className="flex items-center justify-between gap-3">
             <Link
-              href={nav.backHref}
+              href={edit?.backHref ?? nav.backHref}
               aria-disabled={busy}
               onClick={(e) => {
                 if (busy) e.preventDefault()
@@ -226,14 +245,14 @@ export default function DataSourcesExpectedQuestion({
             </Link>
 
             <div className="flex items-center gap-3">
-              <button
+              {edit ? null : <button
                 type="button"
                 onClick={onSkip}
                 disabled={busy}
                 className="btn-sm px-5 py-2 rounded-full text-slate-700 bg-white/80 hover:bg-white border border-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isRTL ? 'تخطي' : 'Skip'}
-              </button>
+              </button>}
 
               <button
                 type="button"
@@ -248,7 +267,7 @@ export default function DataSourcesExpectedQuestion({
                   ? isRTL
                     ? 'جاري الحفظ...'
                     : 'Saving...'
-                  : nav.continueLabel}
+                  : edit?.continueLabel ?? nav.continueLabel}
               </button>
             </div>
           </div>

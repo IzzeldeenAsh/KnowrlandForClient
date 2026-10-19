@@ -16,3 +16,9 @@
   border-start-end-radius: 999px;
   border-end-end-radius: 999px;
 }
+
+/* In-range days outside min/max: shown in the band but not pickable. */
+.calendar .day[data-locked] {
+  color: var(--mantine-color-dimmed);
+  cursor: default;
+}

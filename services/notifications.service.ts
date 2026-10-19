@@ -23,6 +23,12 @@ export interface Notification {
    * Absent on REST history; routing falls back to sub_type + role in that case.
    */
   event_name?: string
+  /** Agreement revision notifications: who receives it and who made the change. */
+  recipient_role?: 'client' | 'insighter'
+  project_title?: string
+  changed_by?: { name?: string; role?: string; profile_photo_url?: string | null }
+  revision_id?: number
+  revision_number?: number
 }
 
 // Singleton pattern to prevent multiple instances

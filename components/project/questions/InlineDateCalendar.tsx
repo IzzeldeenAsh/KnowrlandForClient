@@ -128,12 +128,20 @@ export default function InlineDateCalendar({
             sameMonth(date, visibleMonth) &&
             date >= rangeStartDate! &&
             date <= rangeEndDate!
+          // Mantine strips the range band from disabled days, so in-range days
+          // outside min/max stay enabled but locked: drawn in the band, not clickable.
+          const outOfBounds =
+            Boolean(minDate && date < minDate) || Boolean(maxDate && date > maxDate)
+          const locked = inRange && outOfBounds
           return {
+            ...(locked && { disabled: false, 'aria-disabled': true, 'data-locked': true }),
             selected: sameDate(selectedDate, date) || (inRange && (isRangeStart || isRangeEnd)),
             inRange,
             firstInRange: inRange && isRangeStart,
             lastInRange: inRange && isRangeEnd,
-            onClick: () => onChange(toLocalIsoDate(date)),
+            onClick: () => {
+              if (!locked) onChange(toLocalIsoDate(date))
+            },
           }
         }}
         ariaLabels={{

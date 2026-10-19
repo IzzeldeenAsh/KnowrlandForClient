@@ -7,11 +7,11 @@ import { Fragment, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
+  BriefcaseIcon,
   ClipboardDocumentListIcon,
   DocumentTextIcon,
   GlobeAltIcon,
   PencilSquareIcon,
-  SparklesIcon,
 } from '@heroicons/react/24/solid'
 import { getApiUrl } from '@/app/config'
 import { getAuthToken } from '@/lib/authToken'
@@ -109,7 +109,7 @@ type ProjectRequestData = {
   duration_days?: number | null
 }
 
-type ReviewRow = {
+export type ReviewRow = {
   label: string
   value: string[]
   fileTypes?: string[]
@@ -120,6 +120,8 @@ type ReviewRow = {
   scopeGroups?: Array<{ name: string; subscopes: string[] }>
   editStepId?: string
   wide?: boolean
+  /** Small pill after the label, e.g. "Edited" in the agreement edit summary. */
+  badge?: string
 }
 
 type ReviewSection = {
@@ -159,7 +161,7 @@ const sectionIcons = [
     className: 'bg-sky-50 text-sky-500',
   },
   {
-    icon: SparklesIcon,
+    icon: BriefcaseIcon,
     className: 'bg-amber-50 text-amber-500',
   },
   {
@@ -664,7 +666,7 @@ function buildServiceComponentSections(params: {
     .filter((section): section is ReviewSection => Boolean(section))
 }
 
-function SectionBlock({
+export function SectionBlock({
   locale,
   plannedStartDate,
   title,
@@ -717,6 +719,11 @@ function SectionBlock({
           >
             <div className="mb-2 flex items-center gap-2">
               <div className="text-xs font-semibold text-slate-500">{row.label}</div>
+              {row.badge ? (
+                <span className="inline-flex rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700">
+                  {row.badge}
+                </span>
+              ) : null}
               {row.editStepId ? (
                 <Link
                   href={editHrefFor(row.editStepId)}
