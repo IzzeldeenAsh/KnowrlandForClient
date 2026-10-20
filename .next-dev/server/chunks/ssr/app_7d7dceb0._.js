@@ -5606,8 +5606,10 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconPhoto$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconPhoto$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconPhoto.mjs [app-ssr] (ecmascript) <export default as IconPhoto>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react.js [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$MyFeedsTimeline$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/feed/MyFeedsTimeline.tsx [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$feedImageProcessing$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/feed/feedImageProcessing.ts [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$feed$2e$service$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/services/feed.service.ts [app-ssr] (ecmascript)");
 'use client';
+;
 ;
 ;
 ;
@@ -5659,6 +5661,7 @@ function PostsTab({ uuid, locale, kind = 'insighter' }) {
     const copy = copyByLocale[locale === 'ar' ? 'ar' : 'en'][kind];
     const fetchFeed = kind === 'company' ? __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$feed$2e$service$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getCompanyProfileFeed"] : __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$feed$2e$service$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getInsighterProfileFeed"];
     const [items, setItems] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])([]);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$feedImageProcessing$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useFeedItemMediaUpdates"])(setItems);
     const [meta, setMeta] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
     const [isLoading, setIsLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(true);
     const [isLoadingMore, setIsLoadingMore] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
@@ -5740,12 +5743,12 @@ function PostsTab({ uuid, locale, kind = 'insighter' }) {
                     "aria-label": copy.loading,
                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$MyFeedsTimeline$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["FeedSkeleton"], {}, void 0, false, {
                         fileName: "[project]/app/[locale]/profile/[uuid]/components/PostsTab.tsx",
-                        lineNumber: 137,
+                        lineNumber: 139,
                         columnNumber: 13
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/app/[locale]/profile/[uuid]/components/PostsTab.tsx",
-                    lineNumber: 136,
+                    lineNumber: 138,
                     columnNumber: 11
                 }, this) : loadError && items.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
                     className: "rounded-lg border border-[#DCE4EF] bg-white px-6 py-12 text-center",
@@ -5755,7 +5758,7 @@ function PostsTab({ uuid, locale, kind = 'insighter' }) {
                             children: copy.loadError
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/profile/[uuid]/components/PostsTab.tsx",
-                            lineNumber: 141,
+                            lineNumber: 143,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -5765,13 +5768,13 @@ function PostsTab({ uuid, locale, kind = 'insighter' }) {
                             children: copy.tryAgain
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/profile/[uuid]/components/PostsTab.tsx",
-                            lineNumber: 142,
+                            lineNumber: 144,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/[locale]/profile/[uuid]/components/PostsTab.tsx",
-                    lineNumber: 140,
+                    lineNumber: 142,
                     columnNumber: 11
                 }, this) : items.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
                     className: "rounded-lg border border-[#DCE4EF] bg-white px-6 py-14 text-center",
@@ -5784,12 +5787,12 @@ function PostsTab({ uuid, locale, kind = 'insighter' }) {
                                 stroke: 1.7
                             }, void 0, false, {
                                 fileName: "[project]/app/[locale]/profile/[uuid]/components/PostsTab.tsx",
-                                lineNumber: 153,
+                                lineNumber: 155,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/profile/[uuid]/components/PostsTab.tsx",
-                            lineNumber: 152,
+                            lineNumber: 154,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -5797,7 +5800,7 @@ function PostsTab({ uuid, locale, kind = 'insighter' }) {
                             children: copy.emptyTitle
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/profile/[uuid]/components/PostsTab.tsx",
-                            lineNumber: 155,
+                            lineNumber: 157,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -5805,13 +5808,13 @@ function PostsTab({ uuid, locale, kind = 'insighter' }) {
                             children: copy.emptyDescription
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/profile/[uuid]/components/PostsTab.tsx",
-                            lineNumber: 156,
+                            lineNumber: 158,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/[locale]/profile/[uuid]/components/PostsTab.tsx",
-                    lineNumber: 151,
+                    lineNumber: 153,
                     columnNumber: 11
                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "space-y-4",
@@ -5821,12 +5824,12 @@ function PostsTab({ uuid, locale, kind = 'insighter' }) {
                             articleAccess: "community"
                         }, item.uuid, false, {
                             fileName: "[project]/app/[locale]/profile/[uuid]/components/PostsTab.tsx",
-                            lineNumber: 163,
+                            lineNumber: 165,
                             columnNumber: 15
                         }, this))
                 }, void 0, false, {
                     fileName: "[project]/app/[locale]/profile/[uuid]/components/PostsTab.tsx",
-                    lineNumber: 161,
+                    lineNumber: 163,
                     columnNumber: 11
                 }, this),
                 items.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5842,37 +5845,37 @@ function PostsTab({ uuid, locale, kind = 'insighter' }) {
                                 stroke: 2
                             }, void 0, false, {
                                 fileName: "[project]/app/[locale]/profile/[uuid]/components/PostsTab.tsx",
-                                lineNumber: 172,
+                                lineNumber: 174,
                                 columnNumber: 17
                             }, this),
                             copy.loadingMore
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/[locale]/profile/[uuid]/components/PostsTab.tsx",
-                        lineNumber: 171,
+                        lineNumber: 173,
                         columnNumber: 15
                     }, this) : !meta?.has_more ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                         className: "text-[12px] text-[#8A9AAF]",
                         children: copy.endOfFeed
                     }, void 0, false, {
                         fileName: "[project]/app/[locale]/profile/[uuid]/components/PostsTab.tsx",
-                        lineNumber: 176,
+                        lineNumber: 178,
                         columnNumber: 15
                     }, this) : null
                 }, void 0, false, {
                     fileName: "[project]/app/[locale]/profile/[uuid]/components/PostsTab.tsx",
-                    lineNumber: 169,
+                    lineNumber: 171,
                     columnNumber: 11
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/app/[locale]/profile/[uuid]/components/PostsTab.tsx",
-            lineNumber: 134,
+            lineNumber: 136,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/app/[locale]/profile/[uuid]/components/PostsTab.tsx",
-        lineNumber: 133,
+        lineNumber: 135,
         columnNumber: 5
     }, this);
 }

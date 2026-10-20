@@ -1,0 +1,75 @@
+/* [project]/components/project/questions/InlineDateCalendar.module.css [app-client] (css) */
+.InlineDateCalendar-module__8I3sfq__calendar .InlineDateCalendar-module__8I3sfq__day {
+  border-radius: 999px;
+}
+
+.InlineDateCalendar-module__8I3sfq__calendar .InlineDateCalendar-module__8I3sfq__day[data-in-range] {
+  border-radius: 0;
+}
+
+.InlineDateCalendar-module__8I3sfq__calendar .InlineDateCalendar-module__8I3sfq__day[data-first-in-range]:not(:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  border-top-left-radius: 999px;
+  border-bottom-left-radius: 999px;
+}
+
+.InlineDateCalendar-module__8I3sfq__calendar .InlineDateCalendar-module__8I3sfq__day[data-first-in-range]:not(:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  border-top-left-radius: 999px;
+  border-bottom-left-radius: 999px;
+}
+
+.InlineDateCalendar-module__8I3sfq__calendar .InlineDateCalendar-module__8I3sfq__day[data-first-in-range]:not(:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  border-top-left-radius: 999px;
+  border-bottom-left-radius: 999px;
+}
+
+.InlineDateCalendar-module__8I3sfq__calendar .InlineDateCalendar-module__8I3sfq__day[data-first-in-range]:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  border-top-right-radius: 999px;
+  border-bottom-right-radius: 999px;
+}
+
+.InlineDateCalendar-module__8I3sfq__calendar .InlineDateCalendar-module__8I3sfq__day[data-first-in-range]:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  border-top-right-radius: 999px;
+  border-bottom-right-radius: 999px;
+}
+
+.InlineDateCalendar-module__8I3sfq__calendar .InlineDateCalendar-module__8I3sfq__day[data-first-in-range]:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  border-top-right-radius: 999px;
+  border-bottom-right-radius: 999px;
+}
+
+.InlineDateCalendar-module__8I3sfq__calendar .InlineDateCalendar-module__8I3sfq__day[data-last-in-range]:not(:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  border-top-right-radius: 999px;
+  border-bottom-right-radius: 999px;
+}
+
+.InlineDateCalendar-module__8I3sfq__calendar .InlineDateCalendar-module__8I3sfq__day[data-last-in-range]:not(:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  border-top-right-radius: 999px;
+  border-bottom-right-radius: 999px;
+}
+
+.InlineDateCalendar-module__8I3sfq__calendar .InlineDateCalendar-module__8I3sfq__day[data-last-in-range]:not(:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  border-top-right-radius: 999px;
+  border-bottom-right-radius: 999px;
+}
+
+.InlineDateCalendar-module__8I3sfq__calendar .InlineDateCalendar-module__8I3sfq__day[data-last-in-range]:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  border-top-left-radius: 999px;
+  border-bottom-left-radius: 999px;
+}
+
+.InlineDateCalendar-module__8I3sfq__calendar .InlineDateCalendar-module__8I3sfq__day[data-last-in-range]:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  border-top-left-radius: 999px;
+  border-bottom-left-radius: 999px;
+}
+
+.InlineDateCalendar-module__8I3sfq__calendar .InlineDateCalendar-module__8I3sfq__day[data-last-in-range]:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  border-top-left-radius: 999px;
+  border-bottom-left-radius: 999px;
+}
+
+.InlineDateCalendar-module__8I3sfq__calendar .InlineDateCalendar-module__8I3sfq__day[data-locked] {
+  color: var(--mantine-color-dimmed);
+  cursor: default;
+}
+
+/*# sourceMappingURL=components_project_questions_InlineDateCalendar_module_css_bad6b30c._.single.css.map*/

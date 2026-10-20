@@ -4472,9 +4472,29 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{
     }
     return "".concat(DASHBOARD).concat(pathWithParamId(path, notification.param)).concat(search);
 }
+/**
+ * Agreement revisions open the project's revisions tab. The backend ships the
+ * exact URL; follow it when it points at a dashboard page. Revisions happen
+ * before signing, often before an award, so the insighter reviews them on the
+ * offer page rather than on-work details.
+ */ function agreementRevisionUrl(notification, roles) {
+    const { path, search } = partsFromBackendUrl(notification.url);
+    if (path.startsWith('/app/insighter-dashboard/')) {
+        return "".concat(DASHBOARD).concat(path.replace('/app/insighter-dashboard/on-work-projects/details/', '/app/insighter-dashboard/project-offers/details/')).concat(search);
+    }
+    const param = notification.param;
+    const insighterSide = notification.recipient_role ? notification.recipient_role === 'insighter' : isInsighterSide(roles);
+    if (!hasParam(param)) return insighterSide ? PROJECT_OFFERS : CLIENT_PROJECTS;
+    var _notification_revision_id;
+    const query = "?tab=revisions&revision=".concat(encodeURIComponent(String((_notification_revision_id = notification.revision_id) !== null && _notification_revision_id !== void 0 ? _notification_revision_id : '')));
+    return insighterSide ? "".concat(PROJECT_OFFERS, "/details/").concat(param).concat(query) : "".concat(CLIENT_PROJECTS, "/").concat(param).concat(query);
+}
 function routeForNotification(notification) {
     let roles = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : [];
     const param = notification.param;
+    if (notification.event_name === 'project.agreement.revision' || notification.sub_type === 'project_agreement_revision') {
+        return agreementRevisionUrl(notification, roles);
+    }
     // 1) Route by event_name (realtime broadcasts) — most reliable.
     switch(notification.event_name){
         case 'project.match.invited':
@@ -4867,6 +4887,8 @@ const getNotificationIconName = (subType, subTypeValue, message)=>{
             return 'duotune/communication/com007.svg';
         case 'project_proposal_offer':
             return 'keen:briefcase';
+        case 'project_agreement_revision':
+            return 'duotune/art/art005.svg';
         // Project notifications
         case 'project_proposal':
             return 'keen:briefcase';
@@ -4916,12 +4938,12 @@ const renderKeenIcon = (iconName, className)=>{
                 className: "path".concat(index + 1)
             }, index, false, {
                 fileName: "[project]/components/ui/header/components/NotificationsInner.tsx",
-                lineNumber: 389,
+                lineNumber: 391,
                 columnNumber: 9
             }, ("TURBOPACK compile-time value", void 0)))
     }, void 0, false, {
         fileName: "[project]/components/ui/header/components/NotificationsInner.tsx",
-        lineNumber: 387,
+        lineNumber: 389,
         columnNumber: 5
     }, ("TURBOPACK compile-time value", void 0));
 };
@@ -4949,7 +4971,7 @@ const getNotificationIcon = (subType, color, subTypeValue, message)=>{
         className: iconClassName
     }, void 0, false, {
         fileName: "[project]/components/ui/header/components/NotificationsInner.tsx",
-        lineNumber: 426,
+        lineNumber: 428,
         columnNumber: 5
     }, ("TURBOPACK compile-time value", void 0));
 };
@@ -5092,6 +5114,10 @@ const getNotificationName = (subType, language)=>{
         'project_cancelled': {
             en: 'Project Cancelled',
             ar: 'تم إلغاء المشروع'
+        },
+        'project_agreement_revision': {
+            en: 'Project Agreement Updated',
+            ar: 'تم تحديث اتفاق المشروع'
         }
     };
     const names = nameMap[subType];
@@ -5134,6 +5160,7 @@ const getNotificationTitle = (notification, language)=>{
         return rejected ? 'Project Offer Technically Rejected' : 'Project Offer Technically Accepted';
     }
     const projectSubTypes = new Set([
+        'project_agreement_revision',
         'project_offer_not_selected',
         'project_cancelled'
     ]);
@@ -5141,6 +5168,20 @@ const getNotificationTitle = (notification, language)=>{
         return getNotificationName(notification.sub_type, language);
     }
     return notification.sub_type_value || getNotificationName(notification.sub_type, language);
+};
+// Agreement revisions get a clearer message than the backend's, naming the revision to review.
+const getNotificationMessage = (notification, language)=>{
+    var _notification_changed_by;
+    var _notification_message;
+    if (notification.sub_type !== 'project_agreement_revision') return ((_notification_message = notification.message) !== null && _notification_message !== void 0 ? _notification_message : '').toString();
+    const revision = Number(notification.revision_number || notification.sub_type_value) || '';
+    const ar = language === 'ar';
+    var _notification_changed_by_name;
+    const name = ((_notification_changed_by_name = (_notification_changed_by = notification.changed_by) === null || _notification_changed_by === void 0 ? void 0 : _notification_changed_by.name) !== null && _notification_changed_by_name !== void 0 ? _notification_changed_by_name : '').trim();
+    var _notification_project_title;
+    const title = ((_notification_project_title = notification.project_title) !== null && _notification_project_title !== void 0 ? _notification_project_title : '').trim();
+    if (name && title) return ar ? "حدّث ".concat(name, " تفاصيل اتفاق «").concat(title, "». راجع المراجعة ").concat(revision, ".") : "".concat(name, " updated the agreement for “").concat(title, "”. Review revision ").concat(revision, ".");
+    return ar ? "تغيّرت تفاصيل الاتفاق. راجع المراجعة ".concat(revision, ".") : "The agreement details changed. Review revision ".concat(revision, ".");
 };
 function NotificationsInner(param) {
     let { notifications, parent, roles = [], onNotificationClick, onClickOutside } = param;
@@ -5169,7 +5210,7 @@ function NotificationsInner(param) {
                             children: t('TITLE')
                         }, void 0, false, {
                             fileName: "[project]/components/ui/header/components/NotificationsInner.tsx",
-                            lineNumber: 559,
+                            lineNumber: 578,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -5190,41 +5231,44 @@ function NotificationsInner(param) {
                                     d: "M6 18L18 6M6 6l12 12"
                                 }, void 0, false, {
                                     fileName: "[project]/components/ui/header/components/NotificationsInner.tsx",
-                                    lineNumber: 569,
+                                    lineNumber: 588,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/ui/header/components/NotificationsInner.tsx",
-                                lineNumber: 568,
+                                lineNumber: 587,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/components/ui/header/components/NotificationsInner.tsx",
-                            lineNumber: 562,
+                            lineNumber: 581,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/ui/header/components/NotificationsInner.tsx",
-                    lineNumber: 558,
+                    lineNumber: 577,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/ui/header/components/NotificationsInner.tsx",
-                lineNumber: 557,
+                lineNumber: 576,
                 columnNumber: 7
             }, this)
         }, void 0, false, {
             fileName: "[project]/components/ui/header/components/NotificationsInner.tsx",
-            lineNumber: 550,
+            lineNumber: 569,
             columnNumber: 5
         }, this);
     };
     const NotificationItem = (param)=>{
         let { notification } = param;
         const title = getNotificationTitle(notification, currentLanguage);
-        const messageText = htmlToText(notification.message);
-        const unreadMessageHtml = sanitizeNotificationHtml(notification.message);
+        const message = getNotificationMessage(notification, currentLanguage);
+        // The revision message is built from plain text (names, titles), so escape it rather than parse it as HTML.
+        const isRevision = notification.sub_type === 'project_agreement_revision';
+        const messageText = isRevision ? message : htmlToText(message);
+        const unreadMessageHtml = isRevision ? escapeHtml(message) : sanitizeNotificationHtml(message);
         return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
             onClick: ()=>handleNotificationClick(notification),
             role: "button",
@@ -5246,12 +5290,12 @@ function NotificationsInner(param) {
                             children: getNotificationIcon(notification.sub_type, getNotificationBg(notification.sub_type, notification.sub_type_value, notification.message), notification.sub_type_value, notification.message)
                         }, void 0, false, {
                             fileName: "[project]/components/ui/header/components/NotificationsInner.tsx",
-                            lineNumber: 603,
+                            lineNumber: 625,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/ui/header/components/NotificationsInner.tsx",
-                        lineNumber: 602,
+                        lineNumber: 624,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5265,7 +5309,7 @@ function NotificationsInner(param) {
                                 children: title
                             }, void 0, false, {
                                 fileName: "[project]/components/ui/header/components/NotificationsInner.tsx",
-                                lineNumber: 614,
+                                lineNumber: 636,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -5280,18 +5324,18 @@ function NotificationsInner(param) {
                                     }
                                 }, void 0, false, {
                                     fileName: "[project]/components/ui/header/components/NotificationsInner.tsx",
-                                    lineNumber: 622,
+                                    lineNumber: 644,
                                     columnNumber: 17
                                 }, this) : messageText
                             }, void 0, false, {
                                 fileName: "[project]/components/ui/header/components/NotificationsInner.tsx",
-                                lineNumber: 617,
+                                lineNumber: 639,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/ui/header/components/NotificationsInner.tsx",
-                        lineNumber: 613,
+                        lineNumber: 635,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5301,23 +5345,23 @@ function NotificationsInner(param) {
                             children: t('VIEW')
                         }, void 0, false, {
                             fileName: "[project]/components/ui/header/components/NotificationsInner.tsx",
-                            lineNumber: 633,
+                            lineNumber: 655,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/ui/header/components/NotificationsInner.tsx",
-                        lineNumber: 632,
+                        lineNumber: 654,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/ui/header/components/NotificationsInner.tsx",
-                lineNumber: 601,
+                lineNumber: 623,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/components/ui/header/components/NotificationsInner.tsx",
-            lineNumber: 589,
+            lineNumber: 611,
             columnNumber: 7
         }, this);
     };
@@ -5429,7 +5473,7 @@ function NotificationsInner(param) {
                 className: "jsx-2e35cc4f2b8f6ef8"
             }, void 0, false, {
                 fileName: "[project]/components/ui/header/components/NotificationsInner.tsx",
-                lineNumber: 743,
+                lineNumber: 765,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5454,12 +5498,12 @@ function NotificationsInner(param) {
                                         className: "jsx-2e35cc4f2b8f6ef8"
                                     }, void 0, false, {
                                         fileName: "[project]/components/ui/header/components/NotificationsInner.tsx",
-                                        lineNumber: 752,
+                                        lineNumber: 774,
                                         columnNumber: 17
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/components/ui/header/components/NotificationsInner.tsx",
-                                    lineNumber: 751,
+                                    lineNumber: 773,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -5467,37 +5511,37 @@ function NotificationsInner(param) {
                                     children: t('NO_NEW')
                                 }, void 0, false, {
                                     fileName: "[project]/components/ui/header/components/NotificationsInner.tsx",
-                                    lineNumber: 754,
+                                    lineNumber: 776,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/ui/header/components/NotificationsInner.tsx",
-                            lineNumber: 750,
+                            lineNumber: 772,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/ui/header/components/NotificationsInner.tsx",
-                        lineNumber: 749,
+                        lineNumber: 771,
                         columnNumber: 11
                     }, this),
                     notifications.length > 0 && notifications.map((notification)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(NotificationItem, {
                             notification: notification
                         }, notification.id, false, {
                             fileName: "[project]/components/ui/header/components/NotificationsInner.tsx",
-                            lineNumber: 761,
+                            lineNumber: 783,
                             columnNumber: 11
                         }, this))
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/ui/header/components/NotificationsInner.tsx",
-                lineNumber: 746,
+                lineNumber: 768,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/ui/header/components/NotificationsInner.tsx",
-        lineNumber: 727,
+        lineNumber: 749,
         columnNumber: 5
     }, this);
 }
@@ -6119,6 +6163,7 @@ _c = NotificationIcon;
 // These are routed to the Angular dashboard via routeForNotification(). See
 // utils/notificationRoute.ts for the per-event target URLs.
 const PROJECT_EVENTS = [
+    'project.agreement.revision',
     'project.proposal.offer',
     'project.match.invited',
     'project.client.closed',
@@ -6147,10 +6192,11 @@ function NotificationBell(param) {
     // `eventName` is the Pusher event name; capturing it makes routing reliable
     // (some events share the same sub_type).
     const mapEventToNotification = (data, eventName)=>{
-        var _data_id, _data_message, _data_type, _data_notifiable_group_id, _data_notifiable_id, _data_request_id, _data_param, _data_sub_type, _data_event_name;
+        var _data_id, _data_type, _data_notifiable_group_id, _data_notifiable_id, _data_request_id, _data_param, _data_sub_type, _data_event_name;
         return {
             id: (_data_id = data === null || data === void 0 ? void 0 : data.id) !== null && _data_id !== void 0 ? _data_id : "evt-".concat(Date.now()),
-            message: (_data_message = data === null || data === void 0 ? void 0 : data.message) !== null && _data_message !== void 0 ? _data_message : '',
+            // Some broadcasts ship an untranslated { key, variables } message; the list builds its own text for those.
+            message: typeof (data === null || data === void 0 ? void 0 : data.message) === 'string' ? data.message : '',
             type: (_data_type = data === null || data === void 0 ? void 0 : data.type) !== null && _data_type !== void 0 ? _data_type : 'notification',
             notifiable_group_id: (_data_notifiable_group_id = data === null || data === void 0 ? void 0 : data.notifiable_group_id) !== null && _data_notifiable_group_id !== void 0 ? _data_notifiable_group_id : '',
             notifiable_id: (_data_notifiable_id = data === null || data === void 0 ? void 0 : data.notifiable_id) !== null && _data_notifiable_id !== void 0 ? _data_notifiable_id : 0,
@@ -6164,7 +6210,12 @@ function NotificationBell(param) {
             sub_page: data === null || data === void 0 ? void 0 : data.sub_page,
             tap: data === null || data === void 0 ? void 0 : data.tap,
             category: data === null || data === void 0 ? void 0 : data.category,
-            event_name: (_data_event_name = data === null || data === void 0 ? void 0 : data.event_name) !== null && _data_event_name !== void 0 ? _data_event_name : eventName
+            event_name: (_data_event_name = data === null || data === void 0 ? void 0 : data.event_name) !== null && _data_event_name !== void 0 ? _data_event_name : eventName,
+            recipient_role: data === null || data === void 0 ? void 0 : data.recipient_role,
+            project_title: data === null || data === void 0 ? void 0 : data.project_title,
+            changed_by: data === null || data === void 0 ? void 0 : data.changed_by,
+            revision_id: data === null || data === void 0 ? void 0 : data.revision_id,
+            revision_number: data === null || data === void 0 ? void 0 : data.revision_number
         };
     };
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$hooks$2f$usePusherNotifications$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["usePusherNotificaitons"])({
@@ -6366,7 +6417,7 @@ function NotificationBell(param) {
                 onClick: closeNotifications
             }, void 0, false, {
                 fileName: "[project]/components/ui/header/components/NotificationBell.tsx",
-                lineNumber: 239,
+                lineNumber: 246,
                 columnNumber: 11
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6382,18 +6433,18 @@ function NotificationBell(param) {
                     onClickOutside: closeNotifications
                 }, void 0, false, {
                     fileName: "[project]/components/ui/header/components/NotificationBell.tsx",
-                    lineNumber: 250,
+                    lineNumber: 257,
                     columnNumber: 13
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/ui/header/components/NotificationBell.tsx",
-                lineNumber: 244,
+                lineNumber: 251,
                 columnNumber: 11
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/ui/header/components/NotificationBell.tsx",
-        lineNumber: 234,
+        lineNumber: 241,
         columnNumber: 9
     }, this), document.body) : null;
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6406,7 +6457,7 @@ function NotificationBell(param) {
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(NotificationIcon, {}, void 0, false, {
                         fileName: "[project]/components/ui/header/components/NotificationBell.tsx",
-                        lineNumber: 270,
+                        lineNumber: 277,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -6414,20 +6465,20 @@ function NotificationBell(param) {
                         children: notificationCount > 0 ? notificationCount : ''
                     }, void 0, false, {
                         fileName: "[project]/components/ui/header/components/NotificationBell.tsx",
-                        lineNumber: 271,
+                        lineNumber: 278,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/ui/header/components/NotificationBell.tsx",
-                lineNumber: 265,
+                lineNumber: 272,
                 columnNumber: 7
             }, this),
             drawerPortal
         ]
     }, void 0, true, {
         fileName: "[project]/components/ui/header/components/NotificationBell.tsx",
-        lineNumber: 264,
+        lineNumber: 271,
         columnNumber: 5
     }, this);
 }
@@ -6486,6 +6537,18 @@ function listProjectWizardStorageKeys(locale) {
     return keys;
 }
 const projectWizardStorage = {
+    definitionModeKey (locale) {
+        return "project:wizard:".concat(locale, ":definitionMode");
+    },
+    serviceScopeDeferredKey (locale) {
+        return "project:wizard:".concat(locale, ":serviceScopeDeferred");
+    },
+    /** Project service uuid whose AI intake finished with nothing left to ask. */ aiIntakeReadyKey (locale) {
+        return "project:wizard:".concat(locale, ":aiIntakeReady");
+    },
+    componentCatalogKey (locale) {
+        return "project:wizard:".concat(locale, ":componentCatalog");
+    },
     projectTypeKey (locale) {
         return "project:wizard:".concat(locale, ":projectType");
     },
@@ -6624,8 +6687,26 @@ const projectWizardStorage = {
     specifiedInsighterDisplayKey (locale) {
         return "project:wizard:".concat(locale, ":specifiedInsighterDisplay");
     },
-    deadlineKey (locale) {
-        return "project:wizard:".concat(locale, ":deadline");
+    projectServiceUuidKey (locale) {
+        return "project:wizard:".concat(locale, ":projectServiceUuid");
+    },
+    /** The project's first service — the one the main wizard flow edits. */ primaryProjectServiceUuidKey (locale) {
+        return "project:wizard:".concat(locale, ":primaryProjectServiceUuid");
+    },
+    /** Set while the client adds or edits an additional service from the review step. */ serviceFlowKey (locale) {
+        return "project:wizard:".concat(locale, ":serviceFlow");
+    },
+    /** Saved wizard answers of one project service. */ serviceSessionKey (locale, projectServiceUuid) {
+        return "project:wizard:".concat(locale, ":serviceSession:").concat(projectServiceUuid);
+    },
+    projectComponentSlugsKey (locale) {
+        return "project:wizard:".concat(locale, ":projectComponentSlugs");
+    },
+    plannedStartDateKey (locale) {
+        return "project:wizard:".concat(locale, ":plannedStartDate");
+    },
+    durationDaysKey (locale) {
+        return "project:wizard:".concat(locale, ":durationDays");
     }
 };
 function clearProjectWizardStorage(locale) {
@@ -7107,14 +7188,12 @@ function Header() {
         if (!isFeedPage && !searchQuery.trim()) return;
         handleSearch(searchQuery);
     };
-    // With a query typed, "By Insights" searches Insights right away; on an empty
-    // field it only switches where the next search goes.
+    // Enabling with a query opens Insights; disabling returns to feed search.
     const handleSearchInsightsChange = (active)=>{
-        if (searchQuery.trim()) {
-            router.push((0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$FeedSearchScopeToggle$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getInsightsSearchHref"])(currentLocale, searchQuery));
-            return;
-        }
         setSearchInsights(active);
+        if (active && searchQuery.trim()) {
+            router.push((0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$FeedSearchScopeToggle$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getInsightsSearchHref"])(currentLocale, searchQuery));
+        }
     };
     const clearFeedSearch = ()=>{
         setSearchQuery('');
@@ -7215,7 +7294,7 @@ function Header() {
             className: "absolute inset-x-2 -bottom-[10px] h-[3px] rounded-full bg-[#3B8AEF]"
         }, void 0, false, {
             fileName: "[project]/components/ui/header.tsx",
-            lineNumber: 422,
+            lineNumber: 420,
             columnNumber: 7
         }, this) : null;
     };
@@ -7350,12 +7429,12 @@ function Header() {
                                 className: "absolute inset-0 -z-1"
                             }, void 0, false, {
                                 fileName: "[project]/components/ui/header.tsx",
-                                lineNumber: 575,
+                                lineNumber: 573,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/components/ui/header.tsx",
-                            lineNumber: 574,
+                            lineNumber: 572,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7370,12 +7449,12 @@ function Header() {
                                                 isHomePage: true
                                             }, void 0, false, {
                                                 fileName: "[project]/components/ui/header.tsx",
-                                                lineNumber: 587,
+                                                lineNumber: 585,
                                                 columnNumber: 17
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/components/ui/header.tsx",
-                                            lineNumber: 586,
+                                            lineNumber: 584,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("nav", {
@@ -7406,7 +7485,7 @@ function Header() {
                                                                             rx: "1"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/ui/header.tsx",
-                                                                            lineNumber: 600,
+                                                                            lineNumber: 598,
                                                                             columnNumber: 25
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
@@ -7417,7 +7496,7 @@ function Header() {
                                                                             rx: "1"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/ui/header.tsx",
-                                                                            lineNumber: 601,
+                                                                            lineNumber: 599,
                                                                             columnNumber: 25
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
@@ -7428,7 +7507,7 @@ function Header() {
                                                                             rx: "1"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/ui/header.tsx",
-                                                                            lineNumber: 602,
+                                                                            lineNumber: 600,
                                                                             columnNumber: 25
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
@@ -7439,7 +7518,7 @@ function Header() {
                                                                             rx: "1"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/ui/header.tsx",
-                                                                            lineNumber: 603,
+                                                                            lineNumber: 601,
                                                                             columnNumber: 25
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
@@ -7450,7 +7529,7 @@ function Header() {
                                                                             rx: "1"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/ui/header.tsx",
-                                                                            lineNumber: 604,
+                                                                            lineNumber: 602,
                                                                             columnNumber: 25
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
@@ -7461,25 +7540,25 @@ function Header() {
                                                                             rx: "1"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/ui/header.tsx",
-                                                                            lineNumber: 605,
+                                                                            lineNumber: 603,
                                                                             columnNumber: 25
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/components/ui/header.tsx",
-                                                                    lineNumber: 599,
+                                                                    lineNumber: 597,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 t('navigation.feed')
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/ui/header.tsx",
-                                                            lineNumber: 594,
+                                                            lineNumber: 592,
                                                             columnNumber: 21
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/ui/header.tsx",
-                                                        lineNumber: 593,
+                                                        lineNumber: 591,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
@@ -7492,18 +7571,18 @@ function Header() {
                                                                     active: isActiveNav('home')
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/ui/header.tsx",
-                                                                    lineNumber: 613,
+                                                                    lineNumber: 611,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/ui/header.tsx",
-                                                            lineNumber: 611,
+                                                            lineNumber: 609,
                                                             columnNumber: 21
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/ui/header.tsx",
-                                                        lineNumber: 610,
+                                                        lineNumber: 608,
                                                         columnNumber: 19
                                                     }, this),
                                                     !isFeedPage && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
@@ -7524,7 +7603,7 @@ function Header() {
                                                                                 children: t('navigation.industries')
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/components/ui/header.tsx",
-                                                                                lineNumber: 624,
+                                                                                lineNumber: 622,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconChevronDown$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconChevronDown$3e$__["IconChevronDown"], {
@@ -7532,25 +7611,25 @@ function Header() {
                                                                                 className: "group-hover:translate-y-0.5 transition-transform duration-200"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/components/ui/header.tsx",
-                                                                                lineNumber: 625,
+                                                                                lineNumber: 623,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(NavUnderline, {
                                                                                 active: isActiveNav('industries')
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/components/ui/header.tsx",
-                                                                                lineNumber: 626,
+                                                                                lineNumber: 624,
                                                                                 columnNumber: 27
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/components/ui/header.tsx",
-                                                                        lineNumber: 623,
+                                                                        lineNumber: 621,
                                                                         columnNumber: 25
                                                                     }, this)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/ui/header.tsx",
-                                                                    lineNumber: 622,
+                                                                    lineNumber: 620,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$HoverCard$2f$HoverCard$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["HoverCard"].Dropdown, {
@@ -7572,7 +7651,7 @@ function Header() {
                                                                                     children: t('industriesDropdown.featuredTitle')
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/components/ui/header.tsx",
-                                                                                    lineNumber: 635,
+                                                                                    lineNumber: 633,
                                                                                     columnNumber: 27
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Anchor$2f$Anchor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Anchor"], {
@@ -7582,13 +7661,13 @@ function Header() {
                                                                                     children: t('industriesDropdown.viewAll')
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/components/ui/header.tsx",
-                                                                                    lineNumber: 636,
+                                                                                    lineNumber: 634,
                                                                                     columnNumber: 27
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/components/ui/header.tsx",
-                                                                            lineNumber: 634,
+                                                                            lineNumber: 632,
                                                                             columnNumber: 25
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Divider$2f$Divider$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Divider"], {
@@ -7597,7 +7676,7 @@ function Header() {
                                                                             className: "opacity-50 hover:opacity-80 transition-opacity duration-200"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/ui/header.tsx",
-                                                                            lineNumber: 645,
+                                                                            lineNumber: 643,
                                                                             columnNumber: 25
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$SimpleGrid$2f$SimpleGrid$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SimpleGrid"], {
@@ -7621,7 +7700,7 @@ function Header() {
                                                                                                         children: industry.name
                                                                                                     }, void 0, false, {
                                                                                                         fileName: "[project]/components/ui/header.tsx",
-                                                                                                        lineNumber: 657,
+                                                                                                        lineNumber: 655,
                                                                                                         columnNumber: 37
                                                                                                     }, this),
                                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Text$2f$Text$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Text"], {
@@ -7631,33 +7710,33 @@ function Header() {
                                                                                                         children: t('industriesDropdown.exploreText')
                                                                                                     }, void 0, false, {
                                                                                                         fileName: "[project]/components/ui/header.tsx",
-                                                                                                        lineNumber: 660,
+                                                                                                        lineNumber: 658,
                                                                                                         columnNumber: 37
                                                                                                     }, this)
                                                                                                 ]
                                                                                             }, void 0, true, {
                                                                                                 fileName: "[project]/components/ui/header.tsx",
-                                                                                                lineNumber: 656,
+                                                                                                lineNumber: 654,
                                                                                                 columnNumber: 35
                                                                                             }, this)
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/components/ui/header.tsx",
-                                                                                            lineNumber: 655,
+                                                                                            lineNumber: 653,
                                                                                             columnNumber: 33
                                                                                         }, this)
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/components/ui/header.tsx",
-                                                                                        lineNumber: 654,
+                                                                                        lineNumber: 652,
                                                                                         columnNumber: 31
                                                                                     }, this)
                                                                                 }, industry.id, false, {
                                                                                     fileName: "[project]/components/ui/header.tsx",
-                                                                                    lineNumber: 649,
+                                                                                    lineNumber: 647,
                                                                                     columnNumber: 29
                                                                                 }, this))
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/ui/header.tsx",
-                                                                            lineNumber: 647,
+                                                                            lineNumber: 645,
                                                                             columnNumber: 25
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7675,7 +7754,7 @@ function Header() {
                                                                                                 children: t('industriesDropdown.exploreAllTitle')
                                                                                             }, void 0, false, {
                                                                                                 fileName: "[project]/components/ui/header.tsx",
-                                                                                                lineNumber: 673,
+                                                                                                lineNumber: 671,
                                                                                                 columnNumber: 31
                                                                                             }, this),
                                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Text$2f$Text$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Text"], {
@@ -7685,13 +7764,13 @@ function Header() {
                                                                                                 children: t('industriesDropdown.exploreAllDescription')
                                                                                             }, void 0, false, {
                                                                                                 fileName: "[project]/components/ui/header.tsx",
-                                                                                                lineNumber: 676,
+                                                                                                lineNumber: 674,
                                                                                                 columnNumber: 31
                                                                                             }, this)
                                                                                         ]
                                                                                     }, void 0, true, {
                                                                                         fileName: "[project]/components/ui/header.tsx",
-                                                                                        lineNumber: 672,
+                                                                                        lineNumber: 670,
                                                                                         columnNumber: 29
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Button$2f$Button$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -7702,35 +7781,35 @@ function Header() {
                                                                                         children: t('industriesDropdown.browseAll')
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/components/ui/header.tsx",
-                                                                                        lineNumber: 680,
+                                                                                        lineNumber: 678,
                                                                                         columnNumber: 29
                                                                                     }, this)
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/components/ui/header.tsx",
-                                                                                lineNumber: 671,
+                                                                                lineNumber: 669,
                                                                                 columnNumber: 27
                                                                             }, this)
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/ui/header.tsx",
-                                                                            lineNumber: 670,
+                                                                            lineNumber: 668,
                                                                             columnNumber: 25
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/components/ui/header.tsx",
-                                                                    lineNumber: 630,
+                                                                    lineNumber: 628,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/ui/header.tsx",
-                                                            lineNumber: 618,
+                                                            lineNumber: 616,
                                                             columnNumber: 21
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/ui/header.tsx",
-                                                        lineNumber: 617,
+                                                        lineNumber: 615,
                                                         columnNumber: 19
                                                     }, this),
                                                     !isFeedPage && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
@@ -7751,7 +7830,7 @@ function Header() {
                                                                                 children: t('navigation.types')
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/components/ui/header.tsx",
-                                                                                lineNumber: 702,
+                                                                                lineNumber: 700,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconChevronDown$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconChevronDown$3e$__["IconChevronDown"], {
@@ -7759,25 +7838,25 @@ function Header() {
                                                                                 className: "group-hover:translate-y-0.5 transition-transform duration-200"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/components/ui/header.tsx",
-                                                                                lineNumber: 703,
+                                                                                lineNumber: 701,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(NavUnderline, {
                                                                                 active: isActiveNav('types')
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/components/ui/header.tsx",
-                                                                                lineNumber: 704,
+                                                                                lineNumber: 702,
                                                                                 columnNumber: 27
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/components/ui/header.tsx",
-                                                                        lineNumber: 701,
+                                                                        lineNumber: 699,
                                                                         columnNumber: 25
                                                                     }, this)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/ui/header.tsx",
-                                                                    lineNumber: 700,
+                                                                    lineNumber: 698,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$HoverCard$2f$HoverCard$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["HoverCard"].Dropdown, {
@@ -7797,45 +7876,45 @@ function Header() {
                                                                                     children: label
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/components/ui/header.tsx",
-                                                                                    lineNumber: 715,
+                                                                                    lineNumber: 713,
                                                                                     columnNumber: 31
                                                                                 }, this)
                                                                             }, slug, false, {
                                                                                 fileName: "[project]/components/ui/header.tsx",
-                                                                                lineNumber: 714,
+                                                                                lineNumber: 712,
                                                                                 columnNumber: 29
                                                                             }, this);
                                                                         })
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/components/ui/header.tsx",
-                                                                        lineNumber: 712,
+                                                                        lineNumber: 710,
                                                                         columnNumber: 25
                                                                     }, this)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/ui/header.tsx",
-                                                                    lineNumber: 708,
+                                                                    lineNumber: 706,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/ui/header.tsx",
-                                                            lineNumber: 696,
+                                                            lineNumber: 694,
                                                             columnNumber: 21
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/ui/header.tsx",
-                                                        lineNumber: 695,
+                                                        lineNumber: 693,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/ui/header.tsx",
-                                                lineNumber: 592,
+                                                lineNumber: 590,
                                                 columnNumber: 17
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/components/ui/header.tsx",
-                                            lineNumber: 591,
+                                            lineNumber: 589,
                                             columnNumber: 15
                                         }, this),
                                         !shouldHideSearchBar() && !isFeedPage && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7871,12 +7950,12 @@ function Header() {
                                                                 size: 16
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/ui/header.tsx",
-                                                                lineNumber: 770,
+                                                                lineNumber: 768,
                                                                 columnNumber: 31
                                                             }, void 0)
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/ui/header.tsx",
-                                                            lineNumber: 765,
+                                                            lineNumber: 763,
                                                             columnNumber: 29
                                                         }, void 0) : undefined
                                                     } : {
@@ -7888,12 +7967,12 @@ function Header() {
                                                                 size: 16
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/ui/header.tsx",
-                                                                lineNumber: 781,
+                                                                lineNumber: 779,
                                                                 columnNumber: 31
                                                             }, void 0)
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/ui/header.tsx",
-                                                            lineNumber: 776,
+                                                            lineNumber: 774,
                                                             columnNumber: 29
                                                         }, void 0) : undefined
                                                     },
@@ -7902,17 +7981,17 @@ function Header() {
                                                     }
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/ui/header.tsx",
-                                                    lineNumber: 738,
+                                                    lineNumber: 736,
                                                     columnNumber: 21
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/components/ui/header.tsx",
-                                                lineNumber: 737,
+                                                lineNumber: 735,
                                                 columnNumber: 19
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/components/ui/header.tsx",
-                                            lineNumber: 736,
+                                            lineNumber: 734,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
@@ -7946,7 +8025,7 @@ function Header() {
                                                                                 stopColor: "#fef08a"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/components/ui/header.tsx",
-                                                                                lineNumber: 807,
+                                                                                lineNumber: 805,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("stop", {
@@ -7954,7 +8033,7 @@ function Header() {
                                                                                 stopColor: "#facc15"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/components/ui/header.tsx",
-                                                                                lineNumber: 808,
+                                                                                lineNumber: 806,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("stop", {
@@ -7962,18 +8041,18 @@ function Header() {
                                                                                 stopColor: "#eab308"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/components/ui/header.tsx",
-                                                                                lineNumber: 809,
+                                                                                lineNumber: 807,
                                                                                 columnNumber: 27
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/components/ui/header.tsx",
-                                                                        lineNumber: 806,
+                                                                        lineNumber: 804,
                                                                         columnNumber: 25
                                                                     }, this)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/ui/header.tsx",
-                                                                    lineNumber: 805,
+                                                                    lineNumber: 803,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
@@ -7984,7 +8063,7 @@ function Header() {
                                                                     rx: "1"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/ui/header.tsx",
-                                                                    lineNumber: 812,
+                                                                    lineNumber: 810,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
@@ -7995,7 +8074,7 @@ function Header() {
                                                                     rx: "1"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/ui/header.tsx",
-                                                                    lineNumber: 813,
+                                                                    lineNumber: 811,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
@@ -8006,7 +8085,7 @@ function Header() {
                                                                     rx: "1"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/ui/header.tsx",
-                                                                    lineNumber: 814,
+                                                                    lineNumber: 812,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
@@ -8017,7 +8096,7 @@ function Header() {
                                                                     rx: "1"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/ui/header.tsx",
-                                                                    lineNumber: 815,
+                                                                    lineNumber: 813,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
@@ -8028,7 +8107,7 @@ function Header() {
                                                                     rx: "1"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/ui/header.tsx",
-                                                                    lineNumber: 816,
+                                                                    lineNumber: 814,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
@@ -8039,23 +8118,23 @@ function Header() {
                                                                     rx: "1"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/ui/header.tsx",
-                                                                    lineNumber: 817,
+                                                                    lineNumber: 815,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/ui/header.tsx",
-                                                            lineNumber: 804,
+                                                            lineNumber: 802,
                                                             columnNumber: 21
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/ui/header.tsx",
-                                                        lineNumber: 798,
+                                                        lineNumber: 796,
                                                         columnNumber: 19
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/ui/header.tsx",
-                                                    lineNumber: 797,
+                                                    lineNumber: 795,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
@@ -8069,17 +8148,17 @@ function Header() {
                                                             "aria-hidden": "true"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/ui/header.tsx",
-                                                            lineNumber: 827,
+                                                            lineNumber: 825,
                                                             columnNumber: 21
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/ui/header.tsx",
-                                                        lineNumber: 822,
+                                                        lineNumber: 820,
                                                         columnNumber: 19
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/ui/header.tsx",
-                                                    lineNumber: 821,
+                                                    lineNumber: 819,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
@@ -8095,7 +8174,7 @@ function Header() {
                                                                     className: "".concat(isScrolled ? 'text-white' : 'text-gray-200')
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/ui/header.tsx",
-                                                                    lineNumber: 838,
+                                                                    lineNumber: 836,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -8103,23 +8182,23 @@ function Header() {
                                                                     children: currentLocale === 'en' ? t('language.switchToArabic') : t('language.switchToEnglish')
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/ui/header.tsx",
-                                                                    lineNumber: 839,
+                                                                    lineNumber: 837,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/ui/header.tsx",
-                                                            lineNumber: 834,
+                                                            lineNumber: 832,
                                                             columnNumber: 21
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/ui/header.tsx",
-                                                        lineNumber: 833,
+                                                        lineNumber: 831,
                                                         columnNumber: 19
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/ui/header.tsx",
-                                                    lineNumber: 832,
+                                                    lineNumber: 830,
                                                     columnNumber: 17
                                                 }, this),
                                                 !shouldShowAuthSkeleton && user && (roles.includes('insighter') || roles.includes('company') || roles.includes('company-insighter')) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
@@ -8135,17 +8214,17 @@ function Header() {
                                                             "aria-hidden": true
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/ui/header.tsx",
-                                                            lineNumber: 855,
+                                                            lineNumber: 853,
                                                             columnNumber: 23
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/ui/header.tsx",
-                                                        lineNumber: 849,
+                                                        lineNumber: 847,
                                                         columnNumber: 21
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/ui/header.tsx",
-                                                    lineNumber: 848,
+                                                    lineNumber: 846,
                                                     columnNumber: 19
                                                 }, this),
                                                 !shouldShowAuthSkeleton && !isProjectRoute() && !roles.includes('insighter') && !roles.includes('company') && !roles.includes('company-insighter') && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
@@ -8167,7 +8246,7 @@ function Header() {
                                                                         children: ctaPrefix
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/components/ui/header.tsx",
-                                                                        lineNumber: 873,
+                                                                        lineNumber: 871,
                                                                         columnNumber: 25
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -8177,18 +8256,18 @@ function Header() {
                                                                             children: currentCtaWord
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/ui/header.tsx",
-                                                                            lineNumber: 877,
+                                                                            lineNumber: 875,
                                                                             columnNumber: 27
                                                                         }, this)
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/components/ui/header.tsx",
-                                                                        lineNumber: 874,
+                                                                        lineNumber: 872,
                                                                         columnNumber: 25
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/components/ui/header.tsx",
-                                                                lineNumber: 868,
+                                                                lineNumber: 866,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -8196,18 +8275,18 @@ function Header() {
                                                                 children: ctaAccessibleLabel
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/ui/header.tsx",
-                                                                lineNumber: 880,
+                                                                lineNumber: 878,
                                                                 columnNumber: 23
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/components/ui/header.tsx",
-                                                        lineNumber: 863,
+                                                        lineNumber: 861,
                                                         columnNumber: 21
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/ui/header.tsx",
-                                                    lineNumber: 862,
+                                                    lineNumber: 860,
                                                     columnNumber: 19
                                                 }, this),
                                                 !shouldHideSearchBar() && !isFeedPage && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
@@ -8222,29 +8301,29 @@ function Header() {
                                                             size: 18
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/ui/header.tsx",
-                                                            lineNumber: 895,
+                                                            lineNumber: 893,
                                                             columnNumber: 23
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/ui/header.tsx",
-                                                        lineNumber: 888,
+                                                        lineNumber: 886,
                                                         columnNumber: 21
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/ui/header.tsx",
-                                                    lineNumber: 887,
+                                                    lineNumber: 885,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
                                                     className: "me-2 md:me-4 flex items-center relative z-20",
                                                     children: user ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$header$2f$components$2f$NotificationBell$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                                                         fileName: "[project]/components/ui/header.tsx",
-                                                        lineNumber: 902,
+                                                        lineNumber: 900,
                                                         columnNumber: 27
                                                     }, this) : ''
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/ui/header.tsx",
-                                                    lineNumber: 901,
+                                                    lineNumber: 899,
                                                     columnNumber: 17
                                                 }, this),
                                                 shouldShowAuthSkeleton ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
@@ -8253,30 +8332,30 @@ function Header() {
                                                         className: "w-10 h-10 bg-white/80 animate-pulse rounded-full overflow-hidden border border-white/20"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/ui/header.tsx",
-                                                        lineNumber: 908,
+                                                        lineNumber: 906,
                                                         columnNumber: 23
                                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                         className: "h-9 w-24 bg-white/20 animate-pulse rounded-full overflow-hidden border border-white/10"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/ui/header.tsx",
-                                                        lineNumber: 910,
+                                                        lineNumber: 908,
                                                         columnNumber: 23
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/ui/header.tsx",
-                                                    lineNumber: 906,
+                                                    lineNumber: 904,
                                                     columnNumber: 19
                                                 }, this) : user ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
                                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$header$2f$components$2f$UserProfile$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["UserProfile"], {
                                                         isHome: true
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/ui/header.tsx",
-                                                        lineNumber: 915,
+                                                        lineNumber: 913,
                                                         columnNumber: 21
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/ui/header.tsx",
-                                                    lineNumber: 914,
+                                                    lineNumber: 912,
                                                     columnNumber: 19
                                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
                                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -8292,42 +8371,42 @@ function Header() {
                                                                     children: ">"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/ui/header.tsx",
-                                                                    lineNumber: 922,
+                                                                    lineNumber: 920,
                                                                     columnNumber: 43
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/ui/header.tsx",
-                                                            lineNumber: 921,
+                                                            lineNumber: 919,
                                                             columnNumber: 23
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/ui/header.tsx",
-                                                        lineNumber: 919,
+                                                        lineNumber: 917,
                                                         columnNumber: 21
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/ui/header.tsx",
-                                                    lineNumber: 918,
+                                                    lineNumber: 916,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/ui/header.tsx",
-                                            lineNumber: 795,
+                                            lineNumber: 793,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$mobile$2d$menu$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                                             isHomePage: true
                                         }, void 0, false, {
                                             fileName: "[project]/components/ui/header.tsx",
-                                            lineNumber: 929,
+                                            lineNumber: 927,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/ui/header.tsx",
-                                    lineNumber: 583,
+                                    lineNumber: 581,
                                     columnNumber: 13
                                 }, this),
                                 isFeedPage && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8362,12 +8441,12 @@ function Header() {
                                                             "aria-hidden": true
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/ui/header.tsx",
-                                                            lineNumber: 965,
+                                                            lineNumber: 963,
                                                             columnNumber: 29
                                                         }, void 0)
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/ui/header.tsx",
-                                                        lineNumber: 960,
+                                                        lineNumber: 958,
                                                         columnNumber: 27
                                                     }, void 0);
                                                     // Clear + Insights toggle sit at the inline end of the field.
@@ -8383,12 +8462,12 @@ function Header() {
                                                                     size: 17
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/ui/header.tsx",
-                                                                    lineNumber: 978,
+                                                                    lineNumber: 976,
                                                                     columnNumber: 33
                                                                 }, void 0)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/ui/header.tsx",
-                                                                lineNumber: 972,
+                                                                lineNumber: 970,
                                                                 columnNumber: 31
                                                             }, void 0),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$FeedSearchScopeToggle$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -8397,13 +8476,13 @@ function Header() {
                                                                 onChange: handleSearchInsightsChange
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/ui/header.tsx",
-                                                                lineNumber: 981,
+                                                                lineNumber: 979,
                                                                 columnNumber: 29
                                                             }, void 0)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/components/ui/header.tsx",
-                                                        lineNumber: 970,
+                                                        lineNumber: 968,
                                                         columnNumber: 27
                                                     }, void 0);
                                                     const endSectionWidth = (isArabicLocale ? 118 : 96) + (hasSearchQuery ? 30 : 0);
@@ -8420,39 +8499,39 @@ function Header() {
                                                 styles: feedSearchInputStyles
                                             }, void 0, false, {
                                                 fileName: "[project]/components/ui/header.tsx",
-                                                lineNumber: 944,
+                                                lineNumber: 942,
                                                 columnNumber: 21
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/components/ui/header.tsx",
-                                            lineNumber: 936,
+                                            lineNumber: 934,
                                             columnNumber: 19
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/components/ui/header.tsx",
-                                        lineNumber: 935,
+                                        lineNumber: 933,
                                         columnNumber: 17
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/components/ui/header.tsx",
-                                    lineNumber: 934,
+                                    lineNumber: 932,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/ui/header.tsx",
-                            lineNumber: 582,
+                            lineNumber: 580,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/ui/header.tsx",
-                    lineNumber: 565,
+                    lineNumber: 563,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/ui/header.tsx",
-                lineNumber: 562,
+                lineNumber: 560,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8460,7 +8539,7 @@ function Header() {
                 className: "h-16 md:h-20"
             }, void 0, false, {
                 fileName: "[project]/components/ui/header.tsx",
-                lineNumber: 1003,
+                lineNumber: 1001,
                 columnNumber: 7
             }, this)
         ]

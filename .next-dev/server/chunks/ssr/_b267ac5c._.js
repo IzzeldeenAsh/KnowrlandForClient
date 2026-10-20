@@ -1392,7 +1392,9 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
         characterCount: isRTL ? 'عدد الأحرف' : 'Character Count',
         checkOutPost: isWhitePaper ? isRTL ? 'اطّلع على هذه الورقة البيضاء على انسايتا: ' : 'Check out this white paper on Insighta: ' : isRTL ? 'اطّلع على هذا المنشور على انسايتا: ' : 'Check out this post on Insighta: ',
         facebookTextCopied: isRTL ? 'لا يسمح فيسبوك بتعبئة النص مسبقًا. نسخنا رسالتك — الصقها في مربع النشر على فيسبوك.' : 'Facebook does not allow pre-filled text. We copied your message — paste it into the Facebook composer.',
-        facebookTextManual: isRTL ? 'لا يسمح فيسبوك بتعبئة النص مسبقًا. انسخ رسالتك من الأعلى والصقها في مربع النشر على فيسبوك.' : 'Facebook does not allow pre-filled text. Copy your message above and paste it into the Facebook composer.'
+        facebookTextManual: isRTL ? 'لا يسمح فيسبوك بتعبئة النص مسبقًا. انسخ رسالتك من الأعلى والصقها في مربع النشر على فيسبوك.' : 'Facebook does not allow pre-filled text. Copy your message above and paste it into the Facebook composer.',
+        facebookShareSheetCopied: isRTL ? 'اختر فيسبوك من قائمة المشاركة. نسخنا رسالتك — الصقها في منشورك على فيسبوك.' : 'Choose Facebook in the share menu. We copied your message — paste it into your Facebook post.',
+        facebookShareSheetManual: isRTL ? 'اختر فيسبوك من قائمة المشاركة، ثم انسخ رسالتك من الأعلى والصقها في منشورك على فيسبوك.' : 'Choose Facebook in the share menu, then copy your message above and paste it into your Facebook post.'
     };
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
         if (!active) return;
@@ -1420,9 +1422,20 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
     const openShareWindow = (url)=>{
         // Always a new tab: passing no window features keeps the browser's default
         // tab behaviour, and the current page must stay put so the share surface
-        // survives.
-        const opened = window.open(url, '_blank', 'noopener,noreferrer');
-        if (opened) return;
+        // survives. No `noopener` feature: with it `window.open` returns null even
+        // when the tab opened, so the fallbacks below ran on every click and opened
+        // the share twice (on mobile, also navigating this page away). The opener
+        // is cut by hand instead, while the new tab is still on its initial
+        // same-origin about:blank.
+        const opened = window.open(url, '_blank');
+        if (opened) {
+            try {
+                opened.opener = null;
+            } catch  {
+            // Already cross-origin; nothing more to do.
+            }
+            return;
+        }
         // On mobile a synthetic <a> click is what iOS/Android treat as a user tap on
         // a universal/app link, which hands facebook.com URLs to the Facebook app —
         // and the app has no handler for sharer.php, so it lands on its home screen
@@ -1463,16 +1476,41 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
         }
         if (!socialUrl) return;
         if (platform === 'facebook') {
-            // The Facebook button goes to Facebook on every platform. It used to hand
-            // mobile off to `navigator.share`, which showed the OS share sheet
-            // (AirDrop, Messages, Mail…) on top of our own share modal instead of the
-            // Facebook composer the button promises.
-            //
             // Facebook removed pre-filled share text (the `quote` parameter) back in
             // 2017, so the personal message is copied to the clipboard for pasting.
-            const copied = await copyToClipboard(customShareMessage);
-            setFacebookNotice(copied ? 'copied' : 'manual');
+            //
+            // Every call below must start synchronously inside the click: Safari
+            // blocks a `window.open` that follows an `await`, `navigator.share`
+            // needs the tap's user activation, and Chrome rejects a clipboard write
+            // once the new tab has taken focus. So the copy starts first, the share
+            // opens, and only then is the copy result awaited.
+            const copyResult = copyToClipboard(customShareMessage);
+            // On phones the Facebook app claims facebook.com links, has no handler
+            // for sharer.php, and drops the user on its home feed without a
+            // composer. The OS share sheet hands the link to the app's own share
+            // composer instead. Only the URL is passed: Facebook discards shared
+            // text, and the link is what it builds the post preview from.
+            if (isMobileDevice() && typeof navigator.share === 'function') {
+                const shareResult = navigator.share({
+                    url: shareUrl
+                });
+                const copied = await copyResult;
+                setFacebookNotice(copied ? 'shareSheetCopied' : 'shareSheetManual');
+                try {
+                    await shareResult;
+                } catch (err) {
+                    // Closing the sheet is a normal outcome; anything else means the
+                    // sheet could not open, so fall back to the web composer.
+                    if (!(err instanceof DOMException && err.name === 'AbortError')) {
+                        setFacebookNotice(copied ? 'copied' : 'manual');
+                        openShareWindow(socialUrl);
+                    }
+                }
+                return;
+            }
             openShareWindow(socialUrl);
+            const copied = await copyResult;
+            setFacebookNotice(copied ? 'copied' : 'manual');
             return;
         }
         // The share surface stays open on purpose: the share happens in a new tab,
@@ -1489,7 +1527,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
                         children: t.customShareMessage
                     }, void 0, false, {
                         fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                        lineNumber: 161,
+                        lineNumber: 205,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("textarea", {
@@ -1501,13 +1539,13 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
                         placeholder: t.shareMessageHint
                     }, void 0, false, {
                         fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                        lineNumber: 164,
+                        lineNumber: 208,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0))
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                lineNumber: 160,
+                lineNumber: 204,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0)),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1521,12 +1559,12 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                    lineNumber: 175,
+                    lineNumber: 219,
                     columnNumber: 9
                 }, ("TURBOPACK compile-time value", void 0))
             }, void 0, false, {
                 fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                lineNumber: 174,
+                lineNumber: 218,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0)),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1550,17 +1588,17 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
                                 fill: "white"
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                                lineNumber: 189,
+                                lineNumber: 233,
                                 columnNumber: 13
                             }, ("TURBOPACK compile-time value", void 0))
                         }, void 0, false, {
                             fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                            lineNumber: 188,
+                            lineNumber: 232,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0))
                     }, void 0, false, {
                         fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                        lineNumber: 182,
+                        lineNumber: 226,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1581,17 +1619,17 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
                                 fill: "white"
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                                lineNumber: 200,
+                                lineNumber: 244,
                                 columnNumber: 13
                             }, ("TURBOPACK compile-time value", void 0))
                         }, void 0, false, {
                             fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                            lineNumber: 199,
+                            lineNumber: 243,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0))
                     }, void 0, false, {
                         fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                        lineNumber: 193,
+                        lineNumber: 237,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1615,12 +1653,12 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
                                         fill: "white"
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                                        lineNumber: 212,
+                                        lineNumber: 256,
                                         columnNumber: 15
                                     }, ("TURBOPACK compile-time value", void 0))
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                                    lineNumber: 211,
+                                    lineNumber: 255,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("defs", {
@@ -1632,28 +1670,28 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
                                             fill: "white"
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                                            lineNumber: 216,
+                                            lineNumber: 260,
                                             columnNumber: 17
                                         }, ("TURBOPACK compile-time value", void 0))
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                                        lineNumber: 215,
+                                        lineNumber: 259,
                                         columnNumber: 15
                                     }, ("TURBOPACK compile-time value", void 0))
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                                    lineNumber: 214,
+                                    lineNumber: 258,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0))
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                            lineNumber: 210,
+                            lineNumber: 254,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0))
                     }, void 0, false, {
                         fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                        lineNumber: 204,
+                        lineNumber: 248,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1674,31 +1712,36 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
                                 fill: "white"
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                                lineNumber: 229,
+                                lineNumber: 273,
                                 columnNumber: 13
                             }, ("TURBOPACK compile-time value", void 0))
                         }, void 0, false, {
                             fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                            lineNumber: 228,
+                            lineNumber: 272,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0))
                     }, void 0, false, {
                         fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                        lineNumber: 222,
+                        lineNumber: 266,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0))
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                lineNumber: 181,
+                lineNumber: 225,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0)),
             facebookNotice && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                 className: "-mt-3 mb-4 rounded-lg bg-blue-50 px-3 py-2 text-start text-xs text-blue-800 dark:bg-blue-900/30 dark:text-blue-200",
-                children: facebookNotice === 'copied' ? t.facebookTextCopied : t.facebookTextManual
+                children: {
+                    copied: t.facebookTextCopied,
+                    manual: t.facebookTextManual,
+                    shareSheetCopied: t.facebookShareSheetCopied,
+                    shareSheetManual: t.facebookShareSheetManual
+                }[facebookNotice]
             }, void 0, false, {
                 fileName: "[project]/components/feed/ShareSocialActions.tsx",
-                lineNumber: 235,
+                lineNumber: 279,
                 columnNumber: 9
             }, ("TURBOPACK compile-time value", void 0))
         ]
@@ -2929,7 +2972,9 @@ __turbopack_context__.s([
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react-jsx-dev-runtime.js [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$hooks$2f$knowledgs$2f$usePopularKnowledge$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/hooks/knowledgs/usePopularKnowledge.ts [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$DocumentsListCard$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/feed/DocumentsListCard.tsx [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$FeedSearchScopeToggle$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/feed/FeedSearchScopeToggle.tsx [app-ssr] (ecmascript)");
 'use client';
+;
 ;
 ;
 ;
@@ -2974,13 +3019,13 @@ function TopDocumentsCard({ locale, className }) {
         emptyText: copy.empty,
         unavailableText: copy.unavailable,
         openInNewTabLabel: copy.openInNewTab,
-        viewAllHref: `/${locale}/home`,
+        viewAllHref: (0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$FeedSearchScopeToggle$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getInsightsSearchHref"])(locale, ''),
         viewAllLabel: copy.viewAll,
         viewAllDescription: copy.viewAllDescription,
         className: className
     }, void 0, false, {
         fileName: "[project]/components/feed/TopDocumentsCard.tsx",
-        lineNumber: 49,
+        lineNumber: 50,
         columnNumber: 5
     }, this);
 }
@@ -12388,14 +12433,12 @@ function FeedMobileSearch({ locale }) {
         }
         router.push(keyword ? `/${locale}?keyword=${encodeURIComponent(keyword)}` : `/${locale}`);
     };
-    // With a query typed, "By Insights" searches Insights right away; on an empty
-    // field it only switches where the next search goes.
+    // Enabling with a query opens Insights; disabling returns to feed search.
     const handleSearchInsightsChange = (active)=>{
-        if (query.trim()) {
-            router.push((0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$FeedSearchScopeToggle$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getInsightsSearchHref"])(locale, query));
-            return;
-        }
         setSearchInsights(active);
+        if (active && query.trim()) {
+            router.push((0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$FeedSearchScopeToggle$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getInsightsSearchHref"])(locale, query));
+        }
     };
     const clearSearch = ()=>{
         setQuery('');
@@ -12415,7 +12458,7 @@ function FeedMobileSearch({ locale }) {
                 children: isRTL ? 'البحث في الموجز أو المستندات' : 'Search in Feed or Insights'
             }, void 0, false, {
                 fileName: "[project]/components/feed/FeedMobileSearch.tsx",
-                lineNumber: 72,
+                lineNumber: 70,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12431,7 +12474,7 @@ function FeedMobileSearch({ locale }) {
                         className: `h-11 w-full rounded-lg border border-[#D7E1EE] bg-white text-[14px] text-[#1E293B] shadow-sm outline-none transition-colors placeholder:text-[#94A3B8] focus:border-[#2378E8] focus:ring-2 focus:ring-[#2378E8]/15 [&::-webkit-search-cancel-button]:appearance-none ${isRTL ? 'pr-10 pl-40' : 'pl-10 pr-36'}`
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedMobileSearch.tsx",
-                        lineNumber: 76,
+                        lineNumber: 74,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -12444,12 +12487,12 @@ function FeedMobileSearch({ locale }) {
                             stroke: 2
                         }, void 0, false, {
                             fileName: "[project]/components/feed/FeedMobileSearch.tsx",
-                            lineNumber: 90,
+                            lineNumber: 88,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedMobileSearch.tsx",
-                        lineNumber: 85,
+                        lineNumber: 83,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12466,12 +12509,12 @@ function FeedMobileSearch({ locale }) {
                                     stroke: 2
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/FeedMobileSearch.tsx",
-                                    lineNumber: 100,
+                                    lineNumber: 98,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/FeedMobileSearch.tsx",
-                                lineNumber: 94,
+                                lineNumber: 92,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$FeedSearchScopeToggle$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -12480,25 +12523,25 @@ function FeedMobileSearch({ locale }) {
                                 onChange: handleSearchInsightsChange
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/FeedMobileSearch.tsx",
-                                lineNumber: 103,
+                                lineNumber: 101,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/feed/FeedMobileSearch.tsx",
-                        lineNumber: 92,
+                        lineNumber: 90,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/FeedMobileSearch.tsx",
-                lineNumber: 75,
+                lineNumber: 73,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/feed/FeedMobileSearch.tsx",
-        lineNumber: 71,
+        lineNumber: 69,
         columnNumber: 5
     }, this);
 }

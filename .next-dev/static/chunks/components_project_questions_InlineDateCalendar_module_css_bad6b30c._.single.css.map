@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 1, "column": 0}, "map": {"version":3,"sources":["turbopack:///[project]/components/project/questions/InlineDateCalendar.module.css"],"sourcesContent":["/* Round days; a range reads as one band with round ends. */\n.calendar .day {\n  border-radius: 999px;\n}\n.calendar .day[data-in-range] {\n  border-radius: 0;\n}\n.calendar .day[data-first-in-range] {\n  border-start-start-radius: 999px;\n  border-end-start-radius: 999px;\n}\n.calendar .day[data-last-in-range] {\n  border-start-end-radius: 999px;\n  border-end-end-radius: 999px;\n}\n/* In-range days outside min/max: shown in the band but not pickable. */\n.calendar .day[data-locked] {\n  color: var(--mantine-color-dimmed);\n  cursor: default;\n}\n"],"names":[],"mappings":"AACA;;;;AAGA;;;;AAGA;;;;;AAAA;;;;;AAAA;;;;;AAAA;;;;;AAAA;;;;;AAAA;;;;;AAIA;;;;;AAAA;;;;;AAAA;;;;;AAAA;;;;;AAAA;;;;;AAAA;;;;;AAKA"}}]
+}
