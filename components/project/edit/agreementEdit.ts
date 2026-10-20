@@ -7,7 +7,8 @@ import type { WizardLocale } from '../wizardStorage'
 
 // Client-side agreement editing (before the first signature). The client edits a
 // local draft across the edit pages, then saves everything as one revision through
-// POST (`_method: PATCH`) account/project/agreement/client-requirements/{match}.
+// POST (`_method: PATCH`) account/project/agreement/client-requirements/{project}.
+// The backend applies it project-wide and notifies every eligible Insighter.
 // Ownership rules mirror the Angular agreement-revisions model.
 
 export type EditScope = { id?: number; scope: string; description: string | null; subscopes: EditScope[] }
@@ -67,15 +68,12 @@ export type EditContext = {
 
 export type EditDraft = {
   projectUuid: string
-  matchUuid: string
   fingerprint: string
   context: EditContext
   original: EditState
   current: EditState
   note: string
 }
-
-export type AgreementMatch = { uuid: string; name: string; offerUuid: string | null }
 
 type RawProject = Record<string, any>
 
@@ -113,8 +111,8 @@ export type AgreementPatch = {
   deadline_offer?: string
 }
 
-export async function saveClientAgreement(locale: WizardLocale, matchUuid: string, patch: AgreementPatch) {
-  const res = await fetch(getApiUrl(`/api/account/project/agreement/client-requirements/${encodeURIComponent(matchUuid)}`), {
+export async function saveClientAgreement(locale: WizardLocale, projectUuid: string, patch: AgreementPatch) {
+  const res = await fetch(getApiUrl(`/api/account/project/agreement/client-requirements/${encodeURIComponent(projectUuid)}`), {
     // POST with Laravel's method override: a real PATCH fails the CORS preflight.
     method: 'POST',
     headers: headers(locale),
@@ -132,23 +130,6 @@ export function agreementLocked(project: RawProject): boolean {
   return signed(contract?.user_sign_at) || signed(contract?.insighter_sign_at) ||
     ['payment', 'in_progress', 'in_review', 'closed', 'cancelled', 'completed'].includes(project?.status || '') ||
     (!!project?.contract_uuid && !contract)
-}
-
-export function agreementMatches(project: RawProject): AgreementMatch[] {
-  const invited: any[] = Array.isArray(project?.invited) ? project.invited : []
-  return invited
-    .map(item => ({
-      uuid: String(item?.uuid ?? item?.match_uuid ?? ''),
-      name: String(item?.insighter?.name ?? ''),
-      offerUuid: item?.offer?.uuid ? String(item.offer.uuid) : null,
-    }))
-    .filter(match => !!match.uuid)
-}
-
-/** The awarded invitation, or the only one; otherwise the client must pick. */
-export function defaultMatchUuid(project: RawProject, matches: AgreementMatch[]): string {
-  const awarded = project?.offer?.uuid ? matches.find(m => m.offerUuid === project.offer.uuid) : undefined
-  return awarded?.uuid || (matches.length === 1 ? matches[0].uuid : '')
 }
 
 /**

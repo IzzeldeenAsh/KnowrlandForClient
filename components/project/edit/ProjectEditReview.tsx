@@ -2,7 +2,6 @@
 
 import Image from 'next/image'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useSearchParams } from 'next/navigation'
 import { dashboardUrl } from '@/app/config'
 import { SectionBlock, type ReviewRow } from '../questions/ProjectReviewStep'
 import { getProjectApiErrorMessage } from '../projectApiError'
@@ -13,13 +12,11 @@ import { useProjectStepErrorToast } from '../useProjectStepErrorToast'
 import type { WizardLocale } from '../wizardStorage'
 import {
   agreementLocked,
-  agreementMatches,
   buildEditContext,
   buildEditState,
   buildPatch,
   changedKeys,
   clearDraft,
-  defaultMatchUuid,
   editStepHref,
   fetchClientProject,
   hasEditableContent,
@@ -27,7 +24,6 @@ import {
   readDraft,
   saveClientAgreement,
   writeDraft,
-  type AgreementMatch,
   type EditComponent,
   type EditDraft,
 } from './agreementEdit'
@@ -46,11 +42,8 @@ export function projectDashboardHref(projectUuid: string) {
 export default function ProjectEditReview({ locale, projectUuid }: { locale: WizardLocale; projectUuid: string }) {
   const isRTL = locale === 'ar'
   const t = (en: string, ar: string) => (isRTL ? ar : en)
-  const searchParams = useSearchParams()
-  const requestedMatch = searchParams?.get('match') || ''
 
   const [draft, setDraft] = useState<EditDraft | null>(null)
-  const [matches, setMatches] = useState<AgreementMatch[]>([])
   const [locked, setLocked] = useState(false)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -65,27 +58,23 @@ export default function ProjectEditReview({ locale, projectUuid }: { locale: Wiz
     setDraft(null)
     try {
       const project = await fetchClientProject(locale, projectUuid)
-      const list = agreementMatches(project)
       const fingerprint = projectFingerprint(project)
       const existing = reset ? null : readDraft(projectUuid)
-      const known = (uuid?: string) => !!uuid && list.some(match => match.uuid === uuid)
-      const matchUuid = known(requestedMatch) ? requestedMatch : known(existing?.matchUuid) ? existing!.matchUuid : defaultMatchUuid(project, list)
       let next: EditDraft
       if (existing && existing.fingerprint === fingerprint) {
-        next = { ...existing, matchUuid }
+        next = existing
       } else {
         if (existing && changedKeys(existing).size > 0)
           setNotice(t('The agreement changed since you started editing, so your unsaved changes were cleared.', 'تغيّر الاتفاق منذ بدأت التعديل، لذلك أُزيلت تغييراتك غير المحفوظة.'))
         const state = buildEditState(project)
         next = {
-          projectUuid, matchUuid, fingerprint, note: '',
+          projectUuid, fingerprint, note: '',
           context: buildEditContext(project),
           original: state,
           current: JSON.parse(JSON.stringify(state)),
         }
       }
       writeDraft(next)
-      setMatches(list)
       setLocked(agreementLocked(project))
       setStale(false)
       setDraft(next)
@@ -93,7 +82,7 @@ export default function ProjectEditReview({ locale, projectUuid }: { locale: Wiz
       setLoadError(getProjectApiErrorMessage(err, t('Could not load the project.', 'تعذر تحميل المشروع.')))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [locale, projectUuid, requestedMatch])
+  }, [locale, projectUuid])
 
   useEffect(() => {
     void load()
@@ -190,7 +179,7 @@ export default function ProjectEditReview({ locale, projectUuid }: { locale: Wiz
   }
 
   const save = async () => {
-    if (!draft || saving || !dirty || !draft.matchUuid) return
+    if (!draft || saving || !dirty) return
     setSaving(true)
     setError(null)
     try {
@@ -201,7 +190,7 @@ export default function ProjectEditReview({ locale, projectUuid }: { locale: Wiz
         return
       }
       const note = draft.note.trim()
-      await saveClientAgreement(locale, draft.matchUuid, { ...buildPatch(draft), ...(note ? { user_note: note } : {}) })
+      await saveClientAgreement(locale, projectUuid, { ...buildPatch(draft), ...(note ? { user_note: note } : {}) })
       clearDraft(projectUuid)
       window.location.assign(`${backToProject}?tab=revisions`)
     } catch (err) {
@@ -257,7 +246,7 @@ export default function ProjectEditReview({ locale, projectUuid }: { locale: Wiz
                   <span className="inline-flex rounded-full bg-sky-50 px-4 py-2 text-sm font-medium text-sky-700">{t('Editing agreement', 'تعديل الاتفاق')}</span>
                 </div>
                 <p className="mt-4 text-sm text-slate-600">
-                  {t('Only the details you can change are shown. Save to send all changes as one revision; the Insighter will be notified.', 'تظهر هنا التفاصيل التي يمكنك تعديلها فقط. احفظ لإرسال كل التغييرات كمراجعة واحدة، وسيتم إشعار الخبير.')}
+                  {t('Only the details you can change are shown. Save to send all changes as one revision; the Insighters on this project will be notified.', 'تظهر هنا التفاصيل التي يمكنك تعديلها فقط. احفظ لإرسال كل التغييرات كمراجعة واحدة، وسيتم إشعار الخبراء في هذا المشروع.')}
                 </p>
               </div>
             </div>
@@ -268,20 +257,6 @@ export default function ProjectEditReview({ locale, projectUuid }: { locale: Wiz
                 {t('The agreement changed while you were editing.', 'تغيّر الاتفاق أثناء التعديل.')}{' '}
                 <button type="button" className="font-semibold underline" onClick={() => void load(true)}>{t('Reload the latest details', 'إعادة تحميل أحدث التفاصيل')}</button>
               </div>
-            ) : null}
-
-            {matches.length > 1 ? (
-              <label className="mt-6 flex flex-wrap items-center gap-3 text-sm font-semibold text-slate-700">
-                {t('Agreement with', 'الاتفاق مع')}
-                <select
-                  value={draft.matchUuid}
-                  onChange={e => setDraftAndStore({ ...draft, matchUuid: e.target.value })}
-                  className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                >
-                  <option value="">{t('Choose an Insighter', 'اختر الخبير')}</option>
-                  {matches.map(match => <option key={match.uuid} value={match.uuid}>{match.name || t('Insighter', 'الخبير')}</option>)}
-                </select>
-              </label>
             ) : null}
 
             <div className="mt-8 space-y-6">
@@ -328,13 +303,13 @@ export default function ProjectEditReview({ locale, projectUuid }: { locale: Wiz
             </button>
             <div className="flex items-center gap-3">
               <span className="hidden text-sm text-slate-500 sm:inline">
-                {!draft.matchUuid ? t('Choose an Insighter first', 'اختر الخبير أولاً') : dirty ? t('Unsaved changes', 'تغييرات غير محفوظة') : t('No changes yet', 'لا توجد تغييرات بعد')}
+                {dirty ? t('Unsaved changes', 'تغييرات غير محفوظة') : t('No changes yet', 'لا توجد تغييرات بعد')}
               </span>
               <button
                 type="button"
                 onClick={() => void save()}
-                disabled={saving || !dirty || !draft.matchUuid || stale}
-                className={`btn-sm rounded-full px-6 py-2 ${saving || !dirty || !draft.matchUuid || stale ? 'cursor-not-allowed bg-slate-200 text-slate-500' : 'bg-[#1C7CBB] text-white hover:bg-opacity-90'}`}
+                disabled={saving || !dirty || stale}
+                className={`btn-sm rounded-full px-6 py-2 ${saving || !dirty || stale ? 'cursor-not-allowed bg-slate-200 text-slate-500' : 'bg-[#1C7CBB] text-white hover:bg-opacity-90'}`}
               >
                 {saving ? t('Saving...', 'جاري الحفظ...') : t('Save changes', 'حفظ التعديلات')}
               </button>
