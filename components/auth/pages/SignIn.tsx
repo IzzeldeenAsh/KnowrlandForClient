@@ -31,7 +31,7 @@ export default function SignIn({ locale }: { locale: string }) {
     } catch (e) { setError(authErrorMessage(e, locale, true)); setBusy(false); }
   }
   return <AuthShell locale={locale} title={ar ? 'أهلاً بكم في إنسايتا' : 'Welcome To Insighta'} subtitle={ar ? 'منصتك للبيانات والتقارير والإحصائيات والخبراء المتخصصين' : 'Your platform for data, reports, statistics and specialized experts'}>
-    <SocialButtons locale={locale} returnUrl={returnUrl}/><AuthNotice error={error}/>
+    <SocialButtons locale={locale} returnUrl={returnUrl}/><AuthNotice error={error} message={search.get('verifyEmail') === '1' && !error ? (ar ? 'انتهت جلستك. سجّل الدخول لإكمال تأكيد بريدك الإلكتروني.' : 'Your session ended. Sign in to finish verifying your email.') : ''}/>
     <AuthForm locale={locale} serverError={serverError} onSubmit={submit}><fieldset disabled={busy}>
       <label className="auth-field" htmlFor="email">{ar ? 'البريد الإلكتروني' : 'Email'}<input id="email" name="email" type="email" autoComplete="username" required maxLength={191} dir="ltr" /><FieldError name="email"/></label>
       <PasswordInput label={ar ? 'كلمة المرور' : 'Password'} locale={locale}/>

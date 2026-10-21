@@ -105,6 +105,13 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
         });
 
         if (!response.ok) {
+          // An unverified account gets 403 from the `verified` middleware. Its
+          // token is still valid and the verify-email page (often in another
+          // tab) needs it, so this must not end the shared session.
+          if (response.status === 403) {
+            const body = await response.json().catch(() => null);
+            if (/verif/i.test(String(body?.message || ''))) throw new Error('Email not verified');
+          }
           if (response.status === 401 || response.status === 403) {
             // Mark as an auth failure; callers will clear token + stop refetch loops.
             throw new Error(`Auth failed: ${response.status}`);
@@ -164,7 +171,7 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
         return { user: userData, roles: rolesFromApi };
       } catch (error) {
 
-        if ((error instanceof Error && (error.message.includes('Auth failed') || error.message.includes('Rate limited'))) || attempt === maxRetries) {
+        if ((error instanceof Error && (error.message.includes('Auth failed') || error.message.includes('Email not verified') || error.message.includes('Rate limited'))) || attempt === maxRetries) {
           throw error;
         }
 
@@ -244,6 +251,10 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
         if (error instanceof Error && error.message.includes('Auth failed')) {
           globalProfileCache.authFailedToken = token;
           clearAuthDataEverywhere();
+          resetProfileState();
+        } else if (error instanceof Error && error.message.includes('Email not verified')) {
+          // Keep the cookie; only stop polling /profile for this token.
+          globalProfileCache.authFailedToken = token;
           resetProfileState();
         }
 

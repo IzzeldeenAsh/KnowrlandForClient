@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { apiBaseUrl } from '@/app/config';
 import { verificationUrl } from '@/lib/auth-policy';
 import { getAuthToken } from '@/lib/authToken';
-import { authRequest, authErrorMessage } from '@/lib/auth-client';
+import { authRequest, authErrorMessage, AuthError, clearSession } from '@/lib/auth-client';
 import { authPageUrl, getSafeReturnUrl } from '@/lib/authRedirect';
 import { AuthShell, AuthNotice, SubmitButton } from './AuthShell';
 export default function VerifyEmail({ locale }: { locale: string }) {
@@ -20,12 +20,23 @@ export default function VerifyEmail({ locale }: { locale: string }) {
   const [serverError, setServerError] = useState<unknown>();
   const [busy, setBusy] = useState(false); const [sending, setSending] = useState(false); const [cooldown, setCooldown] = useState(0);
   const [error, setError] = useState(''); const [message, setMessage] = useState(''); const initialized = useRef(false);
+  // The session cookie can disappear while this page is open (signed out or replaced in
+  // another tab). Keep the typed code for this tab and come back here after signing in.
+  function signInAgain(code = '') {
+    if (code) savePendingVerification(code);
+    router.replace(authPageUrl('signin', locale, returnUrl) + (returnUrl ? '&' : '?') + 'verifyEmail=1');
+  }
+  function sessionLost(e: unknown, code = '') {
+    if (!(e instanceof AuthError) || e.status !== 401) return false;
+    clearSession(); signInAgain(code); return true;
+  }
   function finish() { clearPendingVerification(); router.replace(getAuthToken() ? `/${locale}/callback${returnUrl ? `?returnUrl=${encodeURIComponent(returnUrl)}` : ''}` : authPageUrl('signin', locale, returnUrl)); }
   async function resend() {
     if (sending || cooldown > 0) return;
+    if (!getAuthToken()) { signInAgain(); return; }
     setSending(true); setError('');
     try { await authRequest('account/email/resend', locale, {}); clearPendingVerification(); setInitialCode(''); setCooldown(60); try { sessionStorage.setItem(cooldownKey, String(Date.now())); } catch {} setMessage(ar ? 'تم إرسال رمز التحقق.' : 'A verification code has been sent.'); }
-    catch (e) { setServerError(e); setError(hasFieldErrors(e) ? '' : authErrorMessage(e, locale)); } finally { setSending(false); }
+    catch (e) { if (sessionLost(e)) return; setServerError(e); setError(hasFieldErrors(e) ? '' : authErrorMessage(e, locale)); } finally { setSending(false); }
   }
   useEffect(() => { if (!cooldown) return; const id = setTimeout(() => setCooldown(v => v - 1), 1000); return () => clearTimeout(id); }, [cooldown]);
   useEffect(() => {
@@ -46,7 +57,7 @@ export default function VerifyEmail({ locale }: { locale: string }) {
       fetch(url, { headers: { Accept: 'application/json', 'Accept-Language': locale, ...(token ? { Authorization: `Bearer ${token}` } : {}) }, cache: 'no-store', signal: AbortSignal.timeout(20000) })
         .then(async r => { if (!r.ok) throw new Error('Verification failed'); finish(); })
         .catch(() => { setError(ar ? 'الرابط غير صالح أو انتهت صلاحيته. اطلب رمزاً جديداً.' : 'The link is invalid or expired. Request a new code.'); setBusy(false); });
-    } else if (!getAuthToken()) router.replace(authPageUrl('signin', locale, returnUrl) + (returnUrl ? '&' : '?') + 'verifyEmail=1');
+    } else if (!getAuthToken()) signInAgain(pendingCode);
     else {
       let previous = 0;
       try { previous = Number(sessionStorage.getItem(cooldownKey)) || 0; } catch {}
@@ -58,9 +69,11 @@ export default function VerifyEmail({ locale }: { locale: string }) {
   }, []);
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault(); if (busy) return;
-    const code = String(new FormData(e.currentTarget).get('code')); setBusy(true); setError('');
+    const code = String(new FormData(e.currentTarget).get('code'));
+    if (!getAuthToken()) { signInAgain(code); return; }
+    setBusy(true); setError('');
     try { await authRequest('account/email/verify', locale, { code: Number(code) }); finish(); }
-    catch (e) { setServerError(e); setError(hasFieldErrors(e) ? '' : authErrorMessage(e, locale)); setBusy(false); }
+    catch (e) { if (sessionLost(e, code)) return; setServerError(e); setError(hasFieldErrors(e) ? '' : authErrorMessage(e, locale)); setBusy(false); }
   }
   return <AuthShell locale={locale} title={ar ? 'تحقق من بريدك الإلكتروني' : 'Verify your email'} subtitle={email ? (ar ? `أدخل الرمز المرسل إلى ${email}` : `Enter the code sent to ${email}`) : (ar ? 'أدخل رمز التحقق لإكمال تسجيل الدخول.' : 'Enter your verification code to continue.')}>
     <AuthNotice error={error} message={message}/><AuthForm locale={locale} serverError={serverError} onSubmit={submit}><fieldset disabled={busy}>
