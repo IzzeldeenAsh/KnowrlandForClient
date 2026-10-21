@@ -1,6 +1,17 @@
 {
-  "/(auth)/[locale]/reset-password/page": "app/(auth)/[locale]/reset-password/page.js",
+  "/(auth)/[locale]/callback/page": "app/(auth)/[locale]/callback/page.js",
+  "/(auth)/[locale]/signin/page": "app/(auth)/[locale]/signin/page.js",
+  "/(auth)/[locale]/signout/page": "app/(auth)/[locale]/signout/page.js",
   "/(auth)/[locale]/signup/page": "app/(auth)/[locale]/signup/page.js",
   "/(auth)/[locale]/verify-email/page": "app/(auth)/[locale]/verify-email/page.js",
-  "/[locale]/(default)/page": "app/[locale]/(default)/page.js"
+  "/[locale]/(default)/landing/page": "app/[locale]/(default)/landing/page.js",
+  "/[locale]/(default)/page": "app/[locale]/(default)/page.js",
+  "/[locale]/onboarding/page": "app/[locale]/onboarding/page.js",
+  "/[locale]/project/edit/[projectUuid]/[step]/page": "app/[locale]/project/edit/[projectUuid]/[step]/page.js",
+  "/[locale]/project/edit/[projectUuid]/page": "app/[locale]/project/edit/[projectUuid]/page.js",
+  "/[locale]/project/wizard/[step]/page": "app/[locale]/project/wizard/[step]/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/apple-icon/route": "app-edge-has-no-entrypoint",
+  "/icon/route": "app-edge-has-no-entrypoint",
+  "/manifest.webmanifest/route": "app/manifest.webmanifest/route.js"
 }

@@ -711,10 +711,26 @@ const useClearFieldError = ()=>{
 };
 _s(useClearFieldError, "gDsCjeeItUuvgOWf1v4qoK9RF6k=");
 const Errors = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["createContext"])({});
+// Names that have a <FieldError/> on screen; any other error (e.g. the API's `common`) is shown above the form.
+const Shown = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["createContext"])(new Set());
 function FieldError(param) {
     let { name } = param;
     _s1();
     const errors = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useContext"])(Errors);
+    const shown = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useContext"])(Shown);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "FieldError.useEffect": ()=>{
+            shown.add(name);
+            return ({
+                "FieldError.useEffect": ()=>{
+                    shown.delete(name);
+                }
+            })["FieldError.useEffect"];
+        }
+    }["FieldError.useEffect"], [
+        shown,
+        name
+    ]);
     return errors[name] ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
         id: "".concat(name, "-error"),
         className: "auth-field-error",
@@ -722,28 +738,34 @@ function FieldError(param) {
         children: errors[name]
     }, void 0, false, {
         fileName: "[project]/components/auth/pages/AuthForm.tsx",
-        lineNumber: 9,
+        lineNumber: 12,
         columnNumber: 25
     }, this) : null;
 }
-_s1(FieldError, "sg7ncGFUb44a0cVInaZ4WfPImYY=");
+_s1(FieldError, "8gNDdJlE0q9ISWzJnR3RI+XK3Oc=");
 _c2 = FieldError;
 function hasFieldErrors(error) {
     return error instanceof __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$auth$2d$client$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["AuthError"] && Object.keys(error.fields).length > 0;
 }
 function AuthForm(param) {
     let { locale, children, onSubmit, serverError } = param;
+    var _Object_entries_find;
     _s2();
     const [errors, setErrors] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])({});
     const ref = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
     const ar = locale === 'ar';
+    const shown = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(new Set()).current;
+    const general = (_Object_entries_find = Object.entries(errors).find((param)=>{
+        let [name, message] = param;
+        return message && !shown.has(name);
+    })) === null || _Object_entries_find === void 0 ? void 0 : _Object_entries_find[1];
     function validate(form) {
         const result = {};
         for (const element of Array.from(form.elements)){
             if (!(element instanceof HTMLInputElement) || !element.name || element.disabled) continue;
             const value = element.type === 'password' || element.name.startsWith('password') ? element.value : element.value.trim();
             if (element.required && !value) result[element.name] = ar ? 'هذا الحقل مطلوب.' : 'This field is required.';
-            else if (element.type === 'email' && value && element.validity.typeMismatch) result[element.name] = ar ? 'أدخل بريداً إلكترونياً صالحاً.' : 'Enter a valid email address.';
+            else if (element.type === 'email' && value && (element.validity.typeMismatch || !/@[^@.\s]+(\.[^@.\s]+)+$/.test(value))) result[element.name] = ar ? 'أدخل بريداً إلكترونياً صالحاً.' : 'Enter a valid email address.';
             else if (value && element.minLength > 0 && value.length < element.minLength) result[element.name] = ar ? "أدخل ".concat(element.minLength, " أحرف على الأقل.") : "Enter at least ".concat(element.minLength, " characters.");
             if (element.name === 'country_id' && !value) result.country_id = ar ? 'اختر الدولة.' : 'Select your country.';
             if (element.name === 'code' && !/^\d{6}$/.test(value)) result.code = ar ? 'أدخل رمز التحقق المكوّن من 6 أرقام.' : 'Enter the 6-digit verification code.';
@@ -784,66 +806,88 @@ function AuthForm(param) {
     ]);
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(Errors.Provider, {
         value: errors,
-        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(ClearError.Provider, {
-            value: (name)=>setErrors((old)=>({
-                        ...old,
-                        [name]: ''
-                    })),
-            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
-                ref: ref,
-                noValidate: true,
-                className: "auth-form",
-                onBlur: (event)=>{
-                    const input = event.target;
-                    if (!(input instanceof HTMLInputElement)) return;
-                    const name = input.dataset.field || input.name;
-                    if (!name || !ref.current || input.type === 'hidden' || name === 'code' && event.currentTarget.contains(event.relatedTarget)) return;
-                    const next = validate(ref.current);
-                    setErrors((old)=>({
+        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(Shown.Provider, {
+            value: shown,
+            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(ClearError.Provider, {
+                value: (name)=>setErrors((old)=>({
                             ...old,
-                            [name]: next[name] || ''
-                        }));
-                },
-                onChange: (event)=>{
-                    if (event.target.dataset.field) return;
-                    if (ref.current) {
+                            [name]: ''
+                        })),
+                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
+                    ref: ref,
+                    noValidate: true,
+                    className: "auth-form",
+                    onBlur: (event)=>{
+                        const input = event.target;
+                        if (!(input instanceof HTMLInputElement)) return;
+                        const name = input.dataset.field || input.name;
+                        if (!name || !ref.current || input.type === 'hidden' || name === 'code' && event.currentTarget.contains(event.relatedTarget)) return;
                         const next = validate(ref.current);
-                        setErrors((old)=>Object.fromEntries(Object.keys(old).map((key)=>[
-                                    key,
-                                    next[key] || ''
-                                ])));
-                    }
-                },
-                onSubmit: (event)=>{
-                    const next = validate(event.currentTarget);
-                    setErrors(next);
-                    if (Object.keys(next).length) {
-                        var _event_currentTarget_querySelector;
-                        event.preventDefault();
-                        const name = Object.keys(next)[0];
-                        (_event_currentTarget_querySelector = event.currentTarget.querySelector("#".concat(name))) === null || _event_currentTarget_querySelector === void 0 ? void 0 : _event_currentTarget_querySelector.focus();
-                        return;
-                    }
-                    onSubmit(event);
-                },
-                children: children
+                        setErrors((old)=>({
+                                ...old,
+                                [name]: next[name] || ''
+                            }));
+                    },
+                    onChange: (event)=>{
+                        if (general) setErrors((old)=>Object.fromEntries(Object.entries(old).filter((param)=>{
+                                let [name] = param;
+                                return shown.has(name);
+                            })));
+                        if (event.target.dataset.field) return;
+                        if (ref.current) {
+                            const next = validate(ref.current);
+                            setErrors((old)=>Object.fromEntries(Object.keys(old).map((key)=>[
+                                        key,
+                                        next[key] || ''
+                                    ])));
+                        }
+                    },
+                    onSubmit: (event)=>{
+                        const next = validate(event.currentTarget);
+                        setErrors(next);
+                        if (Object.keys(next).length) {
+                            var _event_currentTarget_querySelector;
+                            event.preventDefault();
+                            const name = Object.keys(next)[0];
+                            (_event_currentTarget_querySelector = event.currentTarget.querySelector("#".concat(name))) === null || _event_currentTarget_querySelector === void 0 ? void 0 : _event_currentTarget_querySelector.focus();
+                            return;
+                        }
+                        onSubmit(event);
+                    },
+                    children: [
+                        general && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                            className: "auth-error",
+                            role: "alert",
+                            children: general
+                        }, void 0, false, {
+                            fileName: "[project]/components/auth/pages/AuthForm.tsx",
+                            lineNumber: 53,
+                            columnNumber: 18
+                        }, this),
+                        children
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/components/auth/pages/AuthForm.tsx",
+                    lineNumber: 44,
+                    columnNumber: 152
+                }, this)
             }, void 0, false, {
                 fileName: "[project]/components/auth/pages/AuthForm.tsx",
-                lineNumber: 40,
-                columnNumber: 122
+                lineNumber: 44,
+                columnNumber: 72
             }, this)
         }, void 0, false, {
             fileName: "[project]/components/auth/pages/AuthForm.tsx",
-            lineNumber: 40,
+            lineNumber: 44,
             columnNumber: 42
         }, this)
     }, void 0, false, {
         fileName: "[project]/components/auth/pages/AuthForm.tsx",
-        lineNumber: 40,
+        lineNumber: 44,
         columnNumber: 10
     }, this);
 }
-_s2(AuthForm, "cZ4DqkSLRgLjGzvZhpsInbzvWow=");
+_s2(AuthForm, "ibCBpHeiZhcr4ZdoP4i0NdXR/Ow=");
 _c3 = AuthForm;
 var _c, _c1, _c2, _c3;
 __turbopack_context__.k.register(_c, "ClearError$createContext");
