@@ -738,6 +738,13 @@ function GlobalProfileProvider({ children }) {
                     }
                 });
                 if (!response.ok) {
+                    // An unverified account gets 403 from the `verified` middleware. Its
+                    // token is still valid and the verify-email page (often in another
+                    // tab) needs it, so this must not end the shared session.
+                    if (response.status === 403) {
+                        const body = await response.json().catch(()=>null);
+                        if (/verif/i.test(String(body?.message || ''))) throw new Error('Email not verified');
+                    }
                     if (response.status === 401 || response.status === 403) {
                         // Mark as an auth failure; callers will clear token + stop refetch loops.
                         throw new Error(`Auth failed: ${response.status}`);
@@ -788,7 +795,7 @@ function GlobalProfileProvider({ children }) {
                     roles: rolesFromApi
                 };
             } catch (error) {
-                if (error instanceof Error && (error.message.includes('Auth failed') || error.message.includes('Rate limited')) || attempt === maxRetries) {
+                if (error instanceof Error && (error.message.includes('Auth failed') || error.message.includes('Email not verified') || error.message.includes('Rate limited')) || attempt === maxRetries) {
                     throw error;
                 }
                 const delay = Math.pow(2, attempt - 1) * 1000;
@@ -861,6 +868,10 @@ function GlobalProfileProvider({ children }) {
                     __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$auth$2d$profile$2d$cache$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["globalProfileCache"].authFailedToken = token;
                     clearAuthDataEverywhere();
                     resetProfileState();
+                } else if (error instanceof Error && error.message.includes('Email not verified')) {
+                    // Keep the cookie; only stop polling /profile for this token.
+                    __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$auth$2d$profile$2d$cache$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["globalProfileCache"].authFailedToken = token;
+                    resetProfileState();
                 }
             } finally{
                 __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$auth$2d$profile$2d$cache$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["globalProfileCache"].isLoading = false;
@@ -927,7 +938,7 @@ function GlobalProfileProvider({ children }) {
         children: children
     }, void 0, false, {
         fileName: "[project]/components/auth/GlobalProfileProvider.tsx",
-        lineNumber: 312,
+        lineNumber: 323,
         columnNumber: 5
     }, this);
 }

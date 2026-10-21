@@ -52,113 +52,14 @@
       "env": {
         "__NEXT_BUILD_ID": "development",
         "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "lFIL4e9GyolmTlOgfdzg6VM6ZWCd10wwv5t/Ba/ymOM=",
-        "__NEXT_PREVIEW_MODE_ID": "597815f73324c14f73664f7d205c5176",
-        "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "d9c1421b183aa43cd0224c06c970b9652dd600f8297f46cbd922815ca248828a",
-        "__NEXT_PREVIEW_MODE_SIGNING_KEY": "22285c3af110753d09ef57534104c260848f66de4d64ed01f5b187c8807075fb"
+        "__NEXT_PREVIEW_MODE_ID": "825e7632a68de892c423ad134b72ed13",
+        "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "99a1c97e14f6335d3a72ae238220b8cb0fcb87740c25b914f7ce2ceb0ce1f943",
+        "__NEXT_PREVIEW_MODE_SIGNING_KEY": "03ed4a0f4d135a3fc569215a28248b1e0077575d0e7979aa110fd73f4db3b7e1"
       }
     }
   },
   "sortedMiddleware": [
     "/"
   ],
-  "functions": {
-    "/apple-icon/route": {
-      "files": [
-        "server/middleware-build-manifest.js",
-        "server/interception-route-rewrite-manifest.js",
-        "server/server-reference-manifest.js",
-        "server/app/apple-icon/route_client-reference-manifest.js",
-        "server/edge/chunks/_next-internal_server_app_apple-icon_route_actions_24ecdbff.js",
-        "server/edge/chunks/turbopack-_next-internal_server_app_apple-icon_route_actions_f50b4dc5.js",
-        "server/edge/chunks/node_modules_next_dist_esm_e96bb7e3._.js",
-        "server/edge/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_1d71ac1e._.js",
-        "server/edge/chunks/node_modules_next_dist_compiled_@vercel_og_16be1ace._.js",
-        "server/edge/chunks/node_modules_next_dist_compiled_8f4fd302._.js",
-        "server/edge/chunks/node_modules_next_dist_7bea040f._.js",
-        "server/edge/chunks/edge-wrapper_55e48e8b.js",
-        "server/edge/chunks/[root-of-the-server]__bf9d6c61._.js",
-        "server/edge/chunks/turbopack-edge-wrapper_17abf2f1.js"
-      ],
-      "name": "app/apple-icon/route",
-      "page": "/apple-icon/route",
-      "matchers": [
-        {
-          "regexp": "^/apple\\-icon(?:/)?$",
-          "originalSource": "/apple-icon"
-        }
-      ],
-      "wasm": [
-        {
-          "name": "wasm_fdb56e4cc5936d29",
-          "filePath": "server/edge/chunks/node_modules_next_dist_compiled_@vercel_og_resvg_23ace1ce.wasm"
-        },
-        {
-          "name": "wasm_1ccdc983b1fd9f87",
-          "filePath": "server/edge/chunks/node_modules_next_dist_compiled_@vercel_og_yoga_23ace1ce.wasm"
-        }
-      ],
-      "assets": [
-        {
-          "name": "server/edge/assets/noto-sans-v27-latin-regular.bdfa676c.ttf",
-          "filePath": "server/edge/assets/noto-sans-v27-latin-regular.bdfa676c.ttf"
-        }
-      ],
-      "env": {
-        "__NEXT_BUILD_ID": "development",
-        "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "lFIL4e9GyolmTlOgfdzg6VM6ZWCd10wwv5t/Ba/ymOM=",
-        "__NEXT_PREVIEW_MODE_ID": "597815f73324c14f73664f7d205c5176",
-        "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "d9c1421b183aa43cd0224c06c970b9652dd600f8297f46cbd922815ca248828a",
-        "__NEXT_PREVIEW_MODE_SIGNING_KEY": "22285c3af110753d09ef57534104c260848f66de4d64ed01f5b187c8807075fb"
-      }
-    },
-    "/icon/route": {
-      "files": [
-        "server/middleware-build-manifest.js",
-        "server/interception-route-rewrite-manifest.js",
-        "server/server-reference-manifest.js",
-        "server/app/icon/route_client-reference-manifest.js",
-        "server/edge/chunks/_next-internal_server_app_icon_route_actions_6c46f2f4.js",
-        "server/edge/chunks/turbopack-_next-internal_server_app_icon_route_actions_b4e4710b.js",
-        "server/edge/chunks/node_modules_next_dist_esm_51361001._.js",
-        "server/edge/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_1d71ac1e._.js",
-        "server/edge/chunks/node_modules_next_dist_compiled_@vercel_og_16be1ace._.js",
-        "server/edge/chunks/node_modules_next_dist_compiled_8f4fd302._.js",
-        "server/edge/chunks/node_modules_next_dist_7bea040f._.js",
-        "server/edge/chunks/edge-wrapper_ce73d8ea.js",
-        "server/edge/chunks/[root-of-the-server]__64f2736d._.js",
-        "server/edge/chunks/turbopack-edge-wrapper_1d303059.js"
-      ],
-      "name": "app/icon/route",
-      "page": "/icon/route",
-      "matchers": [
-        {
-          "regexp": "^/icon(?:/)?$",
-          "originalSource": "/icon"
-        }
-      ],
-      "wasm": [
-        {
-          "name": "wasm_fdb56e4cc5936d29",
-          "filePath": "server/edge/chunks/node_modules_next_dist_compiled_@vercel_og_resvg_23ace1ce.wasm"
-        },
-        {
-          "name": "wasm_1ccdc983b1fd9f87",
-          "filePath": "server/edge/chunks/node_modules_next_dist_compiled_@vercel_og_yoga_23ace1ce.wasm"
-        }
-      ],
-      "assets": [
-        {
-          "name": "server/edge/assets/noto-sans-v27-latin-regular.bdfa676c.ttf",
-          "filePath": "server/edge/assets/noto-sans-v27-latin-regular.bdfa676c.ttf"
-        }
-      ],
-      "env": {
-        "__NEXT_BUILD_ID": "development",
-        "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "lFIL4e9GyolmTlOgfdzg6VM6ZWCd10wwv5t/Ba/ymOM=",
-        "__NEXT_PREVIEW_MODE_ID": "597815f73324c14f73664f7d205c5176",
-        "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "d9c1421b183aa43cd0224c06c970b9652dd600f8297f46cbd922815ca248828a",
-        "__NEXT_PREVIEW_MODE_SIGNING_KEY": "22285c3af110753d09ef57534104c260848f66de4d64ed01f5b187c8807075fb"
-      }
-    }
-  }
+  "functions": {}
 }

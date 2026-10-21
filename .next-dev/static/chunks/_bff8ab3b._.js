@@ -809,7 +809,7 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
 ;
 ;
 function AuthShell(param) {
-    let { locale, title, subtitle, children } = param;
+    let { locale, title, subtitle, children, compact = false } = param;
     _s();
     const pathname = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["usePathname"])();
     const search = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useSearchParams"])();
@@ -819,7 +819,7 @@ function AuthShell(param) {
     clean.delete('access_token');
     const languageUrl = pathname.replace(/^\/(ar|en)/, "/".concat(otherLocale)) + (clean.size ? "?".concat(clean) : '');
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
-        className: "auth-screen",
+        className: "auth-screen".concat(compact ? ' auth-signup' : ''),
         dir: locale === 'ar' ? 'rtl' : 'ltr',
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("nav", {
@@ -922,18 +922,26 @@ _s(AuthShell, "YS5teDfk2gwmBHqC1aAr0t/3E50=", false, function() {
 });
 _c = AuthShell;
 function PasswordInput(param) {
-    let { label, locale, name = 'password', newPassword = false } = param;
+    let { label, locale, name = 'password', newPassword = false, hideLabel = false } = param;
     _s1();
     const [visible, setVisible] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
         className: "auth-field",
         htmlFor: name,
         children: [
-            label,
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                className: hideLabel ? 'auth-sr-only' : undefined,
+                children: label
+            }, void 0, false, {
+                fileName: "[project]/components/auth/pages/AuthShell.tsx",
+                lineNumber: 29,
+                columnNumber: 55
+            }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                 className: "auth-password",
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                        placeholder: hideLabel ? label : undefined,
                         id: name,
                         name: name,
                         type: visible ? 'text' : 'password',
@@ -999,7 +1007,7 @@ function PasswordInput(param) {
             }, void 0, true, {
                 fileName: "[project]/components/auth/pages/AuthShell.tsx",
                 lineNumber: 29,
-                columnNumber: 62
+                columnNumber: 126
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$auth$2f$pages$2f$AuthForm$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["FieldError"], {
                 name: name
@@ -1161,12 +1169,30 @@ function VerifyEmail(param) {
     const [error, setError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])('');
     const [message, setMessage] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])('');
     const initialized = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(false);
+    // The session cookie can disappear while this page is open (signed out or replaced in
+    // another tab). Keep the typed code for this tab and come back here after signing in.
+    function signInAgain() {
+        let code = arguments.length > 0 && arguments[0] !== void 0 ? arguments[0] : '';
+        if (code) (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$pending$2d$verification$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["savePendingVerification"])(code);
+        router.replace((0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$authRedirect$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["authPageUrl"])('signin', locale, returnUrl) + (returnUrl ? '&' : '?') + 'verifyEmail=1');
+    }
+    function sessionLost(e) {
+        let code = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : '';
+        if (!(e instanceof __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$auth$2d$client$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["AuthError"]) || e.status !== 401) return false;
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$auth$2d$client$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["clearSession"])();
+        signInAgain(code);
+        return true;
+    }
     function finish() {
         (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$pending$2d$verification$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["clearPendingVerification"])();
         router.replace((0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$authToken$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getAuthToken"])() ? "/".concat(locale, "/callback").concat(returnUrl ? "?returnUrl=".concat(encodeURIComponent(returnUrl)) : '') : (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$authRedirect$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["authPageUrl"])('signin', locale, returnUrl));
     }
     async function resend() {
         if (sending || cooldown > 0) return;
+        if (!(0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$authToken$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getAuthToken"])()) {
+            signInAgain();
+            return;
+        }
         setSending(true);
         setError('');
         try {
@@ -1179,6 +1205,7 @@ function VerifyEmail(param) {
             } catch (e) {}
             setMessage(ar ? 'تم إرسال رمز التحقق.' : 'A verification code has been sent.');
         } catch (e) {
+            if (sessionLost(e)) return;
             setServerError(e);
             setError((0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$auth$2f$pages$2f$AuthForm$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["hasFieldErrors"])(e) ? '' : (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$auth$2d$client$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["authErrorMessage"])(e, locale));
         } finally{
@@ -1242,7 +1269,7 @@ function VerifyEmail(param) {
                         setBusy(false);
                     }
                 }["VerifyEmail.useEffect"]);
-            } else if (!(0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$authToken$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getAuthToken"])()) router.replace((0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$authRedirect$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["authPageUrl"])('signin', locale, returnUrl) + (returnUrl ? '&' : '?') + 'verifyEmail=1');
+            } else if (!(0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$authToken$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getAuthToken"])()) signInAgain(pendingCode);
             else {
                 let previous = 0;
                 try {
@@ -1263,6 +1290,10 @@ function VerifyEmail(param) {
         e.preventDefault();
         if (busy) return;
         const code = String(new FormData(e.currentTarget).get('code'));
+        if (!(0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$authToken$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getAuthToken"])()) {
+            signInAgain(code);
+            return;
+        }
         setBusy(true);
         setError('');
         try {
@@ -1271,6 +1302,7 @@ function VerifyEmail(param) {
             });
             finish();
         } catch (e) {
+            if (sessionLost(e, code)) return;
             setServerError(e);
             setError((0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$auth$2f$pages$2f$AuthForm$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["hasFieldErrors"])(e) ? '' : (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$auth$2d$client$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["authErrorMessage"])(e, locale));
             setBusy(false);
@@ -1286,7 +1318,7 @@ function VerifyEmail(param) {
                 message: message
             }, void 0, false, {
                 fileName: "[project]/components/auth/pages/VerifyEmail.tsx",
-                lineNumber: 66,
+                lineNumber: 79,
                 columnNumber: 5
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$auth$2f$pages$2f$AuthForm$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1301,7 +1333,7 @@ function VerifyEmail(param) {
                             initialCode: initialCode
                         }, initialCode, false, {
                             fileName: "[project]/components/auth/pages/VerifyEmail.tsx",
-                            lineNumber: 67,
+                            lineNumber: 80,
                             columnNumber: 7
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$auth$2f$pages$2f$AuthShell$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SubmitButton"], {
@@ -1310,7 +1342,7 @@ function VerifyEmail(param) {
                             children: ar ? 'تأكيد البريد' : 'Verify email'
                         }, void 0, false, {
                             fileName: "[project]/components/auth/pages/VerifyEmail.tsx",
-                            lineNumber: 68,
+                            lineNumber: 81,
                             columnNumber: 7
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1321,18 +1353,18 @@ function VerifyEmail(param) {
                             children: cooldown ? "".concat(ar ? 'إعادة الإرسال بعد' : 'Resend in', " ").concat(cooldown, "s") : ar ? 'إعادة إرسال الرمز' : 'Resend code'
                         }, void 0, false, {
                             fileName: "[project]/components/auth/pages/VerifyEmail.tsx",
-                            lineNumber: 69,
+                            lineNumber: 82,
                             columnNumber: 7
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/auth/pages/VerifyEmail.tsx",
-                    lineNumber: 66,
+                    lineNumber: 79,
                     columnNumber: 120
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/auth/pages/VerifyEmail.tsx",
-                lineNumber: 66,
+                lineNumber: 79,
                 columnNumber: 50
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1343,18 +1375,18 @@ function VerifyEmail(param) {
                     children: ar ? 'استخدام حساب آخر' : 'Use a different account'
                 }, void 0, false, {
                     fileName: "[project]/components/auth/pages/VerifyEmail.tsx",
-                    lineNumber: 70,
+                    lineNumber: 83,
                     columnNumber: 54
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/auth/pages/VerifyEmail.tsx",
-                lineNumber: 70,
+                lineNumber: 83,
                 columnNumber: 27
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/auth/pages/VerifyEmail.tsx",
-        lineNumber: 65,
+        lineNumber: 78,
         columnNumber: 10
     }, this);
 }
