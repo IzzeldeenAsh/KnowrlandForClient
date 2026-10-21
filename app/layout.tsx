@@ -1,5 +1,6 @@
 
 import React from 'react';
+import DeveloperBar from './components/dev/DeveloperBar';
 import { getLocale } from 'next-intl/server';
 import { Almarai } from 'next/font/google';
 import { publicBaseUrl } from './config';
@@ -21,6 +22,9 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const devSources = process.env.NODE_ENV === 'development'
+    ? (await import('./components/dev/source-manifest')).getSourceManifest()
+    : null;
   const locale = await getLocale();
   const direction = locale === 'ar' ? 'rtl' : 'ltr';
 
@@ -44,7 +48,7 @@ export default async function RootLayout({
         <meta name="apple-mobile-web-app-title" content="Insighta" />
 
       </head>
-      <body suppressHydrationWarning>{children}</body>
+      <body suppressHydrationWarning>{children}{devSources && <DeveloperBar entries={devSources} />}</body>
     </html>
   );
 }
