@@ -4,21 +4,25 @@ import { AuthError } from '@/lib/auth-client';
 const ClearError = createContext<(name: string) => void>(() => {});
 export const useClearFieldError = () => useContext(ClearError);
 const Errors = createContext<Record<string, string>>({});
+// Names that have a <FieldError/> on screen; any other error (e.g. the API's `common`) is shown above the form.
+const Shown = createContext<Set<string>>(new Set());
 export function FieldError({ name }: { name: string }) {
-  const errors = useContext(Errors);
+  const errors = useContext(Errors); const shown = useContext(Shown);
+  useEffect(() => { shown.add(name); return () => { shown.delete(name); }; }, [shown, name]);
   return errors[name] ? <span id={`${name}-error`} className="auth-field-error" role="alert">{errors[name]}</span> : null;
 }
 export function hasFieldErrors(error: unknown) { return error instanceof AuthError && Object.keys(error.fields).length > 0; }
 export default function AuthForm({ locale, children, onSubmit, serverError }: { locale: string; children: React.ReactNode; onSubmit: (event: FormEvent<HTMLFormElement>) => void; serverError?: unknown }) {
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const ref = useRef<HTMLFormElement>(null); const ar = locale === 'ar';
+  const ref = useRef<HTMLFormElement>(null); const ar = locale === 'ar'; const shown = useRef(new Set<string>()).current;
+  const general = Object.entries(errors).find(([name, message]) => message && !shown.has(name))?.[1];
   function validate(form: HTMLFormElement) {
     const result: Record<string, string> = {};
     for (const element of Array.from(form.elements)) {
       if (!(element instanceof HTMLInputElement) || !element.name || element.disabled) continue;
       const value = element.type === 'password' || element.name.startsWith('password') ? element.value : element.value.trim();
       if (element.required && !value) result[element.name] = ar ? 'هذا الحقل مطلوب.' : 'This field is required.';
-      else if (element.type === 'email' && value && element.validity.typeMismatch) result[element.name] = ar ? 'أدخل بريداً إلكترونياً صالحاً.' : 'Enter a valid email address.';
+      else if (element.type === 'email' && value && (element.validity.typeMismatch || !/@[^@.\s]+(\.[^@.\s]+)+$/.test(value))) result[element.name] = ar ? 'أدخل بريداً إلكترونياً صالحاً.' : 'Enter a valid email address.';
       else if (value && element.minLength > 0 && value.length < element.minLength) result[element.name] = ar ? `أدخل ${element.minLength} أحرف على الأقل.` : `Enter at least ${element.minLength} characters.`;
       if (element.name === 'country_id' && !value) result.country_id = ar ? 'اختر الدولة.' : 'Select your country.';
       if (element.name === 'code' && !/^\d{6}$/.test(value)) result.code = ar ? 'أدخل رمز التحقق المكوّن من 6 أرقام.' : 'Enter the 6-digit verification code.';
@@ -37,13 +41,14 @@ export default function AuthForm({ locale, children, onSubmit, serverError }: { 
       if (errors[name]) input.setAttribute('aria-describedby', `${name}-error`); else input.removeAttribute('aria-describedby');
     });
   }, [errors]);
-  return <Errors.Provider value={errors}><ClearError.Provider value={name => setErrors(old => ({ ...old, [name]: '' }))}><form ref={ref} noValidate className="auth-form" onBlur={event => {
+  return <Errors.Provider value={errors}><Shown.Provider value={shown}><ClearError.Provider value={name => setErrors(old => ({ ...old, [name]: '' }))}><form ref={ref} noValidate className="auth-form" onBlur={event => {
     const input = event.target; if (!(input instanceof HTMLInputElement)) return; const name = input.dataset.field || input.name;
     if (!name || !ref.current || input.type === 'hidden' || (name === 'code' && event.currentTarget.contains(event.relatedTarget as Node))) return;
     const next = validate(ref.current); setErrors(old => ({ ...old, [name]: next[name] || '' }));
-  }} onChange={event => { if ((event.target as HTMLInputElement).dataset.field) return; if (ref.current) { const next = validate(ref.current); setErrors(old => Object.fromEntries(Object.keys(old).map(key => [key, next[key] || '']))); } }} onSubmit={event => {
+  }} onChange={event => { if (general) setErrors(old => Object.fromEntries(Object.entries(old).filter(([name]) => shown.has(name))));
+    if ((event.target as HTMLInputElement).dataset.field) return; if (ref.current) { const next = validate(ref.current); setErrors(old => Object.fromEntries(Object.keys(old).map(key => [key, next[key] || '']))); } }} onSubmit={event => {
     const next = validate(event.currentTarget); setErrors(next);
     if (Object.keys(next).length) { event.preventDefault(); const name = Object.keys(next)[0]; event.currentTarget.querySelector<HTMLInputElement>(`#${name}`)?.focus(); return; }
     onSubmit(event);
-  }}>{children}</form></ClearError.Provider></Errors.Provider>;
+  }}>{general && <p className="auth-error" role="alert">{general}</p>}{children}</form></ClearError.Provider></Shown.Provider></Errors.Provider>;
 }

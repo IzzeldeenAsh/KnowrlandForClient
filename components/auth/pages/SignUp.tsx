@@ -17,6 +17,9 @@ export default function SignUp({ locale }: { locale: string }) {
   const [countries, setCountries] = useState<Country[]>([]); const [countriesError, setCountriesError] = useState(false); const [retry, setRetry] = useState(0);
   const [accepted, setAccepted] = useState(false); const [agreement, setAgreement] = useState(false);
   const resolveAgreement = useRef<((value: boolean) => void) | null>(null);
+  // "Create account" opens the terms first; once they are accepted, carry on with that submission.
+  const submitAfterAgreement = useRef(false); const terms = useRef<HTMLInputElement>(null);
+  useEffect(() => { if (accepted && submitAfterAgreement.current) { submitAfterAgreement.current = false; terms.current?.form?.requestSubmit(); } }, [accepted]);
   useEffect(() => {
     const controller = new AbortController(); setCountriesError(false);
     authRequest('common/setting/country/list', locale, undefined, { signal: controller.signal, authenticated: false })
@@ -25,12 +28,12 @@ export default function SignUp({ locale }: { locale: string }) {
     return () => controller.abort();
   }, [locale, retry]);
   useEffect(() => () => resolveAgreement.current?.(false), []);
-  function completeAgreement(value: boolean) { setAgreement(false); setAccepted(value); resolveAgreement.current?.(value); resolveAgreement.current = null; }
+  function completeAgreement(value: boolean) { if (!value) submitAfterAgreement.current = false; setAgreement(false); setAccepted(value); resolveAgreement.current?.(value); resolveAgreement.current = null; }
   function beforeSocial() { if (accepted) return Promise.resolve(true); setAgreement(true); return new Promise<boolean>(resolve => { resolveAgreement.current = resolve; }); }
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); if (busy) return;
     if (!countries.length) { setError(ar ? 'يرجى تحميل قائمة الدول أولاً.' : 'Please load the country list first.'); return; }
-    if (!accepted) { setAgreement(true); return; }
+    if (!accepted) { submitAfterAgreement.current = true; setAgreement(true); return; }
     const form = new FormData(event.currentTarget); const password = String(form.get('password'));
     if (!/[A-Za-z]/.test(password) || !/\d/.test(password) || !/[^A-Za-z\d]/.test(password)) { setError(ar ? 'استخدم 8 أحرف على الأقل تتضمن حرفاً ورقماً ورمزاً.' : 'Use at least 8 characters including a letter, number and symbol.'); return; }
     setBusy(true); setError('');
@@ -49,7 +52,7 @@ export default function SignUp({ locale }: { locale: string }) {
       <p className="auth-hint">{ar ? '8 أحرف على الأقل تتضمن حرفاً ورقماً ورمزاً.' : 'At least 8 characters including a letter, number and symbol.'}</p>
       <CountryInput hideLabel countries={countries} locale={locale}/>
       {countriesError && <p className="auth-error" role="alert">{ar ? 'تعذر تحميل الدول. ' : 'Unable to load countries. '}<button type="button" className="auth-link" onClick={() => setRetry(x => x + 1)}>{ar ? 'إعادة المحاولة' : 'Retry'}</button></p>}
-      <div className="auth-check"><input id="terms" type="checkbox" checked={accepted} onChange={e => e.target.checked ? setAgreement(true) : setAccepted(false)}/><label htmlFor="terms">{ar ? 'أوافق على ' : 'I agree to the '}<button type="button" className="auth-link" onClick={() => setAgreement(true)}>{ar ? 'اتفاقية الاستخدام' : 'terms of service'}</button></label></div>
+      <div className="auth-check"><input ref={terms} id="terms" type="checkbox" checked={accepted} onChange={e => e.target.checked ? setAgreement(true) : setAccepted(false)}/><label htmlFor="terms">{ar ? 'أوافق على ' : 'I agree to the '}<button type="button" className="auth-link" onClick={() => setAgreement(true)}>{ar ? 'اتفاقية الاستخدام' : 'terms of service'}</button></label></div>
       <SubmitButton locale={locale} busy={busy}>{ar ? 'إنشاء حساب' : 'Create account'}</SubmitButton>
     </fieldset></AuthForm><AuthFooter locale={locale} signup returnUrl={returnUrl}/>
     {agreement && <Agreement locale={locale} onAccept={() => completeAgreement(true)} onCancel={() => completeAgreement(false)}/>}
