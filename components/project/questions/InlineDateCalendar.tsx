@@ -16,6 +16,8 @@ type InlineDateCalendarProps = {
   /** Highlights the days from rangeStart to rangeEnd, both ends drawn as selected. */
   rangeStart?: string
   rangeEnd?: string
+  /** Clicks on a locked in-range day, so the page can say why it can't be picked. */
+  onLockedDayClick?: (value: string) => void
 }
 
 function parseIsoDate(value?: string): Date | null {
@@ -74,6 +76,7 @@ export default function InlineDateCalendar({
   className = '',
   rangeStart,
   rangeEnd,
+  onLockedDayClick,
 }: InlineDateCalendarProps) {
   const isRTL = locale === 'ar'
   const selectedDate = useMemo(() => parseIsoDate(value), [value])
@@ -140,7 +143,8 @@ export default function InlineDateCalendar({
             firstInRange: inRange && isRangeStart,
             lastInRange: inRange && isRangeEnd,
             onClick: () => {
-              if (!locked) onChange(toLocalIsoDate(date))
+              if (locked) onLockedDayClick?.(toLocalIsoDate(date))
+              else onChange(toLocalIsoDate(date))
             },
           }
         }}

@@ -96,6 +96,8 @@ export default function ProjectScheduleQuestion({ locale, edit }: { locale: Wiza
   const [urgentAcknowledged, setUrgentAcknowledged] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  // Set when an in-range close day before the minimum duration is clicked.
+  const [closeDayLocked, setCloseDayLocked] = useState(false)
 
   useProjectStepErrorToast(error, locale)
 
@@ -163,6 +165,7 @@ export default function ProjectScheduleQuestion({ locale, edit }: { locale: Wiza
   const updateDuration = (value: number) => {
     const next = Math.min(maxDuration, Math.max(minCloseDays, Math.round(value) || 0))
     setDurationDays(next)
+    setCloseDayLocked(false)
     setUrgentAcknowledged(false)
     setError(null)
   }
@@ -277,6 +280,7 @@ export default function ProjectScheduleQuestion({ locale, edit }: { locale: Wiza
               rangeEnd={plannedCloseDate}
               onChange={(date) => {
                 setStartDate(date)
+                setCloseDayLocked(false)
                 setUrgentAcknowledged(false)
                 setError(null)
               }}
@@ -375,9 +379,17 @@ export default function ProjectScheduleQuestion({ locale, edit }: { locale: Wiza
                 setDurationDraft(null)
                 updateDuration(diffIsoDays(startDate, date))
               }}
+              onLockedDayClick={() => setCloseDayLocked(true)}
               locale={locale}
               label={isRTL ? 'تاريخ الإغلاق المتوقع' : 'Expected close date'}
             />
+            {closeDayLocked && startDate ? (
+              <p role="status" className="mt-2 w-0 min-w-full text-xs font-semibold leading-5 text-amber-700">
+                {isRTL
+                  ? `لا يمكن أن يكون تاريخ الإغلاق قبل ${formatIsoDate(addDaysToIsoDate(startDate, minCloseDays), locale, fullDateFormat)}، لأن المدة لا تقل عن ${durationLabel(locale, minCloseDays)}. اختر تاريخًا لاحقًا (انتقل للشهر التالي بالسهم) أو اكتب مدة أطول في الدائرة.`
+                  : `The close date can't be before ${formatIsoDate(addDaysToIsoDate(startDate, minCloseDays), locale, fullDateFormat)}, since the duration can't be shorter than ${durationLabel(locale, minCloseDays)}. Pick a later date (use the arrow for the next month) or type a longer duration in the circle.`}
+              </p>
+            ) : null}
           </div>
         </div>
 
