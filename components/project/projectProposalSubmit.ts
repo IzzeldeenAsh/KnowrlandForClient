@@ -72,6 +72,7 @@ export async function submitProjectProposal(locale: WizardLocale) {
   const deadlineOffer = formatProposalDeadlineOffer(
     readStorageValue(locale, projectWizardStorage.deadlineOfferKey(locale))
   )
+  if (!deadlineOffer) throw new Error('no_deadline_offer')
   const isSpecific = isSpecifiedInsighterProject(locale)
   const matches = isSpecific ? [] : readStoredSelectedMatchIds(locale)
   if (!isSpecific && matches.length === 0) throw new Error('no_matches')

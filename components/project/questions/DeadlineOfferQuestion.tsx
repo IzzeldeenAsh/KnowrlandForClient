@@ -55,12 +55,6 @@ function futureDateString(daysFromNow: number): string {
   return `${yyyy}-${mm}-${dd}`
 }
 
-function defaultOfferExpiryDate(projectType: string | null): string {
-  return normalizeProjectType(projectType) === 'urgent_request'
-    ? futureDateString(1)
-    : futureDateString(7)
-}
-
 // ISO dates (YYYY-MM-DD) compare correctly as strings.
 function clampIsoDate(value: string, min: string, max: string): string {
   if (min && value < min) return min
@@ -121,6 +115,8 @@ export default function DeadlineOfferQuestion({
   const isInvalidDate =
     !keepsCurrentDeadline &&
     (!hasSelectableDates || isPastDate || isAfterUrgentMaxDate || isOutsideProjectDates)
+  // The offer deadline is required: nothing is picked for the client.
+  const isMissingDate = dateValue === ''
 
   useEffect(() => {
     const timer = window.setTimeout(() => setEntered(true), 30)
@@ -150,13 +146,10 @@ export default function DeadlineOfferQuestion({
       const min = start > now ? start : now
       const max =
         [end, urgent ? futureDateString(1) : ''].filter(Boolean).sort()[0] || ''
-      // A stored or default date outside the project window is moved into it.
-      const stored = window.sessionStorage.getItem(storageKey)
-      setDateValue(
-        !max || min <= max
-          ? clampIsoDate(stored || defaultOfferExpiryDate(storedProjectType), min, max)
-          : stored || ''
-      )
+      // A stored date outside the project window is moved into it; with none stored
+      // the client has to pick one.
+      const stored = window.sessionStorage.getItem(storageKey) || ''
+      setDateValue(stored && (!max || min <= max) ? clampIsoDate(stored, min, max) : stored)
       setSelectedMatchesCount(
         isSpecifiedInsighterProject(locale) ? 1 : readStoredSelectedMatchIds(locale).length
       )
@@ -180,6 +173,10 @@ export default function DeadlineOfferQuestion({
           ? isRTL
             ? 'يرجى اختيار خبير واحد على الأقل قبل إرسال الطلب.'
             : 'Please select at least one matched insighter before submitting.'
+          : err instanceof Error && err.message === 'no_deadline_offer'
+            ? isRTL
+              ? 'يرجى اختيار تاريخ انتهاء العرض.'
+              : 'Please select the offer expiry date.'
           : err instanceof Error && err.message === 'no_match_request_uuid'
             ? isRTL
               ? 'تعذر العثور على بيانات المطابقة الخاصة بالإرسال. أعد تحميل نتائج المطابقة ثم حاول مرة أخرى.'
@@ -206,8 +203,8 @@ export default function DeadlineOfferQuestion({
     if (!dateValue) {
       setError(
         isRTL
-          ? 'يرجى اختيار تاريخ.'
-          : 'Please select a date.'
+          ? 'يرجى اختيار تاريخ انتهاء العرض.'
+          : 'Please select the offer expiry date.'
       )
       return
     }
@@ -284,6 +281,7 @@ export default function DeadlineOfferQuestion({
             {isRTL
               ? 'متى تنتهي صلاحية هذا العرض؟'
               : 'When should this offer expire?'}
+            <span className="ms-1 text-rose-600" aria-hidden="true">*</span>
           </h2>
           <p className="mt-3 text-sm text-slate-500 max-w-2xl">
             {isRTL
@@ -329,7 +327,7 @@ export default function DeadlineOfferQuestion({
                 setError(null)
               }}
               locale={locale}
-              label={isRTL ? 'تاريخ انتهاء العرض' : 'Offer expiry date'}
+              label={isRTL ? 'تاريخ انتهاء العرض (مطلوب)' : 'Offer expiry date (required)'}
             />
             {projectStart || projectEnd ? (
               <p className="mt-3 text-xs font-medium text-slate-500">
@@ -367,8 +365,8 @@ export default function DeadlineOfferQuestion({
               <button
                 type="button"
                 onClick={() => void onContinue()}
-                disabled={submitting || isInvalidDate}
-                className={`btn-sm px-6 py-2 rounded-full ${!submitting && !isInvalidDate
+                disabled={submitting || isInvalidDate || isMissingDate}
+                className={`btn-sm px-6 py-2 rounded-full ${!submitting && !isInvalidDate && !isMissingDate
                     ? 'text-white bg-[#1C7CBB] hover:bg-opacity-90'
                     : 'text-slate-500 bg-slate-200 cursor-not-allowed'
                   }`}
