@@ -3,7 +3,7 @@ import Link from 'next/link'
 import Logo from './logo'
 import MobileMenu from './mobile-menu'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { IconChevronDown, IconLanguage, IconPlus, IconSearch, IconX } from '@tabler/icons-react'
+import { IconBriefcase, IconChevronDown, IconLanguage, IconPlus, IconSearch, IconX } from '@tabler/icons-react'
 import { HoverCard, Group, Text, Anchor, Divider, SimpleGrid, Button, TextInput } from '@mantine/core'
 import { UserProfile } from './header/components/UserProfile'
 import { useTranslations } from 'next-intl'
@@ -114,6 +114,9 @@ async function fetchIndustriesFromAPI(locale: string): Promise<Industry[]> {
 export default function Header() {
   const t = useTranslations('Header');
   const headerShellRef = useRef<HTMLDivElement | null>(null);
+  const [navActionsEl, setNavActionsEl] = useState<HTMLUListElement | null>(null);
+  const [feedSearchFormEl, setFeedSearchFormEl] = useState<HTMLFormElement | null>(null);
+  const [feedSearchMaxWidth, setFeedSearchMaxWidth] = useState<number | null>(null);
   const [industries, setIndustries] = useState<Industry[]>(industriesCache.data);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -233,6 +236,34 @@ export default function Header() {
       setSearchQuery(activeFeedKeyword);
     }
   }, [activeFeedKeyword, isFeedPage]);
+
+  // The feed search floats over the header; cap its width so it never runs under the nav actions.
+  // LTR it grows from its start edge, RTL it is centred, so those edges stay put while the cap changes.
+  useLayoutEffect(() => {
+    const form = feedSearchFormEl;
+    const nav = navActionsEl;
+    if (!isFeedPage || !form || !nav) return;
+    const measure = () => {
+      const formRect = form.getBoundingClientRect();
+      const navRect = nav.getBoundingClientRect();
+      const gap = 16;
+      const allowed = isArabicLocale
+        ? 2 * ((formRect.left + formRect.right) / 2 - navRect.right - gap)
+        : navRect.left - gap - formRect.left;
+      setFeedSearchMaxWidth(prev => {
+        const next = Math.max(0, Math.floor(allowed));
+        return prev === next ? prev : next;
+      });
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(nav);
+    window.addEventListener('resize', measure);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, [feedSearchFormEl, navActionsEl, isFeedPage, isArabicLocale]);
 
   useEffect(() => {
     if (!isFeedPage || searchInsights) return;
@@ -794,7 +825,7 @@ export default function Header() {
               )}
 
               {/* Desktop sign in links */}
-              <ul className="flex justify-end items-center flex-shrink-0">
+              <ul ref={setNavActionsEl} className="flex justify-end items-center flex-shrink-0">
                 {/* Feed + Home icons — mobile/tablet only, mirrors the Angular mobile header. */}
                 <li className="xl:hidden">
                   <Link
@@ -829,6 +860,20 @@ export default function Header() {
                     <i className="ki-outline ki-home-2 text-[17.6px] leading-none" aria-hidden="true" />
                   </Link>
                 </li>
+
+                {/* Request Service - feed page on wide screens (smaller screens have it beside the feed search).
+                    Styled like "Become an Insighter"; briefcase is the app's Request Service icon. */}
+                {isFeedPage && (
+                  <li className="mx-1 md:mx-2 hidden xl:block">
+                    <Link
+                      href={`/${currentLocale}/project`}
+                      className="inline-flex items-center gap-1.5 font-medium text-sm text-white px-2 md:px-3 py-2 rounded-md bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 ease-in-out whitespace-nowrap"
+                    >
+                      <IconBriefcase size={16} stroke={2} aria-hidden />
+                      {isArabicLocale ? 'طلب خدمة' : 'Request Service'}
+                    </Link>
+                  </li>
+                )}
 
                 {/* Language Switch Button */}
                 <li className="mx-1 md:mx-2">
@@ -936,8 +981,13 @@ export default function Header() {
               <div className="pointer-events-none absolute inset-0 hidden xl:block">
                 <div className="mx-auto grid h-full max-w-7xl grid-cols-[280px_minmax(0,1fr)_300px] items-center gap-6 px-0 sm:px-4 lg:px-6">
                   <form
+                    ref={setFeedSearchFormEl}
                     onSubmit={handleSearchSubmit}
-                    className="pointer-events-auto col-start-2 flex min-w-0 items-center gap-2 w-full"
+                    style={feedSearchMaxWidth ? { maxWidth: feedSearchMaxWidth } : undefined}
+                    className={`pointer-events-auto col-start-2 ${isArabicLocale
+                      ? 'justify-self-center w-[clamp(20rem,38vw,48rem)]'
+                      : 'w-full'
+                      }`}
                     role="search"
                   >
                     <TextInput
@@ -953,7 +1003,7 @@ export default function Header() {
                       }}
                       size="sm"
                       radius="md"
-                      className="min-w-0 flex-1"
+                      className="w-full"
                       {...(() => {
                         const submitSection = (
                           <button
@@ -989,9 +1039,6 @@ export default function Header() {
                       rightSectionPointerEvents="all"
                       styles={feedSearchInputStyles}
                     />
-                    <Link href={`/${currentLocale}/project`} className="shrink-0 whitespace-nowrap rounded-md bg-sky-600 px-3 py-2 text-xs font-semibold text-white hover:bg-sky-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600">
-                      {isArabicLocale ? 'طلب مشروع' : 'Request Project'}
-                    </Link>
                   </form>
                 </div>
               </div>

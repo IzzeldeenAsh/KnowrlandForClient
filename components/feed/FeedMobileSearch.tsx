@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { IconSearch, IconX } from '@tabler/icons-react'
+import { IconBriefcase, IconSearch, IconX } from '@tabler/icons-react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { FEED_REFRESH_REQUESTED_EVENT } from './feedEvents'
@@ -102,8 +102,9 @@ export default function FeedMobileSearch({ locale }: { locale: string }) {
           <FeedSearchScopeToggle locale={locale} active={searchInsights} onChange={handleSearchInsightsChange} />
         </div>
       </div>
-      <Link href={`/${locale}/project`} className="rounded-lg bg-sky-600 px-3 py-3 text-xs font-semibold text-white hover:bg-sky-700">
-        {isRTL ? 'طلب مشروع' : 'Request Project'}
+      <Link href={`/${locale}/project`} className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 px-3 py-3 text-sm font-medium text-white transition-all duration-300 ease-in-out hover:from-blue-600 hover:to-cyan-600">
+        <IconBriefcase size={16} stroke={2} aria-hidden />
+        {isRTL ? 'طلب خدمة' : 'Request Service'}
       </Link>
     </form>
   )
