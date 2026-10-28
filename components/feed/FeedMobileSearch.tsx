@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { IconSearch, IconX } from '@tabler/icons-react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -66,11 +67,11 @@ export default function FeedMobileSearch({ locale }: { locale: string }) {
   if (pathname !== `/${locale}`) return null
 
   return (
-    <form onSubmit={submit} className="xl:hidden" role="search">
+    <form onSubmit={submit} className="xl:hidden flex flex-wrap items-center gap-2" role="search">
       <label className="sr-only" htmlFor={`feed-mobile-search-${locale}`}>
         {isRTL ? 'البحث في الموجز أو المستندات' : 'Search in Feed or Insights'}
       </label>
-      <div className="relative">
+      <div className="relative min-w-0 flex-1 basis-64">
         <input
           id={`feed-mobile-search-${locale}`}
           type="search"
@@ -101,6 +102,9 @@ export default function FeedMobileSearch({ locale }: { locale: string }) {
           <FeedSearchScopeToggle locale={locale} active={searchInsights} onChange={handleSearchInsightsChange} />
         </div>
       </div>
+      <Link href={`/${locale}/project`} className="rounded-lg bg-sky-600 px-3 py-3 text-xs font-semibold text-white hover:bg-sky-700">
+        {isRTL ? 'طلب مشروع' : 'Request Project'}
+      </Link>
     </form>
   )
 }

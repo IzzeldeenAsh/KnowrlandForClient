@@ -111,18 +111,30 @@ function pathWithParamId(path: string, param: unknown): string {
  * `project.discussion.message` is special: the backend resolves the exact
  * destination and ships the full URL in `url`. We don't re-derive the route —
  * we take its path, swap in `param` as the id, pin it to this environment's
- * dashboard host, and force the discussion tab.
+ * dashboard host, and preserve private-offer message destinations.
  *
  * Falls back to the role-based project route for notifications predating the
  * backend `url` field.
  */
-function discussionUrl(notification: Pick<Notification, 'param' | 'url'>, roles: string[]): string {
-  const { path } = partsFromBackendUrl(notification.url)
-  if (!path) {
-    return roleBasedProjectUrl(notification.param, roles)
-  }
+type DiscussionNotification = Pick<Notification, 'param' | 'url'>
+  & Partial<Pick<Notification, 'notifiable_group_id' | 'visibility' | 'project_proposal_offer_uuid'>>
 
-  return `${DASHBOARD}${pathWithParamId(path, notification.param)}?tab=discussion`
+function discussionUrl(notification: DiscussionNotification, roles: string[]): string {
+  const { path, search } = partsFromBackendUrl(notification.url)
+  const query = new URLSearchParams(search)
+  const legacy = String(notification.notifiable_group_id ?? '').trim()
+  const offerUuid = notification.visibility === 'public' ? '' :
+    notification.project_proposal_offer_uuid?.trim() || query.get('offer') ||
+    (notification.visibility !== 'private_offer' && /^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(legacy) && legacy !== String(notification.param) ? legacy : '')
+  let target = path
+    ? `${DASHBOARD}${pathWithParamId(path, notification.param)}`
+    : roleBasedProjectUrl(notification.param, roles)
+  if (offerUuid) {
+    target = target.replace('/on-work-projects/details/', '/project-offers/details/')
+    const tab = target.includes('/project-offers/details/') ? 'tab=offer&' : ''
+    return `${target}?${tab}offer=${encodeURIComponent(offerUuid)}`
+  }
+  return `${target}?tab=discussion`
 }
 
 /** insighter → on-work details, client → projects-created details (role-based events). */
@@ -174,7 +186,7 @@ function agreementRevisionUrl(notification: RevisionNotification, roles: string[
 }
 
 export function routeForNotification(
-  notification: Pick<Notification, 'event_name' | 'type' | 'sub_type' | 'param' | 'url'> & Partial<RevisionNotification>,
+  notification: Pick<Notification, 'event_name' | 'type' | 'sub_type' | 'param' | 'url'> & Partial<RevisionNotification> & DiscussionNotification,
   roles: string[] = []
 ): string | null {
   const param = notification.param

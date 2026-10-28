@@ -317,7 +317,8 @@ export default function DeadlineOfferQuestion({
             }`}
           style={{ transitionDelay: '160ms' }}
         >
-          <div className="max-w-sm">
+          <div className="flex flex-col sm:flex-row items-start gap-6">
+          <div className="w-full max-w-sm">
             <InlineDateCalendar
               value={dateValue}
               min={minDate}
@@ -347,6 +348,23 @@ export default function DeadlineOfferQuestion({
             {visibleError ? (
               <div className="mt-3 text-sm text-rose-700">{visibleError}</div>
             ) : null}
+          </div>
+          {dateValue && !isInvalidDate && (
+            <aside className="w-full sm:w-64 rounded-2xl border border-emerald-200 bg-emerald-50 p-5" aria-live="polite">
+              <div className="flex items-center gap-4">
+                <div className="flex h-20 w-20 shrink-0 flex-col items-center justify-center rounded-full border-[5px] border-emerald-600 bg-white text-emerald-900">
+                  <strong className="text-2xl">{Math.max(0, Math.round((Date.parse(dateValue) - Date.parse(today)) / 86400000))}</strong>
+                  <span className="text-[10px] font-bold uppercase">{isRTL ? 'أيام متبقية' : 'Days left'}</span>
+                </div>
+                <div><p className="text-xs font-semibold text-emerald-800">{isRTL ? 'موعد انتهاء العرض' : 'Offer deadline'}</p><strong className="text-sm text-slate-900">{formatIsoDate(dateValue, locale)}</strong></div>
+              </div>
+              <p className="mt-4 text-sm font-medium text-emerald-900">
+                {isRTL
+                  ? `أكّد موعد انتهاء العرض: ${formatIsoDate(dateValue, locale)}.`
+                  : `Confirm the offer deadline: ${formatIsoDate(dateValue, locale)}.`}
+              </p>
+            </aside>
+          )}
           </div>
         </div>
       </div>

@@ -10,6 +10,8 @@ export interface Notification {
   notifiable_id: number
   request_id: number
   param: any
+  visibility?: 'public' | 'private_offer'
+  project_proposal_offer_uuid?: string
   url?: string
   sub_type: string
   redirect_page: boolean

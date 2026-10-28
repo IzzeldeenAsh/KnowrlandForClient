@@ -473,6 +473,10 @@ export default function Header() {
 
   // Function to switch locale
   const switchLocale = (locale: string) => {
+    if (locale === currentLocale) return;
+    if (/\/project\/(wizard|edit)(\/|$)/.test(pathname) && !window.confirm(currentLocale === 'ar'
+      ? 'تغيير اللغة سيعيد تحميل الصفحة وقد يؤدي إلى فقدان التغييرات غير المحفوظة. هل تريد المتابعة؟'
+      : 'Changing language reloads this page and may discard unsaved changes. Continue?')) return;
     // Set loading state before switching locale
     setAppLoading(true);
 
@@ -819,7 +823,7 @@ export default function Header() {
                 <li className="xl:hidden">
                   <Link
                     href={`/${currentLocale}/landing`}
-                    aria-label={currentLocale === 'ar' ? 'الصفحة الرئيسية' : 'Home'}
+                    aria-label={currentLocale === 'ar' ? 'رؤى' : 'Insights'}
                     className="flex h-9 w-9 items-center justify-center rounded-md text-slate-300 transition-all duration-200 hover:bg-[#3B8AEF]/20 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#67B5F6]"
                   >
                     <i className="ki-outline ki-home-2 text-[17.6px] leading-none" aria-hidden="true" />
@@ -933,10 +937,7 @@ export default function Header() {
                 <div className="mx-auto grid h-full max-w-7xl grid-cols-[280px_minmax(0,1fr)_300px] items-center gap-6 px-0 sm:px-4 lg:px-6">
                   <form
                     onSubmit={handleSearchSubmit}
-                    className={`pointer-events-auto col-start-2 ${isArabicLocale
-                      ? 'justify-self-center w-[clamp(20rem,38vw,48rem)]'
-                      : 'w-full'
-                      }`}
+                    className="pointer-events-auto col-start-2 flex min-w-0 items-center gap-2 w-full"
                     role="search"
                   >
                     <TextInput
@@ -952,7 +953,7 @@ export default function Header() {
                       }}
                       size="sm"
                       radius="md"
-                      className="w-full"
+                      className="min-w-0 flex-1"
                       {...(() => {
                         const submitSection = (
                           <button
@@ -988,6 +989,9 @@ export default function Header() {
                       rightSectionPointerEvents="all"
                       styles={feedSearchInputStyles}
                     />
+                    <Link href={`/${currentLocale}/project`} className="shrink-0 whitespace-nowrap rounded-md bg-sky-600 px-3 py-2 text-xs font-semibold text-white hover:bg-sky-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600">
+                      {isArabicLocale ? 'طلب مشروع' : 'Request Project'}
+                    </Link>
                   </form>
                 </div>
               </div>
