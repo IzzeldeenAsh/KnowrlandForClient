@@ -973,7 +973,7 @@ function DeliverablesPlanQuestion(param) {
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
                         id: "deliverables-plan-question-title",
                         className: "text-2xl sm:text-3xl font-medium tracking-tight text-slate-900",
-                        children: isRTL ? "ما المخرجات التي ستستلمها؟" : "What will you receive?"
+                        children: isRTL ? "مخرجات المشروع" : "Project deliverables"
                     }, void 0, false, {
                         fileName: "[project]/components/project/questions/service-components/DeliverablesPlanQuestion.tsx",
                         lineNumber: 738,

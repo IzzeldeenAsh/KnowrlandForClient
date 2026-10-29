@@ -1,11 +1,5 @@
 {
   "/(auth)/[locale]/callback/page": "app/(auth)/[locale]/callback/page.js",
   "/(auth)/[locale]/signin/page": "app/(auth)/[locale]/signin/page.js",
-  "/(auth)/[locale]/signout/page": "app/(auth)/[locale]/signout/page.js",
-  "/[locale]/(default)/landing/page": "app/[locale]/(default)/landing/page.js",
-  "/[locale]/(default)/page": "app/[locale]/(default)/page.js",
-  "/[locale]/project/edit/[projectUuid]/[step]/page": "app/[locale]/project/edit/[projectUuid]/[step]/page.js",
-  "/[locale]/project/edit/[projectUuid]/page": "app/[locale]/project/edit/[projectUuid]/page.js",
-  "/[locale]/project/wizard/[step]/page": "app/[locale]/project/wizard/[step]/page.js",
   "/manifest.webmanifest/route": "app/manifest.webmanifest/route.js"
 }

@@ -5577,7 +5577,7 @@ function sameDate(a, b) {
 function getInitialMonth(value, min) {
     return startOfMonth(parseIsoDate(value) || parseIsoDate(min) || new Date());
 }
-function InlineDateCalendar({ value, min, max, onChange, locale, label, className = '', rangeStart, rangeEnd }) {
+function InlineDateCalendar({ value, min, max, onChange, locale, label, className = '', rangeStart, rangeEnd, onLockedDayClick }) {
     const isRTL = locale === 'ar';
     const selectedDate = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useMemo"])(()=>parseIsoDate(value), [
         value
@@ -5651,7 +5651,8 @@ function InlineDateCalendar({ value, min, max, onChange, locale, label, classNam
                     firstInRange: inRange && isRangeStart,
                     lastInRange: inRange && isRangeEnd,
                     onClick: ()=>{
-                        if (!locked) onChange(toLocalIsoDate(date));
+                        if (locked) onLockedDayClick?.(toLocalIsoDate(date));
+                        else onChange(toLocalIsoDate(date));
                     }
                 };
             },
@@ -5695,12 +5696,12 @@ function InlineDateCalendar({ value, min, max, onChange, locale, label, classNam
             }
         }, void 0, false, {
             fileName: "[project]/components/project/questions/InlineDateCalendar.tsx",
-            lineNumber: 108,
+            lineNumber: 111,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/components/project/questions/InlineDateCalendar.tsx",
-        lineNumber: 104,
+        lineNumber: 107,
         columnNumber: 5
     }, this);
 }
@@ -5761,9 +5762,6 @@ function futureDateString(daysFromNow) {
     const dd = String(date.getDate()).padStart(2, '0');
     return `${yyyy}-${mm}-${dd}`;
 }
-function defaultOfferExpiryDate(projectType) {
-    return normalizeProjectType(projectType) === 'urgent_request' ? futureDateString(1) : futureDateString(7);
-}
 // ISO dates (YYYY-MM-DD) compare correctly as strings.
 function clampIsoDate(value, min, max) {
     if (min && value < min) return min;
@@ -5809,6 +5807,8 @@ function DeadlineOfferQuestion({ locale, edit }) {
     const isAfterUrgentMaxDate = isUrgentProject && dateValue !== '' && dateValue > tomorrow;
     const isOutsideProjectDates = dateValue !== '' && (!edit && projectStart !== '' && dateValue < projectStart || projectEnd !== '' && dateValue > projectEnd);
     const isInvalidDate = !keepsCurrentDeadline && (!hasSelectableDates || isPastDate || isAfterUrgentMaxDate || isOutsideProjectDates);
+    // The offer deadline is required: nothing is picked for the client.
+    const isMissingDate = dateValue === '';
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
         const timer = window.setTimeout(()=>setEntered(true), 30);
         return ()=>window.clearTimeout(timer);
@@ -5835,9 +5835,10 @@ function DeadlineOfferQuestion({ locale, edit }) {
                 end,
                 urgent ? futureDateString(1) : ''
             ].filter(Boolean).sort()[0] || '';
-            // A stored or default date outside the project window is moved into it.
-            const stored = window.sessionStorage.getItem(storageKey);
-            setDateValue(!max || min <= max ? clampIsoDate(stored || defaultOfferExpiryDate(storedProjectType), min, max) : stored || '');
+            // A stored date outside the project window is moved into it; with none stored
+            // the client has to pick one.
+            const stored = window.sessionStorage.getItem(storageKey) || '';
+            setDateValue(stored && (!max || min <= max) ? clampIsoDate(stored, min, max) : stored);
             setSelectedMatchesCount((0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$specifiedInsighterProject$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["isSpecifiedInsighterProject"])(locale) ? 1 : (0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectProposalSubmit$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["readStoredSelectedMatchIds"])(locale).length);
         } catch  {
         // ignore
@@ -5855,7 +5856,7 @@ function DeadlineOfferQuestion({ locale, edit }) {
             await (0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectProposalSubmit$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["submitProjectProposal"])(locale);
             router.push(nav.hrefFor(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectWizardFlow$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["projectWizardStepIds"].projectSubmissionSuccess));
         } catch (err) {
-            const message = err instanceof Error && err.message === 'no_matches' ? isRTL ? 'يرجى اختيار خبير واحد على الأقل قبل إرسال الطلب.' : 'Please select at least one matched insighter before submitting.' : err instanceof Error && err.message === 'no_match_request_uuid' ? isRTL ? 'تعذر العثور على بيانات المطابقة الخاصة بالإرسال. أعد تحميل نتائج المطابقة ثم حاول مرة أخرى.' : 'The proposal match identifier is missing. Reload the match results and try again.' : (0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectApiError$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getProjectApiErrorMessage"])(err, isRTL ? 'تعذر إرسال الطلب.' : 'Failed to submit project proposal.');
+            const message = err instanceof Error && err.message === 'no_matches' ? isRTL ? 'يرجى اختيار خبير واحد على الأقل قبل إرسال الطلب.' : 'Please select at least one matched insighter before submitting.' : err instanceof Error && err.message === 'no_deadline_offer' ? isRTL ? 'يرجى اختيار تاريخ انتهاء العرض.' : 'Please select the offer expiry date.' : err instanceof Error && err.message === 'no_match_request_uuid' ? isRTL ? 'تعذر العثور على بيانات المطابقة الخاصة بالإرسال. أعد تحميل نتائج المطابقة ثم حاول مرة أخرى.' : 'The proposal match identifier is missing. Reload the match results and try again.' : (0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectApiError$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getProjectApiErrorMessage"])(err, isRTL ? 'تعذر إرسال الطلب.' : 'Failed to submit project proposal.');
             setSelectedMatchesCount((0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$specifiedInsighterProject$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["isSpecifiedInsighterProject"])(locale) ? 1 : (0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectProposalSubmit$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["readStoredSelectedMatchIds"])(locale).length);
             setError(message);
         } finally{
@@ -5865,7 +5866,7 @@ function DeadlineOfferQuestion({ locale, edit }) {
     const onContinue = async ()=>{
         if (submitting || isInvalidDate) return;
         if (!dateValue) {
-            setError(isRTL ? 'يرجى اختيار تاريخ.' : 'Please select a date.');
+            setError(isRTL ? 'يرجى اختيار تاريخ انتهاء العرض.' : 'Please select the offer expiry date.');
             return;
         }
         if (edit) {
@@ -5895,7 +5896,7 @@ function DeadlineOfferQuestion({ locale, edit }) {
                         serviceLabelOverride: edit ? edit.serviceLabel : undefined
                     }, void 0, false, {
                         fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                        lineNumber: 258,
+                        lineNumber: 255,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5909,16 +5910,27 @@ function DeadlineOfferQuestion({ locale, edit }) {
             `
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                                lineNumber: 274,
+                                lineNumber: 271,
                                 columnNumber: 13
                             }, this) : null,
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
                                 id: "deadline-offer-question-title",
                                 className: "text-2xl sm:text-3xl font-medium tracking-tight text-slate-900",
-                                children: isRTL ? 'متى تنتهي صلاحية هذا العرض؟' : 'When should this offer expire?'
-                            }, void 0, false, {
+                                children: [
+                                    isRTL ? 'متى تنتهي صلاحية هذا العرض؟' : 'When should this offer expire?',
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        className: "ms-1 text-rose-600",
+                                        "aria-hidden": "true",
+                                        children: "*"
+                                    }, void 0, false, {
+                                        fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
+                                        lineNumber: 284,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
                                 fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                                lineNumber: 280,
+                                lineNumber: 277,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -5926,7 +5938,7 @@ function DeadlineOfferQuestion({ locale, edit }) {
                                 children: isRTL ? 'إذا لم يتم التعاقد قبل هذا التاريخ، سيتم إزالة العرض تلقائيًا.' : 'If no contract is made by this date, the offer will be automatically removed.'
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                                lineNumber: 288,
+                                lineNumber: 286,
                                 columnNumber: 11
                             }, this),
                             edit ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -5934,7 +5946,7 @@ function DeadlineOfferQuestion({ locale, edit }) {
                                 children: isRTL ? 'يمكن تمديد الموعد فقط، وينطبق على جميع الخبراء المدعوين لهذا الطلب.' : 'The deadline can only be extended, and it applies to every Insighter invited to this request.'
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                                lineNumber: 294,
+                                lineNumber: 292,
                                 columnNumber: 13
                             }, this) : selectedMatchesCount > 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "mt-4 inline-flex max-w-full items-center gap-2 rounded-full border border-sky-100 bg-sky-50/80 px-3 py-2 text-sm font-semibold text-sky-800 shadow-sm",
@@ -5944,7 +5956,7 @@ function DeadlineOfferQuestion({ locale, edit }) {
                                         children: selectedMatchesCount
                                     }, void 0, false, {
                                         fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                                        lineNumber: 301,
+                                        lineNumber: 299,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -5952,19 +5964,19 @@ function DeadlineOfferQuestion({ locale, edit }) {
                                         children: isRTL ? 'من الخبراء/الجهات المختارة سيتم إرسالهم مع هذا العرض' : `selected match${selectedMatchesCount === 1 ? '' : 'es'} will be submitted with this offer`
                                     }, void 0, false, {
                                         fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                                        lineNumber: 304,
+                                        lineNumber: 302,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                                lineNumber: 300,
+                                lineNumber: 298,
                                 columnNumber: 13
                             }, this) : null
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                        lineNumber: 265,
+                        lineNumber: 262,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5973,54 +5985,139 @@ function DeadlineOfferQuestion({ locale, edit }) {
                             transitionDelay: '160ms'
                         },
                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "max-w-sm",
+                            className: "flex flex-col sm:flex-row items-start gap-6",
                             children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$questions$2f$InlineDateCalendar$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
-                                    value: dateValue,
-                                    min: minDate,
-                                    max: maxDate || undefined,
-                                    onChange: (date)=>{
-                                        setDateValue(date);
-                                        setError(null);
-                                    },
-                                    locale: locale,
-                                    label: isRTL ? 'تاريخ انتهاء العرض' : 'Offer expiry date'
-                                }, void 0, false, {
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "w-full max-w-sm",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$questions$2f$InlineDateCalendar$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                            value: dateValue,
+                                            min: minDate,
+                                            max: maxDate || undefined,
+                                            onChange: (date)=>{
+                                                setDateValue(date);
+                                                setError(null);
+                                            },
+                                            locale: locale,
+                                            label: isRTL ? 'تاريخ انتهاء العرض (مطلوب)' : 'Offer expiry date (required)'
+                                        }, void 0, false, {
+                                            fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
+                                            lineNumber: 322,
+                                            columnNumber: 13
+                                        }, this),
+                                        projectStart || projectEnd ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                            className: "mt-3 text-xs font-medium text-slate-500",
+                                            children: projectStart && projectEnd ? isRTL ? `مدة المشروع: ${formatIsoDate(projectStart, locale)} – ${formatIsoDate(projectEnd, locale)}` : `Project dates: ${formatIsoDate(projectStart, locale)} – ${formatIsoDate(projectEnd, locale)}` : projectEnd ? isRTL ? `الموعد النهائي للمشروع: ${formatIsoDate(projectEnd, locale)}` : `Project deadline: ${formatIsoDate(projectEnd, locale)}` : isRTL ? `بداية المشروع: ${formatIsoDate(projectStart, locale)}` : `Project start: ${formatIsoDate(projectStart, locale)}`
+                                        }, void 0, false, {
+                                            fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
+                                            lineNumber: 334,
+                                            columnNumber: 15
+                                        }, this) : null,
+                                        visibleError ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "mt-3 text-sm text-rose-700",
+                                            children: visibleError
+                                        }, void 0, false, {
+                                            fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
+                                            lineNumber: 349,
+                                            columnNumber: 15
+                                        }, this) : null
+                                    ]
+                                }, void 0, true, {
                                     fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                                    lineNumber: 323,
-                                    columnNumber: 13
+                                    lineNumber: 321,
+                                    columnNumber: 11
                                 }, this),
-                                projectStart || projectEnd ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                    className: "mt-3 text-xs font-medium text-slate-500",
-                                    children: projectStart && projectEnd ? isRTL ? `مدة المشروع: ${formatIsoDate(projectStart, locale)} – ${formatIsoDate(projectEnd, locale)}` : `Project dates: ${formatIsoDate(projectStart, locale)} – ${formatIsoDate(projectEnd, locale)}` : projectEnd ? isRTL ? `الموعد النهائي للمشروع: ${formatIsoDate(projectEnd, locale)}` : `Project deadline: ${formatIsoDate(projectEnd, locale)}` : isRTL ? `بداية المشروع: ${formatIsoDate(projectStart, locale)}` : `Project start: ${formatIsoDate(projectStart, locale)}`
-                                }, void 0, false, {
+                                dateValue && !isInvalidDate && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("aside", {
+                                    className: "w-full sm:w-64 rounded-2xl border border-emerald-200 bg-emerald-50 p-5",
+                                    "aria-live": "polite",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "flex items-center gap-4",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "flex h-20 w-20 shrink-0 flex-col items-center justify-center rounded-full border-[5px] border-emerald-600 bg-white text-emerald-900",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
+                                                            className: "text-2xl",
+                                                            children: Math.max(0, Math.round((Date.parse(dateValue) - Date.parse(today)) / 86400000))
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
+                                                            lineNumber: 356,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                            className: "text-[10px] font-bold uppercase",
+                                                            children: isRTL ? 'أيام متبقية' : 'Days left'
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
+                                                            lineNumber: 357,
+                                                            columnNumber: 19
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
+                                                    lineNumber: 355,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                            className: "text-xs font-semibold text-emerald-800",
+                                                            children: isRTL ? 'موعد انتهاء العرض' : 'Offer deadline'
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
+                                                            lineNumber: 359,
+                                                            columnNumber: 22
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
+                                                            className: "text-sm text-slate-900",
+                                                            children: formatIsoDate(dateValue, locale)
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
+                                                            lineNumber: 359,
+                                                            columnNumber: 128
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
+                                                    lineNumber: 359,
+                                                    columnNumber: 17
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
+                                            lineNumber: 354,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                            className: "mt-4 text-sm font-medium text-emerald-900",
+                                            children: isRTL ? `أكّد موعد انتهاء العرض: ${formatIsoDate(dateValue, locale)}.` : `Confirm the offer deadline: ${formatIsoDate(dateValue, locale)}.`
+                                        }, void 0, false, {
+                                            fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
+                                            lineNumber: 361,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
                                     fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                                    lineNumber: 335,
-                                    columnNumber: 15
-                                }, this) : null,
-                                visibleError ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "mt-3 text-sm text-rose-700",
-                                    children: visibleError
-                                }, void 0, false, {
-                                    fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                                    lineNumber: 350,
-                                    columnNumber: 15
-                                }, this) : null
+                                    lineNumber: 353,
+                                    columnNumber: 13
+                                }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                            lineNumber: 322,
+                            lineNumber: 320,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                        lineNumber: 313,
+                        lineNumber: 311,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                lineNumber: 257,
+                lineNumber: 254,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6036,7 +6133,7 @@ function DeadlineOfferQuestion({ locale, edit }) {
                                 children: isRTL ? 'رجوع' : 'Back'
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                                lineNumber: 359,
+                                lineNumber: 375,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6044,39 +6141,39 @@ function DeadlineOfferQuestion({ locale, edit }) {
                                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                     type: "button",
                                     onClick: ()=>void onContinue(),
-                                    disabled: submitting || isInvalidDate,
-                                    className: `btn-sm px-6 py-2 rounded-full ${!submitting && !isInvalidDate ? 'text-white bg-[#1C7CBB] hover:bg-opacity-90' : 'text-slate-500 bg-slate-200 cursor-not-allowed'}`,
+                                    disabled: submitting || isInvalidDate || isMissingDate,
+                                    className: `btn-sm px-6 py-2 rounded-full ${!submitting && !isInvalidDate && !isMissingDate ? 'text-white bg-[#1C7CBB] hover:bg-opacity-90' : 'text-slate-500 bg-slate-200 cursor-not-allowed'}`,
                                     children: submitting ? isRTL ? 'جاري الإرسال...' : 'Submitting...' : edit ? edit.continueLabel : isRTL ? 'إرسال الطلب' : 'Submit proposal'
                                 }, void 0, false, {
                                     fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                                    lineNumber: 367,
+                                    lineNumber: 383,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                                lineNumber: 366,
+                                lineNumber: 382,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                        lineNumber: 358,
+                        lineNumber: 374,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                    lineNumber: 357,
+                    lineNumber: 373,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-                lineNumber: 356,
+                lineNumber: 372,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/project/questions/DeadlineOfferQuestion.tsx",
-        lineNumber: 253,
+        lineNumber: 250,
         columnNumber: 5
     }, this);
 }
@@ -6235,6 +6332,8 @@ function ProjectScheduleQuestion({ locale, edit }) {
     const [urgentAcknowledged, setUrgentAcknowledged] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     const [submitting, setSubmitting] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     const [error, setError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    // Set when an in-range close day before the minimum duration is clicked.
+    const [closeDayLocked, setCloseDayLocked] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$useProjectStepErrorToast$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useProjectStepErrorToast"])(error, locale);
     const today = (0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectSchedule$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["todayIsoDate"])();
     const isUrgent = !edit && (0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectSchedule$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["isUrgentProjectType"])(projectType);
@@ -6288,6 +6387,7 @@ function ProjectScheduleQuestion({ locale, edit }) {
     const updateDuration = (value)=>{
         const next = Math.min(maxDuration, Math.max(minCloseDays, Math.round(value) || 0));
         setDurationDays(next);
+        setCloseDayLocked(false);
         setUrgentAcknowledged(false);
         setError(null);
     };
@@ -6365,7 +6465,7 @@ function ProjectScheduleQuestion({ locale, edit }) {
                         serviceLabelOverride: edit ? edit.serviceLabel : undefined
                     }, void 0, false, {
                         fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                        lineNumber: 237,
+                        lineNumber: 240,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6379,7 +6479,7 @@ function ProjectScheduleQuestion({ locale, edit }) {
             `
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                                lineNumber: 246,
+                                lineNumber: 249,
                                 columnNumber: 13
                             }, this) : null,
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -6388,13 +6488,13 @@ function ProjectScheduleQuestion({ locale, edit }) {
                                 children: isRTL ? 'متى يبدأ المشروع وكم يستغرق؟' : 'When should the project start, and how long will it take?'
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                                lineNumber: 252,
+                                lineNumber: 255,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                        lineNumber: 244,
+                        lineNumber: 247,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6411,7 +6511,7 @@ function ProjectScheduleQuestion({ locale, edit }) {
                                         children: isRTL ? 'تاريخ البدء المتوقع' : 'Expected start date'
                                     }, void 0, false, {
                                         fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                                        lineNumber: 265,
+                                        lineNumber: 268,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -6419,7 +6519,7 @@ function ProjectScheduleQuestion({ locale, edit }) {
                                         children: startDate ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectSchedule$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["formatIsoDate"])(startDate, locale, fullDateFormat) : '—'
                                     }, void 0, false, {
                                         fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                                        lineNumber: 268,
+                                        lineNumber: 271,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$questions$2f$InlineDateCalendar$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -6431,6 +6531,7 @@ function ProjectScheduleQuestion({ locale, edit }) {
                                         rangeEnd: plannedCloseDate,
                                         onChange: (date)=>{
                                             setStartDate(date);
+                                            setCloseDayLocked(false);
                                             setUrgentAcknowledged(false);
                                             setError(null);
                                         },
@@ -6438,20 +6539,20 @@ function ProjectScheduleQuestion({ locale, edit }) {
                                         label: isRTL ? 'تاريخ البدء المتوقع' : 'Expected start date'
                                     }, void 0, false, {
                                         fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                                        lineNumber: 271,
+                                        lineNumber: 274,
                                         columnNumber: 13
                                     }, this),
                                     isUrgent ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$questions$2f$UrgentDateNotice$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
                                         locale: locale
                                     }, void 0, false, {
                                         fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                                        lineNumber: 286,
+                                        lineNumber: 290,
                                         columnNumber: 25
                                     }, this) : null
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                                lineNumber: 264,
+                                lineNumber: 267,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6465,7 +6566,7 @@ function ProjectScheduleQuestion({ locale, edit }) {
                                                 className: "absolute inset-x-0 top-1/2 hidden border-t-2 border-dashed border-slate-300 lg:block"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                                                lineNumber: 291,
+                                                lineNumber: 295,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -6481,7 +6582,7 @@ function ProjectScheduleQuestion({ locale, edit }) {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                                                        lineNumber: 296,
+                                                        lineNumber: 300,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -6506,7 +6607,7 @@ function ProjectScheduleQuestion({ locale, edit }) {
                                                         className: "border-0 border-b-2 border-transparent bg-transparent p-0 text-center text-5xl font-semibold leading-none tracking-tight tabular-nums text-slate-900 transition-colors hover:border-slate-200 focus:border-[#1C7CBB] focus:outline-none focus:ring-0 disabled:hover:border-transparent"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                                                        lineNumber: 299,
+                                                        lineNumber: 303,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -6514,7 +6615,7 @@ function ProjectScheduleQuestion({ locale, edit }) {
                                                         children: durationUnit(locale, unit, durationValue)
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                                                        lineNumber: 318,
+                                                        lineNumber: 322,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -6522,19 +6623,19 @@ function ProjectScheduleQuestion({ locale, edit }) {
                                                         children: unit === 'days' ? startDate ? `${(0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectSchedule$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["formatIsoDate"])(startDate, locale, shortDateFormat)} ${isRTL ? '←' : '→'} ${(0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectSchedule$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["formatIsoDate"])(plannedCloseDate, locale, shortDateFormat)}` : '' : (0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectDeliverables$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["durationLabel"])(locale, durationDays)
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                                                        lineNumber: 321,
+                                                        lineNumber: 325,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                                                lineNumber: 295,
+                                                lineNumber: 299,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                                        lineNumber: 290,
+                                        lineNumber: 294,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6554,19 +6655,19 @@ function ProjectScheduleQuestion({ locale, edit }) {
                                                 children: unitButtonLabel(locale, option)
                                             }, option, false, {
                                                 fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                                                lineNumber: 339,
+                                                lineNumber: 343,
                                                 columnNumber: 19
                                             }, this);
                                         })
                                     }, void 0, false, {
                                         fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                                        lineNumber: 331,
+                                        lineNumber: 335,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                                lineNumber: 289,
+                                lineNumber: 293,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6577,7 +6678,7 @@ function ProjectScheduleQuestion({ locale, edit }) {
                                         children: isRTL ? 'تاريخ الإغلاق المتوقع' : 'Expected close date'
                                     }, void 0, false, {
                                         fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                                        lineNumber: 361,
+                                        lineNumber: 365,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -6585,7 +6686,7 @@ function ProjectScheduleQuestion({ locale, edit }) {
                                         children: plannedCloseDate ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectSchedule$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["formatIsoDate"])(plannedCloseDate, locale, fullDateFormat) : '—'
                                     }, void 0, false, {
                                         fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                                        lineNumber: 364,
+                                        lineNumber: 368,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$questions$2f$InlineDateCalendar$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -6599,23 +6700,33 @@ function ProjectScheduleQuestion({ locale, edit }) {
                                             setDurationDraft(null);
                                             updateDuration((0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectSchedule$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["diffIsoDays"])(startDate, date));
                                         },
+                                        onLockedDayClick: ()=>setCloseDayLocked(true),
                                         locale: locale,
                                         label: isRTL ? 'تاريخ الإغلاق المتوقع' : 'Expected close date'
                                     }, void 0, false, {
                                         fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                                        lineNumber: 367,
+                                        lineNumber: 371,
                                         columnNumber: 13
-                                    }, this)
+                                    }, this),
+                                    closeDayLocked && startDate ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                        role: "status",
+                                        className: "mt-2 w-0 min-w-full text-xs font-semibold leading-5 text-amber-700",
+                                        children: isRTL ? `لا يمكن أن يكون تاريخ الإغلاق قبل ${(0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectSchedule$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["formatIsoDate"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectSchedule$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["addDaysToIsoDate"])(startDate, minCloseDays), locale, fullDateFormat)}، لأن المدة لا تقل عن ${(0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectDeliverables$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["durationLabel"])(locale, minCloseDays)}. اختر تاريخًا لاحقًا (انتقل للشهر التالي بالسهم) أو اكتب مدة أطول في الدائرة.` : `The close date can't be before ${(0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectSchedule$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["formatIsoDate"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectSchedule$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["addDaysToIsoDate"])(startDate, minCloseDays), locale, fullDateFormat)}, since the duration can't be shorter than ${(0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectDeliverables$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["durationLabel"])(locale, minCloseDays)}. Pick a later date (use the arrow for the next month) or type a longer duration in the circle.`
+                                    }, void 0, false, {
+                                        fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
+                                        lineNumber: 387,
+                                        columnNumber: 15
+                                    }, this) : null
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                                lineNumber: 360,
+                                lineNumber: 364,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                        lineNumber: 260,
+                        lineNumber: 263,
                         columnNumber: 9
                     }, this),
                     hasDeliverables && minDuration > 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -6623,7 +6734,7 @@ function ProjectScheduleQuestion({ locale, edit }) {
                         children: isRTL ? `يجب أن تشمل المدة آخر مخرج (${(0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectDeliverables$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["dayLabel"])(locale, minDuration)}).` : `The duration has to cover your last deliverable (${(0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectDeliverables$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["dayLabel"])(locale, minDuration)}).`
                     }, void 0, false, {
                         fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                        lineNumber: 385,
+                        lineNumber: 397,
                         columnNumber: 11
                     }, this) : null,
                     edit ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -6631,7 +6742,7 @@ function ProjectScheduleQuestion({ locale, edit }) {
                         children: isRTL ? `يمكن تأجيل تاريخ البدء وتمديد المدة فقط، ولا يمكن أن تقل عن ${(0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectDeliverables$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["durationLabel"])(locale, minDuration)}.` : `The start can only move later and the duration can only be extended; it cannot go below ${(0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectDeliverables$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["durationLabel"])(locale, minDuration)}.`
                     }, void 0, false, {
                         fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                        lineNumber: 392,
+                        lineNumber: 404,
                         columnNumber: 11
                     }, this) : null,
                     startInPast ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -6639,7 +6750,7 @@ function ProjectScheduleQuestion({ locale, edit }) {
                         children: edit ? isRTL ? 'لا يمكن أن يكون تاريخ البدء قبل التاريخ المتفق عليه أو في الماضي.' : 'The start date cannot be earlier than the agreed start or in the past.' : isRTL ? 'لا يمكن أن يكون تاريخ البدء في الماضي.' : 'The start date cannot be in the past.'
                     }, void 0, false, {
                         fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                        lineNumber: 399,
+                        lineNumber: 411,
                         columnNumber: 11
                     }, this) : null,
                     error ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -6647,7 +6758,7 @@ function ProjectScheduleQuestion({ locale, edit }) {
                         children: error
                     }, void 0, false, {
                         fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                        lineNumber: 409,
+                        lineNumber: 421,
                         columnNumber: 18
                     }, this) : null,
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6662,7 +6773,7 @@ function ProjectScheduleQuestion({ locale, edit }) {
                                 "aria-hidden": "true"
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                                lineNumber: 415,
+                                lineNumber: 427,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -6670,19 +6781,19 @@ function ProjectScheduleQuestion({ locale, edit }) {
                                 children: isRTL ? 'يُرجى العلم أن تاريخي البدء والإغلاق المتوقعين تقديريان. يبدأ المشروع رسميًا في تاريخ توقيع العقد، سواء كان قبل التاريخ المحدد أو بعده، ويُعدَّل تاريخ الإغلاق ومواعيد جميع المخرجات تبعًا لذلك مع الحفاظ على المدة المتفق عليها.' : 'Please note that the expected start and close dates are indicative. The project officially commences on the date the contract is signed, whether earlier or later than the date selected, and the close date and all deliverable dates will be adjusted accordingly, keeping the agreed duration.'
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                                lineNumber: 416,
+                                lineNumber: 428,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                        lineNumber: 411,
+                        lineNumber: 423,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                lineNumber: 236,
+                lineNumber: 239,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6698,7 +6809,7 @@ function ProjectScheduleQuestion({ locale, edit }) {
                                 children: isRTL ? 'رجوع' : 'Back'
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                                lineNumber: 427,
+                                lineNumber: 439,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -6709,23 +6820,23 @@ function ProjectScheduleQuestion({ locale, edit }) {
                                 children: submitting ? isRTL ? 'جاري الحفظ...' : 'Saving...' : edit?.continueLabel ?? nav.continueLabel
                             }, void 0, false, {
                                 fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                                lineNumber: 433,
+                                lineNumber: 445,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                        lineNumber: 426,
+                        lineNumber: 438,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                    lineNumber: 425,
+                    lineNumber: 437,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                lineNumber: 424,
+                lineNumber: 436,
                 columnNumber: 7
             }, this),
             showUrgentWarning ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6742,7 +6853,7 @@ function ProjectScheduleQuestion({ locale, edit }) {
                             children: isRTL ? 'طلب عاجل' : 'Urgent project request'
                         }, void 0, false, {
                             fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                            lineNumber: 456,
+                            lineNumber: 468,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -6750,7 +6861,7 @@ function ProjectScheduleQuestion({ locale, edit }) {
                             children: isRTL ? 'إنهاء المشروع بهذه السرعة سيجعل طلبك عاجلًا، وقد يؤثر على عدد الخبراء المقترحين المتاحين. هل تريد المتابعة؟' : 'Finishing this soon will make this an urgent project request, which may affect the number of suggested available insighters. Do you want to continue?'
                         }, void 0, false, {
                             fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                            lineNumber: 459,
+                            lineNumber: 471,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6763,7 +6874,7 @@ function ProjectScheduleQuestion({ locale, edit }) {
                                     children: isRTL ? 'إلغاء' : 'Cancel'
                                 }, void 0, false, {
                                     fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                                    lineNumber: 465,
+                                    lineNumber: 477,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -6777,30 +6888,30 @@ function ProjectScheduleQuestion({ locale, edit }) {
                                     children: isRTL ? 'نعم، متابعة' : 'Yes, continue'
                                 }, void 0, false, {
                                     fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                                    lineNumber: 472,
+                                    lineNumber: 484,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                            lineNumber: 464,
+                            lineNumber: 476,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                    lineNumber: 450,
+                    lineNumber: 462,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-                lineNumber: 449,
+                lineNumber: 461,
                 columnNumber: 9
             }, this) : null
         ]
     }, void 0, true, {
         fileName: "[project]/components/project/questions/ProjectScheduleQuestion.tsx",
-        lineNumber: 235,
+        lineNumber: 238,
         columnNumber: 5
     }, this);
 }

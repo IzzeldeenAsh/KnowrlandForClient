@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { getProjectApiErrorMessage } from '@/components/project/projectApiError'
@@ -12,6 +12,7 @@ import { isSpecifiedInsighterProject } from '@/components/project/specifiedInsig
 import { useProjectStepErrorToast } from '@/components/project/useProjectStepErrorToast'
 import { projectWizardStepIds } from '../projectWizardFlow'
 import InlineDateCalendar from './InlineDateCalendar'
+import timerStyles from './OfferTimerCard.module.css'
 import ProjectSelectedTypeHeader from '../ProjectSelectedTypeHeader'
 import { useProjectWizardNavigation } from '../useProjectWizardNavigation'
 import { projectWizardStorage, type WizardLocale } from '../wizardStorage'
@@ -62,13 +63,33 @@ function clampIsoDate(value: string, min: string, max: string): string {
   return value
 }
 
-function formatIsoDate(value: string, locale: WizardLocale): string {
+function formatIsoDate(value: string, locale: WizardLocale, englishLocale = 'en-GB'): string {
   const [year, month, day] = value.split('-').map(Number)
   if (!year || !month || !day) return value
   return new Date(year, month - 1, day).toLocaleDateString(
-    locale === 'ar' ? 'ar-u-nu-latn' : 'en-GB',
+    locale === 'ar' ? 'ar-u-nu-latn' : englishLocale,
     { day: 'numeric', month: 'short', year: 'numeric' }
   )
+}
+
+/**
+ * Countdown shown in the offer timer ring, matching the Angular dashboard card:
+ * whole days while more than one is left, then hours until the end of the picked day.
+ */
+function offerTimerCountdown(
+  value: string,
+  today: string,
+  isRTL: boolean
+): { value: string; unit: string } {
+  const days = Math.max(0, Math.round((Date.parse(value) - Date.parse(today)) / 86400000))
+  if (days > 1) {
+    return { value: `${days}`, unit: isRTL ? 'أيام متبقية' : 'days left' }
+  }
+
+  const [year, month, day] = value.split('-').map(Number)
+  const endOfDay = new Date(year, month - 1, day + 1).getTime()
+  const hours = Math.max(1, Math.ceil((endOfDay - Date.now()) / 3600000))
+  return { value: `${hours}`, unit: isRTL ? 'ساعات متبقية' : 'hours left' }
 }
 
 export default function DeadlineOfferQuestion({
@@ -245,6 +266,7 @@ export default function DeadlineOfferQuestion({
             : 'Choose a date within the project dates.'
           : null
   const visibleError = (keepsCurrentDeadline ? null : validationError) || error
+  const offerTimer = offerTimerCountdown(dateValue, today, isRTL)
 
   return (
     <div
@@ -350,19 +372,24 @@ export default function DeadlineOfferQuestion({
             ) : null}
           </div>
           {dateValue && !isInvalidDate && (
-            <aside className="w-full sm:w-64 rounded-2xl border border-emerald-200 bg-emerald-50 p-5" aria-live="polite">
-              <div className="flex items-center gap-4">
-                <div className="flex h-20 w-20 shrink-0 flex-col items-center justify-center rounded-full border-[5px] border-emerald-600 bg-white text-emerald-900">
-                  <strong className="text-2xl">{Math.max(0, Math.round((Date.parse(dateValue) - Date.parse(today)) / 86400000))}</strong>
-                  <span className="text-[10px] font-bold uppercase">{isRTL ? 'أيام متبقية' : 'Days left'}</span>
+            <aside
+              className={`${timerStyles.timer} ${timerStyles.healthy} w-full sm:w-80`}
+              style={{ '--timer-progress': '100%' } as CSSProperties}
+              aria-live="polite"
+            >
+              <div
+                className={timerStyles.ring}
+                aria-label={isRTL ? 'الوقت المتبقي حتى انتهاء العرض' : 'Time remaining until offer deadline'}
+              >
+                <div className={timerStyles.core}>
+                  <strong>{offerTimer.value}</strong>
+                  <span>{offerTimer.unit}</span>
                 </div>
-                <div><p className="text-xs font-semibold text-emerald-800">{isRTL ? 'موعد انتهاء العرض' : 'Offer deadline'}</p><strong className="text-sm text-slate-900">{formatIsoDate(dateValue, locale)}</strong></div>
               </div>
-              <p className="mt-4 text-sm font-medium text-emerald-900">
-                {isRTL
-                  ? `أكّد موعد انتهاء العرض: ${formatIsoDate(dateValue, locale)}.`
-                  : `Confirm the offer deadline: ${formatIsoDate(dateValue, locale)}.`}
-              </p>
+              <div className={timerStyles.copy}>
+                <span className={timerStyles.label}>{isRTL ? 'مهلة العرض' : 'Offer timeout'}</span>
+                <strong>{formatIsoDate(dateValue, locale, 'en-US')}</strong>
+              </div>
             </aside>
           )}
           </div>

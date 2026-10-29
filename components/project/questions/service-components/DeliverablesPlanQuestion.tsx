@@ -739,7 +739,7 @@ export default function DeliverablesPlanQuestion({
           id="deliverables-plan-question-title"
           className="text-2xl sm:text-3xl font-medium tracking-tight text-slate-900"
         >
-          {isRTL ? "ما المخرجات التي ستستلمها؟" : "What will you receive?"}
+          {isRTL ? "مخرجات المشروع" : "Project deliverables"}
         </h2>
         <p className="mt-2 text-sm sm:text-base font-semibold text-slate-600">
           {isRTL

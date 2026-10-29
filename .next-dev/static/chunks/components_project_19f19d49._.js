@@ -3825,6 +3825,7 @@ async function submitProjectProposal(locale) {
     const proposalMatchUuid = (0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$projectProposalMatchUuid$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["readStoredProposalMatchUuid"])(locale);
     if (!proposalMatchUuid) throw new Error('no_match_request_uuid');
     const deadlineOffer = formatProposalDeadlineOffer(readStorageValue(locale, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$wizardStorage$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["projectWizardStorage"].deadlineOfferKey(locale)));
+    if (!deadlineOffer) throw new Error('no_deadline_offer');
     const isSpecific = (0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$specifiedInsighterProject$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["isSpecifiedInsighterProject"])(locale);
     const matches = isSpecific ? [] : readStoredSelectedMatchIds(locale);
     if (!isSpecific && matches.length === 0) throw new Error('no_matches');
