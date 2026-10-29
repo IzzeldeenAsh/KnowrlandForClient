@@ -866,7 +866,8 @@ export default function Header() {
                 {isFeedPage && (
                   <li className="mx-1 md:mx-2 hidden xl:block">
                     <Link
-                      href={`/${currentLocale}/project`}
+                      href={`/${currentLocale}/project/wizard/project-type?fresh=1`}
+                      prefetch={false}
                       className="inline-flex items-center gap-1.5 font-medium text-sm leading-none text-white px-2 md:px-3 py-[7.75px] rounded-md bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 ease-in-out whitespace-nowrap"
                     >
                       <IconBriefcase size={16} stroke={2} aria-hidden />

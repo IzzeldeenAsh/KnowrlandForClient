@@ -102,7 +102,7 @@ export default function FeedMobileSearch({ locale }: { locale: string }) {
           <FeedSearchScopeToggle locale={locale} active={searchInsights} onChange={handleSearchInsightsChange} />
         </div>
       </div>
-      <Link href={`/${locale}/project`} className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 px-3 py-3 text-sm font-medium text-white transition-all duration-300 ease-in-out hover:from-blue-600 hover:to-cyan-600">
+      <Link href={`/${locale}/project/wizard/project-type?fresh=1`} prefetch={false} className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 px-3 py-3 text-sm font-medium text-white transition-all duration-300 ease-in-out hover:from-blue-600 hover:to-cyan-600">
         <IconBriefcase size={16} stroke={2} aria-hidden />
         {isRTL ? 'طلب خدمة' : 'Request Service'}
       </Link>

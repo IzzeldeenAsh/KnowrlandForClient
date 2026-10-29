@@ -45,6 +45,14 @@ export default function middleware(request: NextRequest) {
     const target = request.nextUrl.clone(); target.hostname = target.hostname.slice(4);
     return NextResponse.redirect(target, 308);
   }
+  // Require sign-in before starting a service request, then return to step one.
+  if (/^\/(en|ar)\/project\/wizard\/project-type\/?$/.test(pathname) && !request.cookies.get('token')?.value) {
+    const target = new URL(`/${locale}/signin`, request.url);
+    target.searchParams.set('returnUrl', `${pathname}${request.nextUrl.search}`);
+    const response = NextResponse.redirect(target, 307);
+    response.headers.set('Cache-Control', 'no-store');
+    return response;
+  }
   // Resolve the dashboard index here rather than via `redirect()` in the page.
   // A server redirect is delivered to the client router as a NEXT_REDIRECT row
   // inside the Flight payload, which has to be unwound mid-navigation. If that
