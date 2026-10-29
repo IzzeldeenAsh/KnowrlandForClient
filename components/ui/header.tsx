@@ -861,10 +861,10 @@ export default function Header() {
                   </Link>
                 </li>
 
-                {/* Request Service - feed page on wide screens (smaller screens have it beside the feed search).
+                {/* Request Service - feed page on tablet and up (phones get the promo card above the feed).
                     Styled like "Become an Insighter"; briefcase is the app's Request Service icon. */}
                 {isFeedPage && (
-                  <li className="mx-1 md:mx-2 hidden xl:block">
+                  <li className="mx-1 md:mx-2 hidden md:block">
                     <Link
                       href={`/${currentLocale}/project/wizard/project-type?fresh=1`}
                       prefetch={false}
